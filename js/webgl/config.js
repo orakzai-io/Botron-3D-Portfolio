@@ -33,3 +33,9 @@ export const GAZE_TARGETS = {
   testimonials: ".nx-beat-copy",
   contact: ".nx-beat-copy",
 };
+
+// Extra yaw bias per beat (gaze units). Positive = head turns further
+// screen-right, negative = further left. 0 / missing = current behavior.
+export const GAZE_YAW_BIAS = {
+  contact: 0.15,
+};

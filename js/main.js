@@ -129,7 +129,9 @@ function updateBotronBubble() {
   }
 
   // Position bubble: default to LEFT of head with tail pointing right -> bot
-  const gap = 16; // px gap between bubble and head
+  // Bubble gap (px) from the projected head CENTER; contact needs more to clear the head.
+  const GAP_BY_SECTION = { contact: 90 };
+  const gap = GAP_BY_SECTION[getCurrentSectionId()] ?? 16;
   let x = screenX - _bubbleW - gap;
   let isTailRight = true;
 

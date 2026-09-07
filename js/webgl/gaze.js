@@ -3,7 +3,7 @@
 // Projects the robot's world position to NDC, then steers a smoothed yaw/pitch
 // toward the active section's card. robot.js reads state.yaw / state.pitch.
 import * as THREE from "three";
-import { GAZE_TARGETS } from "./config.js";
+import { GAZE_TARGETS, GAZE_YAW_BIAS } from "./config.js";
 
 const _WB = new THREE.Vector3();
 
@@ -42,7 +42,7 @@ export function createGaze({ camera, beats, getRobot, getGazeBeatIndex, getBotVi
     const cy = -(rect.top + rect.height * 0.5) / window.innerHeight * 2 + 1;
 
     // The bot turns toward the card by their on-screen offset.
-    const yawT = THREE.MathUtils.clamp((cx - botNX) * 1.3, -1.25, 1.25);
+    const yawT = THREE.MathUtils.clamp((cx - botNX) * 1.3 + (GAZE_YAW_BIAS[beat.el.id] ?? 0), -1.25, 1.25);
     state.yaw += (yawT - state.yaw) * 0.1;
 
     const pitchT = THREE.MathUtils.clamp((cy - botNY) * 0.8, -0.5, 0.5);
