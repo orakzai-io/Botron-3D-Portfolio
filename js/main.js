@@ -8,7 +8,7 @@ import { createGaze } from "./webgl/gaze.js";
 import { createRobot } from "./webgl/robot.js";
 import { createTelemetry } from "./webgl/telemetry.js";
 import { createDebugOverlay } from "./webgl/debug-camera.js"; // <--- NEW
-import { NEXBOT_GLB_B64 } from "./data/nexbot-model.js";
+import nexbotModelUrl from "./data/nexbot.glb?url";
 import { TARGET_FPS } from "./webgl/config.js";
 
 const container = document.getElementById("stage-container");
@@ -37,7 +37,7 @@ const gaze = createGaze({
 const robot = createRobot({
   scene,
   renderer,
-  modelB64: NEXBOT_GLB_B64,
+  modelUrl: nexbotModelUrl,
   mouse,
   gazeState: gaze.state,
   storyState: story.state,

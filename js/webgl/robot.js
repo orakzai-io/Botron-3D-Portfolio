@@ -2,14 +2,7 @@
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 
-function base64ToArrayBuffer(b64) {
-  const binary = atob(b64);
-  const bytes = new Uint8Array(binary.length);
-  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
-  return bytes.buffer;
-}
-
-export function createRobot({ scene, renderer, modelB64, mouse, gazeState, storyState, env }) {
+export function createRobot({ scene, renderer, modelUrl, mouse, gazeState, storyState, env }) {
   let robotModel = null;
   let headBone = null;
   let initialBaseX = 58;
@@ -215,10 +208,12 @@ export function createRobot({ scene, renderer, modelB64, mouse, gazeState, story
   }
 
   // --- Model load ---
+  // The .glb is fetched as a content-hashed asset (Vite `?url` import) instead
+  // of being base64-embedded in the JS bundle — keeps the bundle small and the
+  // model cached independently of code changes.
   const loader = new GLTFLoader();
-  loader.parse(
-    base64ToArrayBuffer(modelB64),
-    "",
+  loader.load(
+    modelUrl,
     (gltf) => {
       const model = gltf.scene;
       robotModel = model;
@@ -250,7 +245,7 @@ export function createRobot({ scene, renderer, modelB64, mouse, gazeState, story
       findHandNodes();
     },
     (err) => {
-      console.error("Model parse failed:", err.message || err);
+      console.error("Model load failed (robot will not spawn):", err.message || err);
     }
   );
 
