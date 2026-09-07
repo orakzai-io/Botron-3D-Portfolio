@@ -1,0 +1,3 @@
+tf '=====PROJECTS=====
+' && sed -n '640,748p' /mnt/c/Users/shahs/project/modern-portfolio/index.html
+

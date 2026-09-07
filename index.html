@@ -1,0 +1,1378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shahsawar Orakzai (Shaso) — Full-Stack AI Engineer | orakzai.io</title>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Orbitron:wght@600;800;900&display=swap');
+
+      :root {
+        --bg-color: #030305;
+        --primary-cyan: #00f0ff;
+        --primary-glow: rgba(0, 240, 255, 0.4);
+        --accent-blue: #3b82f6;
+        --text-main: #f8fafc;
+        --text-muted: #94a3b8;
+        --glass-bg: rgba(10, 15, 30, 0.75);
+        --glass-border: rgba(0, 240, 255, 0.25);
+        --card-glow: 0 8px 32px 0 rgba(0, 240, 255, 0.15);
+        --font-heading: 'Orbitron', sans-serif;
+        --font-body: 'Inter', sans-serif;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html, body {
+        width: 100%;
+        min-height: 100vh;
+        background: #030305;
+        color: var(--text-main);
+        font-family: var(--font-body);
+        overflow-x: hidden;
+        scroll-behavior: smooth;
+      }
+
+      /* Fixed 3D Canvas Stage Background */
+      .stage-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: 1;
+        pointer-events: none;
+      }
+
+      .stage-container canvas {
+        width: 100% !important;
+        height: 100% !important;
+        display: block;
+        pointer-events: auto;
+      }
+
+      /* UI Overlay Layer */
+      .ui-overlay {
+        position: relative;
+        z-index: 10;
+        width: 100%;
+        pointer-events: none;
+      }
+
+      .navbar, .hero-content, .section-card, a, button {
+        pointer-events: auto;
+      }
+
+      /* Navbar (Initially hidden until intro finishes, then slides down) */
+      .navbar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.25rem 3rem;
+        background: rgba(3, 3, 5, 0.85);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border-bottom: 1px solid var(--glass-border);
+        z-index: 100;
+        transform: translateY(-100%);
+        opacity: 0;
+        transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.8s ease;
+      }
+
+      .intro-complete .navbar {
+        transform: translateY(0);
+        opacity: 1;
+      }
+
+      .nav-brand {
+        font-family: var(--font-heading);
+        font-size: 1.4rem;
+        font-weight: 800;
+        letter-spacing: 1.5px;
+        color: #fff;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .brand-dot {
+        width: 10px;
+        height: 10px;
+        background-color: var(--primary-cyan);
+        border-radius: 50%;
+        box-shadow: 0 0 10px var(--primary-cyan);
+      }
+
+      .status-pill {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.35rem 0.85rem;
+        border-radius: 999px;
+        background: rgba(0, 240, 255, 0.1);
+        border: 1px solid var(--glass-border);
+        font-size: 0.75rem;
+        font-family: var(--font-heading);
+        letter-spacing: 1px;
+        color: var(--primary-cyan);
+      }
+
+      .status-dot {
+        width: 6px;
+        height: 6px;
+        background-color: #10b981;
+        border-radius: 50%;
+        box-shadow: 0 0 8px #10b981;
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.4; }
+      }
+
+      .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+        list-style: none;
+      }
+
+      .nav-link {
+        color: var(--text-muted);
+        text-decoration: none;
+        font-size: 0.9rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        letter-spacing: 0.5px;
+      }
+
+      .nav-link:hover {
+        color: var(--primary-cyan);
+        text-shadow: 0 0 8px var(--primary-glow);
+      }
+
+      /* Hero Section (3-Column Command Center Layout) */
+      .hero-section {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 6rem 2rem 2rem;
+      }
+
+      .hero-split-container {
+        width: 100%;
+        max-width: 1350px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: 1fr 340px 320px;
+        gap: 2rem;
+        align-items: center;
+      }
+
+      @media (max-width: 1100px) {
+        .hero-split-container {
+          grid-template-columns: 1fr 280px;
+        }
+        .hero-right {
+          display: none;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .hero-split-container {
+          grid-template-columns: 1fr;
+          text-align: center;
+        }
+        .hero-actions {
+          justify-content: center;
+        }
+      }
+
+      /* Hero Left (Main Headline + CTA) */
+      .hero-left {
+        text-align: left;
+        transform: translateX(-60px);
+        opacity: 0;
+        transition: transform 1s cubic-bezier(0.16, 1, 0.3, 1) 0.2s, opacity 1s ease 0.2s;
+      }
+
+      .intro-complete .hero-left {
+        transform: translateX(0);
+        opacity: 1;
+      }
+
+      .hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.4rem 1.2rem;
+        border-radius: 999px;
+        background: var(--glass-bg);
+        border: 1px solid var(--glass-border);
+        backdrop-filter: blur(12px);
+        font-size: 0.78rem;
+        font-family: var(--font-heading);
+        letter-spacing: 1.5px;
+        color: var(--primary-cyan);
+        margin-bottom: 1.25rem;
+        box-shadow: var(--card-glow);
+      }
+
+      .hero-title {
+        font-family: var(--font-heading);
+        font-size: clamp(2rem, 3.8vw, 3.6rem);
+        font-weight: 900;
+        line-height: 1.15;
+        letter-spacing: -1px;
+        margin-bottom: 1.25rem;
+        background: linear-gradient(135deg, #ffffff 30%, var(--primary-cyan) 70%, var(--accent-blue) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-shadow: 0 0 30px rgba(0, 240, 255, 0.25);
+      }
+
+      .hero-subtitle {
+        font-size: clamp(0.95rem, 1.4vw, 1.15rem);
+        color: var(--text-muted);
+        line-height: 1.6;
+        margin-bottom: 2.2rem;
+        max-width: 580px;
+      }
+
+      .hero-actions {
+        display: flex;
+        gap: 1.25rem;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+
+      /* Hero Center (Spotlight Space for NEXBOT) */
+      .hero-center-spotlight {
+        min-height: 400px;
+      }
+
+      /* Hero Right (Telemetry HUD Card) */
+      .hero-right {
+        transform: translateX(60px);
+        opacity: 0;
+        transition: transform 1s cubic-bezier(0.16, 1, 0.3, 1) 0.4s, opacity 1s ease 0.4s;
+      }
+
+      .intro-complete .hero-right {
+        transform: translateX(0);
+        opacity: 1;
+      }
+
+      .hud-card {
+        background: var(--glass-bg);
+        border: 1px solid var(--glass-border);
+        border-radius: 20px;
+        padding: 1.75rem;
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        box-shadow: var(--card-glow);
+      }
+
+      .hud-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-bottom: 0.85rem;
+        margin-bottom: 1rem;
+        border-bottom: 1px solid var(--glass-border);
+      }
+
+      .hud-title {
+        font-family: var(--font-heading);
+        font-size: 0.82rem;
+        letter-spacing: 1.5px;
+        color: #fff;
+      }
+
+      .hud-tag {
+        font-family: var(--font-heading);
+        font-size: 0.65rem;
+        padding: 0.2rem 0.5rem;
+        border-radius: 4px;
+        background: rgba(0, 240, 255, 0.15);
+        color: var(--primary-cyan);
+        border: 1px solid var(--glass-border);
+      }
+
+      .hud-metric {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.85rem;
+      }
+
+      .metric-label {
+        color: var(--text-muted);
+        font-size: 0.72rem;
+        font-family: var(--font-heading);
+        letter-spacing: 0.5px;
+      }
+
+      .metric-val {
+        color: var(--primary-cyan);
+        font-size: 0.78rem;
+        font-weight: 600;
+        font-family: var(--font-heading);
+      }
+
+      .btn-primary {
+        padding: 0.9rem 2.2rem;
+        border-radius: 12px;
+        background: linear-gradient(135deg, var(--primary-cyan), var(--accent-blue));
+        color: #030305;
+        font-family: var(--font-heading);
+        font-size: 0.85rem;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-decoration: none;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 0 20px rgba(0, 240, 255, 0.35);
+        border: none;
+        cursor: pointer;
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 0 30px rgba(0, 240, 255, 0.6);
+      }
+
+      .btn-secondary {
+        padding: 0.9rem 2.2rem;
+        border-radius: 12px;
+        background: var(--glass-bg);
+        color: #fff;
+        font-family: var(--font-heading);
+        font-size: 0.85rem;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-decoration: none;
+        border: 1px solid var(--glass-border);
+        backdrop-filter: blur(12px);
+        transition: all 0.3s ease;
+        cursor: pointer;
+      }
+
+      .btn-secondary:hover {
+        border-color: var(--primary-cyan);
+        box-shadow: 0 0 15px var(--primary-glow);
+        color: var(--primary-cyan);
+      }
+
+      /* Sections */
+      .content-section {
+        min-height: 100vh;
+        padding: 6rem 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .section-card {
+        width: 100%;
+        max-width: 1050px;
+        background: var(--glass-bg);
+        border: 1px solid var(--glass-border);
+        border-radius: 24px;
+        padding: 3rem;
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        box-shadow: var(--card-glow);
+      }
+
+      .section-title {
+        font-family: var(--font-heading);
+        font-size: 2rem;
+        font-weight: 800;
+        letter-spacing: 1px;
+        color: #fff;
+        margin-bottom: 2rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+
+      .section-title::before {
+        content: '';
+        width: 4px;
+        height: 28px;
+        background: var(--primary-cyan);
+        border-radius: 2px;
+        box-shadow: 0 0 10px var(--primary-cyan);
+      }
+
+      /* === EXPERIENCE CARD WIDTH — critical, inlined so a cached nexus.css can never shrink these === */
+      @media (min-width: 901px) {
+        #experience .nx-beat-grid { grid-template-columns: 1fr !important; width: min(1400px, 94vw) !important; max-width: 1400px !important; }
+        #experience .nx-timeline { width: 100% !important; max-width: 100% !important; }
+        .nx-timeline-card { width: calc(50% - 60px) !important; }
+      }
+
+      /* === SKILLS SECTION: 3D GLOBE & TELEMETRY HUD (Inlined to prevent cache issues) === */
+      .nx-skills-grid {
+        display: grid !important;
+        grid-template-columns: minmax(0, 520px) 1fr !important;
+        gap: clamp(1.5rem, 5vw, 4.5rem) !important;
+        align-items: center !important;
+        width: min(1280px, 92vw) !important;
+        margin: 0 auto !important;
+      }
+
+      .nx-filter-bar {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        gap: 0.5rem !important;
+        margin-top: 1.4rem !important;
+        margin-bottom: 1.6rem !important;
+        pointer-events: auto !important;
+      }
+
+      .nx-filter-pill {
+        font-family: var(--font-ui, 'Inter', sans-serif) !important;
+        font-size: 0.72rem !important;
+        font-weight: 600 !important;
+        letter-spacing: 0.08em !important;
+        padding: 0.45rem 0.9rem !important;
+        border-radius: 6px !important;
+        border: 1px solid rgba(255, 255, 255, 0.12) !important;
+        background: rgba(10, 15, 26, 0.75) !important;
+        backdrop-filter: blur(8px) !important;
+        color: #94a3b8 !important;
+        cursor: pointer !important;
+        transition: all 0.25s ease !important;
+        user-select: none !important;
+      }
+
+      .nx-filter-pill:hover {
+        color: #ffffff !important;
+        border-color: rgba(0, 240, 255, 0.5) !important;
+        background: rgba(15, 23, 42, 0.9) !important;
+        transform: translateY(-1px) !important;
+      }
+
+      .nx-filter-pill.active {
+        color: #00f0ff !important;
+        border-color: #00f0ff !important;
+        background: rgba(0, 240, 255, 0.14) !important;
+        box-shadow: 0 0 16px rgba(0, 240, 255, 0.25) !important;
+      }
+
+      /* Telemetry HUD Card */
+      .nx-telemetry-hud {
+        padding: 1.3rem 1.5rem !important;
+        border-radius: 12px !important;
+        border: 1px solid rgba(0, 240, 255, 0.25) !important;
+        background: linear-gradient(135deg, rgba(12, 18, 32, 0.85), rgba(6, 10, 20, 0.95)) !important;
+        backdrop-filter: blur(14px) !important;
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(0, 240, 255, 0.05) !important;
+        pointer-events: auto !important;
+        position: relative !important;
+        overflow: hidden !important;
+      }
+
+      .nx-telemetry-hud::before {
+        content: "" !important;
+        position: absolute !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 4px !important;
+        height: 100% !important;
+        background: #00f0ff !important;
+        box-shadow: 0 0 12px #00f0ff !important;
+      }
+
+      .nx-telemetry-header {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        margin-bottom: 0.65rem !important;
+      }
+
+      .nx-telemetry-badge {
+        display: flex !important;
+        align-items: center !important;
+        gap: 0.5rem !important;
+      }
+
+      .nx-telemetry-icon {
+        font-size: 1rem !important;
+      }
+
+      .nx-telemetry-cat {
+        font-family: var(--font-ui, 'Inter', sans-serif) !important;
+        font-size: 0.65rem !important;
+        font-weight: 700 !important;
+        letter-spacing: 0.14em !important;
+        padding: 0.2rem 0.55rem !important;
+        border-radius: 4px !important;
+        border: 1px solid rgba(0, 240, 255, 0.3) !important;
+        color: #00f0ff !important;
+        background: rgba(0, 240, 255, 0.08) !important;
+      }
+
+      .nx-telemetry-status {
+        display: flex !important;
+        align-items: center !important;
+        gap: 0.45rem !important;
+      }
+
+      .nx-telemetry-dot {
+        width: 7px !important;
+        height: 7px !important;
+        border-radius: 50% !important;
+        background: #00f0ff !important;
+        box-shadow: 0 0 8px #00f0ff !important;
+      }
+
+      .nx-telemetry-level {
+        font-family: var(--font-ui, 'Inter', sans-serif) !important;
+        font-size: 0.9rem !important;
+        font-weight: 700 !important;
+        color: #f8fafc !important;
+      }
+
+      .nx-telemetry-title {
+        font-family: var(--font-heading, 'Orbitron', sans-serif) !important;
+        font-size: 1.25rem !important;
+        font-weight: 700 !important;
+        letter-spacing: 0.04em !important;
+        color: #ffffff !important;
+        margin-bottom: 0.4rem !important;
+      }
+
+      .nx-telemetry-desc {
+        font-size: 0.85rem !important;
+        line-height: 1.5 !important;
+        color: #94a3b8 !important;
+        margin-bottom: 1rem !important;
+        min-height: 2.5em !important;
+      }
+
+      .nx-telemetry-meter {
+        width: 100% !important;
+        height: 6px !important;
+        background: rgba(255, 255, 255, 0.08) !important;
+        border-radius: 3px !important;
+        overflow: hidden !important;
+      }
+
+      .nx-telemetry-fill {
+        height: 100% !important;
+        background: #00f0ff !important;
+        border-radius: 3px !important;
+        box-shadow: 0 0 10px rgba(0, 240, 255, 0.6) !important;
+        transition: width 0.4s ease, background-color 0.4s ease !important;
+      }
+
+      .nx-telemetry-hint {
+        font-family: var(--font-ui, 'Inter', sans-serif) !important;
+        font-size: 0.6rem !important;
+        letter-spacing: 0.16em !important;
+        color: #64748b !important;
+        margin-top: 0.75rem !important;
+        text-align: right !important;
+      }
+
+      /* 3D Skills Stage */
+      .nx-skills-stage {
+        position: relative !important;
+        width: 100% !important;
+        max-width: 500px !important;
+        aspect-ratio: 1 / 1 !important;
+        justify-self: center !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        pointer-events: auto !important;
+      }
+
+      .nx-skills-stage canvas {
+        width: 100% !important;
+        height: 100% !important;
+        display: block !important;
+        touch-action: none !important;
+      }
+
+      .nx-globe-reticle {
+        position: absolute !important;
+        top: 6px !important;
+        left: 10px !important;
+        right: 10px !important;
+        display: flex !important;
+        justify-content: space-between !important;
+        font-family: var(--font-ui, 'Inter', sans-serif) !important;
+        font-size: 0.6rem !important;
+        letter-spacing: 0.14em !important;
+        color: #64748b !important;
+        pointer-events: none !important;
+        opacity: 0.8 !important;
+      }
+
+      .nx-globe-drag-hint {
+        position: absolute !important;
+        bottom: 8px !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        font-family: var(--font-ui, 'Inter', sans-serif) !important;
+        font-size: 0.62rem !important;
+        letter-spacing: 0.16em !important;
+        color: #94a3b8 !important;
+        pointer-events: none !important;
+        white-space: nowrap !important;
+        opacity: 0.8 !important;
+        background: rgba(4, 7, 14, 0.75) !important;
+        padding: 0.25rem 0.75rem !important;
+        border-radius: 4px !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+      }
+
+      /* === CONTACT SECTION: UNIFIED CONSOLE & ROBOT STAGE (OPTION 1) === */
+      .nx-contact-grid {
+        width: min(1280px, 92vw) !important;
+        margin: 0 auto !important;
+        display: grid !important;
+        grid-template-columns: minmax(0, 560px) 1fr !important;
+        gap: clamp(2rem, 5vw, 5rem) !important;
+        align-items: center !important;
+      }
+
+      .nx-contact-console {
+        max-width: 560px !important;
+        width: 100% !important;
+        pointer-events: auto !important;
+        z-index: 3 !important;
+      }
+
+      .nx-contact-info {
+        display: grid !important;
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 0.65rem !important;
+        margin-top: 1.2rem !important;
+        margin-bottom: 1.4rem !important;
+      }
+
+      .nx-contact-info .nx-mini {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 0.35rem !important;
+        padding: 0.85rem 0.95rem !important;
+        border: 1px solid var(--line-2, rgba(255, 255, 255, 0.1)) !important;
+        border-radius: 10px !important;
+        background: rgba(10, 15, 28, 0.75) !important;
+        backdrop-filter: blur(12px) !important;
+        text-decoration: none !important;
+        color: inherit !important;
+        transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1) !important;
+        cursor: pointer !important;
+      }
+
+      .nx-contact-info .nx-mini:hover {
+        border-color: var(--primary-cyan, #00f0ff) !important;
+        background: rgba(15, 23, 42, 0.95) !important;
+        transform: translateY(-3px) !important;
+        box-shadow: 0 6px 20px rgba(0, 240, 255, 0.16) !important;
+      }
+
+      .nx-contact-info .nx-mini span {
+        font-family: var(--font-ui, 'Inter', sans-serif) !important;
+        font-size: 0.65rem !important;
+        font-weight: 700 !important;
+        letter-spacing: 0.08em !important;
+        color: var(--primary-cyan, #00f0ff) !important;
+        width: fit-content !important;
+        padding: 0.15rem 0.45rem !important;
+        background: rgba(0, 240, 255, 0.08) !important;
+        border: 1px solid rgba(0, 240, 255, 0.25) !important;
+        border-radius: 4px !important;
+      }
+
+      .nx-contact-info .nx-mini b {
+        font-family: var(--font-heading, 'Orbitron', sans-serif) !important;
+        font-weight: 600 !important;
+        font-size: 0.72rem !important;
+        letter-spacing: 0.1em !important;
+        color: var(--silver-2, #cbd5e1) !important;
+      }
+
+      .nx-contact-info .nx-mini i {
+        font-family: var(--font-body, 'Inter', sans-serif) !important;
+        font-size: 0.78rem !important;
+        font-style: normal !important;
+        color: var(--silver-4, #94a3b8) !important;
+        word-break: break-word !important;
+        line-height: 1.3 !important;
+        transition: color 0.3s ease !important;
+      }
+
+      .nx-contact-info .nx-mini:hover i {
+        color: #ffffff !important;
+      }
+
+      .nx-contact-stage {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        min-height: 520px !important;
+        position: relative !important;
+        pointer-events: none !important;
+      }
+
+      .nx-contact-stage .nx-bubble-station {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        gap: 1.2rem !important;
+        position: absolute !important;
+        top: 20% !important;
+      }
+
+      @media (max-width: 900px) {
+        .nx-skills-grid, .nx-contact-grid {
+          grid-template-columns: 1fr !important;
+        }
+        .nx-skills-stage {
+          max-width: min(90vw, 360px) !important;
+          margin: 1.5rem auto 0 !important;
+        }
+        .nx-contact-info {
+          grid-template-columns: 1fr !important;
+        }
+        .nx-contact-stage {
+          min-height: 320px !important;
+        }
+      /* === CYBER FOOTER === */
+      .nx-footer {
+        position: relative !important;
+        z-index: 10 !important;
+        width: 100% !important;
+        border-top: 1px solid var(--line-2, rgba(255, 255, 255, 0.12)) !important;
+        background: rgba(5, 7, 12, 0.88) !important;
+        backdrop-filter: blur(16px) !important;
+        padding: 2.2rem 0 calc(2.5rem + 35px) !important; /* bottom padding clears the fixed nx-strip */
+        pointer-events: auto !important;
+      }
+
+      .nx-footer-container {
+        width: min(1280px, 92vw) !important;
+        margin: 0 auto !important;
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        gap: 1.5rem !important;
+        flex-wrap: wrap !important;
+      }
+
+      .nx-footer-brand {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 0.35rem !important;
+      }
+
+      .nx-footer-logo {
+        font-family: var(--font-heading, 'Orbitron', sans-serif) !important;
+        font-size: 1rem !important;
+        font-weight: 700 !important;
+        letter-spacing: 0.18em !important;
+        color: var(--silver-1, #f8fafc) !important;
+      }
+
+      .nx-footer-logo span {
+        color: var(--primary-cyan, #00f0ff) !important;
+      }
+
+      .nx-footer-copy {
+        font-family: var(--font-ui, 'Inter', sans-serif) !important;
+        font-size: 0.72rem !important;
+        letter-spacing: 0.08em !important;
+        color: var(--silver-4, #94a3b8) !important;
+      }
+
+      .nx-footer-socials {
+        display: flex !important;
+        align-items: center !important;
+        gap: 12px !important;
+        flex-wrap: wrap !important;
+      }
+
+      .nx-social-link {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 40px !important;
+        height: 40px !important;
+        border-radius: 50% !important;
+        border: 2px solid var(--line-2, rgba(255, 255, 255, 0.15)) !important;
+        background: rgba(12, 17, 28, 0.6) !important;
+        color: var(--silver-3, #cbd5e1) !important;
+        font-size: 1.1rem !important;
+        text-decoration: none !important;
+        transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1) !important;
+        cursor: pointer !important;
+        padding: 0 !important;
+      }
+
+      .nx-social-link i {
+        font-size: 1.1rem !important;
+        line-height: 1 !important;
+        transition: transform 0.3s ease !important;
+      }
+
+      .nx-social-link svg {
+        width: 18px !important;
+        height: 18px !important;
+        transition: transform 0.3s ease !important;
+      }
+
+
+      .nx-social-link:hover {
+        color: var(--primary-cyan, #00f0ff) !important;
+        border-color: var(--primary-cyan, #00f0ff) !important;
+        background: rgba(0, 240, 255, 0.12) !important;
+        transform: translateY(-3px) !important;
+        box-shadow: 0 4px 16px rgba(0, 240, 255, 0.25) !important;
+      }
+
+      .nx-social-link:hover i,
+      .nx-social-link:hover svg {
+        transform: scale(1.15) !important;
+      }
+
+      @media (max-width: 768px) {
+        .nx-footer-container {
+          flex-direction: column !important;
+          align-items: center !important;
+          text-align: center !important;
+          gap: 1.2rem !important;
+        }
+        .nx-footer-socials {
+          justify-content: center !important;
+        }
+      }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="css/nexus.css">
+</head>
+<body>
+    <div class="nx-fx" aria-hidden="true"></div>
+    <div class="nx-boot" id="nx-boot" aria-hidden="true">
+        <p>&gt; nexus_bios v2.0 — booting</p>
+        <p>&gt; calibrate_eyes .......... OK</p>
+        <p>&gt; mount_arms ............. OK</p>
+        <p>&gt; handshake_with_human ..... <span class="nx-boot-caret">▊</span></p>
+    </div>
+    <div class="nx-cursor" id="nx-cursor" aria-hidden="true">
+        <span class="nx-cursor-ring"><i></i><i></i><i></i><i></i></span>
+        <span class="nx-cursor-dot"></span>
+    </div>
+
+    <!-- 3D Stage Container (Fixed 3D Canvas Stage) -->
+    <div class="stage-container" id="stage-container"></div>
+
+    <!-- UI Overlay Layer -->
+    <div class="ui-overlay">
+        <!-- BOTRON mouth-tracking speech bubble (JS drives its position) -->
+        <div class="nx-bubble nx-bubble--hero" id="botron-bubble" aria-live="polite">
+            <span class="nx-bubble-dot"></span>
+            <p>// I'M BOTRON &mdash; SHASO'S AI COPILOT. <span style="color:#5f6875">CHAT CORE OFFLINE</span></p>
+        </div>
+        <!-- Glassmorphic Navbar -->
+        <nav class="nx-nav">
+            <a href="#hero" class="nx-brand">
+                <span class="nx-cube" aria-hidden="true"><i></i><i></i><i></i></span>
+                <span class="nx-brand-name">ORAKZAI<span>.IO</span></span>
+            </a>
+                                                <ul class="nx-nav-links">
+                <li><a class="nx-nav-link" href="#hero" data-cursor="hover">HOME</a></li>
+                <li><a class="nx-nav-link" href="#about" data-cursor="hover">ABOUT</a></li>
+                <li><a class="nx-nav-link" href="#skills" data-cursor="hover">SKILLS</a></li>
+                <li><a class="nx-nav-link" href="#experience" data-cursor="hover">EXPERIENCE</a></li>
+                <li><a class="nx-nav-link" href="#projects" data-cursor="hover">WORK</a></li>
+                <li><a class="nx-nav-link" href="#education" data-cursor="hover">EDUCATION</a></li>
+                <li><a class="nx-nav-link" href="#testimonials" data-cursor="hover">TESTIMONIALS</a></li>
+                <li><a class="nx-nav-link" href="#contact" data-cursor="hover">CONTACT</a></li>
+            </ul>
+            <div class="nx-status"><span class="nx-status-dot"></span>SYSTEM ONLINE</div>
+            <span class="nx-hair" id="nx-hair" aria-hidden="true"></span>
+        </nav>
+
+        <!-- Hero Section -->
+        <section class="nx-hero" id="hero" data-beat="0">
+            <div class="nx-hero-grid">
+                <div class="nx-copy">
+                    <p class="nx-eyebrow nx-in">hello_world // orakzai.io &bull; aka "shaso"</p>
+                    <h1 class="nx-title nx-in">
+                        <span class="nx-title-line">SHAHSAWAR</span>
+                        <span class="nx-title-line nx-title-line--last">ORAKZAI<span class="nx-caret">▊</span></span>
+                    </h1>
+                    <p class="nx-role nx-in">AI ENGINEER · INTERACTIVE 3D · WEB SYSTEMS</p>
+                    <p class="nx-desc nx-in">Full-Stack AI Engineer &amp; CS student (4.0 CGPA) building sub-250ms RAG on pgvector, async pipelines over 50k+ records, and Docker/CI that ships in minutes. A decade as a National Swimmer &amp; Gold Medalist taught me discipline is non-negotiable — off the clock I coach 30+ swimmers and grind chess.</p>
+                    <div class="nx-actions nx-in">
+                        <a class="nx-btn" href="#contact">INITIATE CONTACT</a>
+                        <a class="nx-btn nx-btn--ghost" href="#" onclick="return false;">RESUME</a>
+                    </div>
+                    <p class="nx-scrollcue nx-in">SCROLL — BOTRON WILL GUIDE YOU<span class="nx-scroll-arrow">▾</span></p>
+                </div>
+                <div class="nx-stage" aria-hidden="true"></div>
+            </div>
+        </section>
+
+        <!-- About & Core Specs Section -->
+        <section class="nx-beat" id="about" data-beat="1">
+            <div class="nx-beat-grid">
+                <div class="nx-beat-copy nx-reveal">
+                    <p class="nx-kicker">01 — THE CREATOR</p>
+                    <h2 class="nx-beat-title">HUMAN, BEHIND THE MACHINE</h2>
+                    <p class="nx-beat-txt">I'm a Full-Stack AI Engineer and Computer Science student (4.0 CGPA) building systems that feel alive. Before code, I spent a decade on national swim teams as a Gold Medalist — a discipline I now pour into every system: sub-250ms RAG search on pgvector, and the Docker/CI pipelines that keep it online 24/7. When I'm not wiring backends, I coach 30+ swimmers at the KP Swimming Association and play chess by night.</p>
+                    <div class="nx-tags">
+                        <span class="nx-tag">WEBGL</span>
+                        <span class="nx-tag">AI PIPELINES</span>
+                        <span class="nx-tag">FULL-STACK</span>
+                        <span class="nx-tag">UX MOTION</span>
+                    </div>
+                </div>
+                <div class="nx-stage" aria-hidden="true"></div>
+            </div>
+        </section>
+
+        <section class="nx-beat nx-beat--skills" id="skills" data-beat="2">
+            <div class="nx-beat-grid nx-skills-grid">
+                <div class="nx-beat-copy nx-reveal">
+                    <p class="nx-kicker">02 — SYSTEM SPECIFICATIONS</p>
+                    <h2 class="nx-beat-title">SKILLS MATRIX</h2>
+                    
+                    <!-- Category Filter Tabs -->
+                    <div class="nx-filter-bar">
+                        <button type="button" class="nx-filter-pill active" data-category="all">ALL (25)</button>
+                        <button type="button" class="nx-filter-pill" data-category="ai">AI & LLM (9)</button>
+                        <button type="button" class="nx-filter-pill" data-category="backend">BACKEND (7)</button>
+                        <button type="button" class="nx-filter-pill" data-category="devops">DEVOPS (4)</button>
+                        <button type="button" class="nx-filter-pill" data-category="frontend">FRONTEND (5)</button>
+                        <button type="button" class="nx-filter-pill" data-category="tools">TOOLS (4)</button>
+                    </div>
+
+                    <!-- Live Skill Telemetry HUD Card -->
+                    <div class="nx-telemetry-hud" id="nx-telemetry-hud">
+                        <div class="nx-telemetry-header">
+                            <div class="nx-telemetry-badge">
+                                <span class="nx-telemetry-icon" id="nx-telemetry-icon">⚡</span>
+                                <span class="nx-telemetry-cat" id="nx-telemetry-cat">AI & LLM</span>
+                            </div>
+                            <div class="nx-telemetry-status">
+                                <span class="nx-telemetry-dot"></span>
+                                <span class="nx-telemetry-level" id="nx-telemetry-level">99%</span>
+                            </div>
+                        </div>
+                        <h3 class="nx-telemetry-title" id="nx-telemetry-name">OpenAI API</h3>
+                        <p class="nx-telemetry-desc" id="nx-telemetry-desc">GPT-4o/o1 reasoning, tool-calling pipelines & system guardrails</p>
+                        <div class="nx-telemetry-meter">
+                            <div class="nx-telemetry-fill" id="nx-telemetry-bar" style="width: 99%;"></div>
+                        </div>
+                        <div class="nx-telemetry-hint">HOVER OR DRAG 3D GLOBE TO INSPECT NODES</div>
+                    </div>
+                </div>
+
+                <!-- 3D Holographic Globe Stage -->
+                <div class="nx-skills-stage nx-reveal" id="skills-globe-container">
+                    <div class="nx-globe-reticle">
+                        <span class="nx-globe-tag">// 3D MATRIX HUD //</span>
+                        <span class="nx-globe-coords">LAT: 34.01° · LON: 71.52°</span>
+                    </div>
+                    <canvas id="skills-globe"></canvas>
+                    <div class="nx-globe-drag-hint">
+                        <span>‹ DRAG TO ROTATE · HOVER TO INSPECT ›</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+                <!-- Experience & Career Section -->
+        <section class="nx-beat nx-beat--dashboard" id="experience" data-beat="3">
+            <div class="nx-beat-grid">
+                <div class="nx-beat-copy nx-reveal">
+                    <p class="nx-kicker">03 — CAREER PATH</p>
+                    <h2 class="nx-beat-title">EXPERIENCE</h2>
+                    <p class="nx-beat-txt">Work that stuck. A chronological log of roles, problems owned, and impact measured.</p>
+                </div>
+                <div class="nx-timeline nx-reveal">
+                    <!-- Role 01 : Full-stack AI Engineer -->
+                    <div class="nx-timeline-item">
+                        <span class="nx-timeline-dot" aria-hidden="true"></span>
+                        <span class="nx-timeline-date">Present</span>
+                        <article class="nx-timeline-card">
+                            <span class="nx-card-status"><span class="nx-pulse-light"></span>SYS_LOG // ACTIVE</span>
+                            <h3 class="nx-role">Full-stack AI Engineer</h3>
+                            <h4 class="nx-org">Independent Freelancer · Remote</h4>
+                            <p class="nx-beat-txt">Delivered 5+ full-stack AI applications integrating LLMs and vector databases (pgvector/Qdrant), with 100% on-time completion. Built scalable FastAPI backends supporting sub-200ms average response times and zero-downtime production deployments.</p>
+                            <div class="nx-tags">
+                                <span class="nx-tag">LLMs</span>
+                                <span class="nx-tag">FastAPI</span>
+                                <span class="nx-tag">Docker</span>
+                            </div>
+                        </article>
+                    </div>
+                    <!-- Role 02 : Python Developer Intern -->
+                    <div class="nx-timeline-item">
+                        <span class="nx-timeline-dot" aria-hidden="true"></span>
+                        <span class="nx-timeline-date">Dec 2025 – Feb 2026</span>
+                        <article class="nx-timeline-card">
+                            <span class="nx-card-status"><span class="nx-pulse-light nx-pulse-light--dim"></span>SYS_LOG // COMPLETED</span>
+                            <h3 class="nx-role">Python Developer Intern</h3>
+                            <h4 class="nx-org">MINDGIGS · Peshawar, Pakistan</h4>
+                            <p class="nx-beat-txt">Engineered high-throughput REST APIs with FastAPI and asyncio, lifting throughput ~40% under strict Pydantic schema validation. Integrated local Intel Small LLMs and built Dockerized scraping pipelines processing 20k+ daily records.</p>
+                            <div class="nx-tags">
+                                <span class="nx-tag">FastAPI</span>
+                                <span class="nx-tag">Asyncio</span>
+                                <span class="nx-tag">Docker</span>
+                            </div>
+                        </article>
+                    </div>
+                    <!-- Role 03 : Swimming Coach & IT Manager -->
+                    <div class="nx-timeline-item">
+                        <span class="nx-timeline-dot" aria-hidden="true"></span>
+                        <span class="nx-timeline-date">Present (Seasonal)</span>
+                        <article class="nx-timeline-card">
+                            <span class="nx-card-status"><span class="nx-pulse-light"></span>SYS_LOG // SEASONAL</span>
+                            <h3 class="nx-role">Swimming Coach & IT Manager</h3>
+                            <h4 class="nx-org">KP Swimming Association · Peshawar, Pakistan</h4>
+                            <p class="nx-beat-txt">National swimmer for 10 years (10+ medals incl. gold at National Juniors). As IT manager, digitized records for 200+ athletes and automated admin workflows, cutting processing time 90%. Coached 30+ swimmers to regional podiums.</p>
+                            <div class="nx-tags">
+                                <span class="nx-tag">Leadership</span>
+                                <span class="nx-tag">Automations</span>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+                <!-- Projects Section -->
+        <section class="nx-beat nx-beat--dashboard" id="projects" data-beat="4">
+            <div class="nx-beat-grid">
+                <div class="nx-beat-copy nx-reveal">
+                    <p class="nx-kicker">04 — DEPLOYED MISSIONS</p>
+                    <h2 class="nx-beat-title">SELECTED WORK</h2>
+                    <p class="nx-beat-txt">A few things worth showing twice.</p>
+                </div>
+                <div class="nx-proj-grid nx-reveal">
+                    <!-- П.01 REDNOTE -->
+                    <article class="nx-proj nx-reveal">
+                        <div class="nx-proj-thumb">
+                            <img src="my_website/assets/rednote.png" alt="REDNOTE screenshot" loading="lazy">
+                            <div class="nx-proj-thumb-overlay">
+                                <div class="nx-proj-header">
+                                    <span class="nx-proj-mission">// MISSION: REDNOTE //</span>
+                                    <span class="nx-proj-status">[ONLINE]</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="nx-proj-body">
+                            <span class="nx-proj-idx">П.01</span>
+                            <div>
+                                <h3>REDNOTE</h3>
+                                <p class="nx-beat-txt">Full-stack RAG document assistant with pgvector semantic search — sub-250ms responses across 10k+ chunks. JWT auth + AI agents + Docker CI/CD (deploys in under 3 min).</p>
+                                <div class="nx-tags"><span class="nx-tag">Python</span><span class="nx-tag">FastAPI</span><span class="nx-tag">pgvector</span></div>
+                                <div class="nx-proj-cta">
+                                    <a class="nx-btn nx-btn--ghost" href="https://github.com/orakzai-io/Rednote.git" target="_blank" rel="noopener">CODE ↗</a>
+                                    <a class="nx-btn nx-btn--ghost" href="https://orakzai-io-rednote.hf.space" target="_blank" rel="noopener">LIVE ↗</a>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+                    <!-- П.02 ASYNC SCRAPER -->
+                    <article class="nx-proj nx-reveal">
+                        <div class="nx-proj-thumb">
+                            <img src="my_website/assets/scraper.png" alt="Async Web Scraper screenshot" loading="lazy">
+                            <div class="nx-proj-thumb-overlay">
+                                <div class="nx-proj-header">
+                                    <span class="nx-proj-mission">// MISSION: ASYNC_SCRAPER //</span>
+                                    <span class="nx-proj-status">[ONLINE]</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="nx-proj-body">
+                            <span class="nx-proj-idx">П.02</span>
+                            <div>
+                                <h3>ASYNC WEB SCRAPER</h3>
+                                <p class="nx-beat-txt">Async pipeline processing 50k+ web pages into PostgreSQL at 99.2% success, rate-limited via Groq LLM + n8n. TypeScript monitoring dashboard, 3s polling, 90% less manual verification.</p>
+                                <div class="nx-tags"><span class="nx-tag">Python</span><span class="nx-tag">n8n</span><span class="nx-tag">TypeScript</span></div>
+                                <div class="nx-proj-cta">
+                                    <a class="nx-btn nx-btn--ghost" href="https://github.com/orakzai-io/Async-Web-Scraper.git" target="_blank" rel="noopener">CODE ↗</a>
+                                    <a class="nx-btn nx-btn--ghost" href="https://orakzai-io-async-web-scraper.hf.space" target="_blank" rel="noopener">LIVE ↗</a>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+                    <!-- П.03 VAULTGUARD -->
+                    <article class="nx-proj nx-reveal">
+                        <div class="nx-proj-thumb">
+                            <img src="my_website/assets/password_manager.png" alt="VaultGuard screenshot" loading="lazy">
+                            <div class="nx-proj-thumb-overlay">
+                                <div class="nx-proj-header">
+                                    <span class="nx-proj-mission">// MISSION: VAULTGUARD //</span>
+                                    <span class="nx-proj-status">[STANDBY]</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="nx-proj-body">
+                            <span class="nx-proj-idx">П.03</span>
+                            <div>
+                                <h3>VAULTGUARD</h3>
+                                <p class="nx-beat-txt">PBKDF2 master-key + client-side AES-256 security platform. Zero-knowledge credential vaulting, sub-50ms encryption latency, PostgreSQL-backed.</p>
+                                <div class="nx-tags"><span class="nx-tag">Python</span><span class="nx-tag">AES-256</span><span class="nx-tag">Docker</span></div>
+                                <div class="nx-proj-cta">
+                                    <a class="nx-btn nx-btn--ghost" href="https://github.com/orakzai-io/Vault-Guard.git" target="_blank" rel="noopener">CODE ↗</a>
+                                    <a class="nx-btn nx-btn--ghost" href="https://youtu.be/-OcbtZTuibo?si=o0BBKnni7OCR09bJ" target="_blank" rel="noopener">VIDEO ↗</a>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+                    <!-- П.04 THIS PORTFOLIO -->
+                    <article class="nx-proj nx-reveal">
+                        <div class="nx-proj-thumb">
+                            <img src="my_website/assets/portfolio.png" alt="3D Portfolio screenshot" loading="lazy">
+                            <div class="nx-proj-thumb-overlay">
+                                <div class="nx-proj-header">
+                                    <span class="nx-proj-mission">// MISSION: PORTFOLIO_3D //</span>
+                                    <span class="nx-proj-status">[ACTIVE]</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="nx-proj-body">
+                            <span class="nx-proj-idx">П.04</span>
+                            <div>
+                                <h3>THIS PORTFOLIO</h3>
+                                <p class="nx-beat-txt">A living 3D WebGL portfolio — GLTF bot with procedural eyes, gaze tracking and a scroll-driven cinematic camera.</p>
+                                <div class="nx-tags"><span class="nx-tag">Three.js</span><span class="nx-tag">WebGL</span><span class="nx-tag">GSAP</span></div>
+                                <div class="nx-proj-cta">
+                                    <a class="nx-btn nx-btn--ghost" href="https://github.com/orakzai-io/Personal-Portfolio.git" target="_blank" rel="noopener">CODE ↗</a>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+                        <!-- Education & Certifications Section -->
+        <section class="nx-beat nx-beat--dashboard" id="education" data-beat="5">
+            <div class="nx-beat-grid">
+                <div class="nx-beat-copy nx-reveal">
+                    <p class="nx-kicker">05 — CREDENTIALS</p>
+                    <h2 class="nx-beat-title">EDUCATION / CERTIFICATION</h2>
+                    <p class="nx-beat-txt">The credentials behind the code.</p>
+                </div>
+                <div class="nx-edu-grid nx-reveal">
+                    <article class="nx-edu nx-reveal">
+                        <div class="nx-edu-header">
+                            <span class="nx-edu-type">[ ACADEMIC NODE ]</span>
+                            <span class="nx-edu-status">// VERIFIED</span>
+                        </div>
+                        <p class="nx-kicker nx-kicker--sm">BSCS</p>
+                        <h3>Bachelor of Science in Computer Science</h3>
+                        <h4 class="nx-edu-school">University of Agriculture, Peshawar</h4>
+                        <p class="nx-beat-txt">Oct 2024 – Oct 2028 (Expected) · CGPA 4.0</p>
+                        <p class="nx-beat-txt">Coursework: Programming Fundamentals, DSA, OOP, Database Systems.</p>
+                    </article>
+                    <article class="nx-edu nx-reveal">
+                        <div class="nx-edu-header">
+                            <span class="nx-edu-type">[ CREDENTIAL NODE ]</span>
+                            <span class="nx-edu-status">// SECURE_HASH</span>
+                        </div>
+                        <p class="nx-kicker nx-kicker--sm">CS50X</p>
+                        <h3>CS50X: Introduction to Computer Science</h3>
+                        <h4 class="nx-edu-school">Harvard University · Remote</h4>
+                        <p class="nx-beat-txt">Issued February 2026</p>
+                        <a class="nx-btn nx-btn--ghost nx-edu-verify" href="https://certificates.cs50.io/46d6924e-c5e2-49f5-8639-90d52ebb90d1.pdf" target="_blank" rel="noopener">VERIFY ↗</a>
+                    </article>
+                    <article class="nx-edu nx-reveal">
+                        <div class="nx-edu-header">
+                            <span class="nx-edu-type">[ CREDENTIAL NODE ]</span>
+                            <span class="nx-edu-status">// SECURE_HASH</span>
+                        </div>
+                        <p class="nx-kicker nx-kicker--sm">CS50P</p>
+                        <h3>CS50P: Introduction to Programming with Python</h3>
+                        <h4 class="nx-edu-school">Harvard University · Remote</h4>
+                        <p class="nx-beat-txt">Issued October 2025</p>
+                        <a class="nx-btn nx-btn--ghost nx-edu-verify" href="https://certificates.cs50.io/9847b334-9e42-4281-a696-a6e5cc35b008.pdf" target="_blank" rel="noopener">VERIFY ↗</a>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+                <!-- Testimonials Section -->
+        <section class="nx-beat nx-beat--dashboard" id="testimonials" data-beat="6">
+            <div class="nx-beat-grid">
+                <div class="nx-beat-copy nx-reveal">
+                    <p class="nx-kicker">06 — REFERENCE FRAME</p>
+                    <h2 class="nx-beat-title">TESTIMONIALS</h2>
+                    <p class="nx-beat-txt">A few words that stuck around.</p>
+                </div>
+                <div class="nx-quotes-viewport nx-reveal">
+                    <div class="nx-quotes-track">
+                        <blockquote class="nx-quote">
+                            <div class="nx-quote-stars">★★★★★</div>
+                            <p class="nx-quote-body">"Shahsawar optimized our RAG search pipeline using pgvector and FastAPI, delivering sub-second response times across indexed document chunks."</p>
+                            <footer class="nx-quote-author">
+                                <div class="nx-avatar-slot" title="Add photo: set background-image on this div">VP</div>
+                                <div class="nx-author-info">
+                                    <span class="nx-author-name">Vivek Pippala</span>
+                                    <span class="nx-author-role">AI Engineer</span>
+                                </div>
+                                <span class="nx-quote-platform">// UPWORK</span>
+                            </footer>
+                        </blockquote>
+                        <blockquote class="nx-quote">
+                            <div class="nx-quote-stars">★★★★★</div>
+                            <p class="nx-quote-body">"His technical mastery of async Python, REST APIs, and Docker containerization significantly boosted our backend throughput."</p>
+                            <footer class="nx-quote-author">
+                                <div class="nx-avatar-slot" title="Add photo: set background-image on this div">AK</div>
+                                <div class="nx-author-info">
+                                    <span class="nx-author-name">Awais Khan</span>
+                                    <span class="nx-author-role">Software Engineer</span>
+                                </div>
+                                <span class="nx-quote-platform">// DIRECT</span>
+                            </footer>
+                        </blockquote>
+                        <blockquote class="nx-quote">
+                            <div class="nx-quote-stars">★★★★★</div>
+                            <p class="nx-quote-body">"One of the most talented full-stack devs I've worked with — integrated modern LLM endpoints and TypeScript interfaces cleanly."</p>
+                            <footer class="nx-quote-author">
+                                <div class="nx-avatar-slot" title="Add photo: set background-image on this div">MH</div>
+                                <div class="nx-author-info">
+                                    <span class="nx-author-name">Muhammad Husnain</span>
+                                    <span class="nx-author-role">Web Developer</span>
+                                </div>
+                                <span class="nx-quote-platform">// DIRECT</span>
+                            </footer>
+                        </blockquote>
+                    </div>
+                    <div class="nx-quotes-controls">
+                        <button class="nx-quotes-arrow" data-action="prev" type="button" aria-label="Previous quote">‹</button>
+                        <div class="nx-quotes-dots" role="group" aria-label="Quote navigation"></div>
+                        <button class="nx-quotes-arrow" data-action="next" type="button" aria-label="Next quote">›</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="nx-beat nx-beat--contact" id="contact" data-beat="7">
+            <div class="nx-beat-grid nx-contact-grid">
+                <div class="nx-beat-copy nx-contact-console nx-reveal">
+                    <p class="nx-kicker">07 — END OF TRANSMISSION</p>
+                    <h2 class="nx-beat-title">ESTABLISH CONTACT</h2>
+                    <p class="nx-beat-txt">Got an idea for something that moves, breathes, and translates? I'm online.</p>
+
+                    <!-- Contact Info Cards (3-card grid) -->
+                    <div class="nx-contact-info">
+                        <a href="mailto:shahsawar.dev@gmail.com" class="nx-mini" data-cursor="hover">
+                            <span>01</span>
+                            <b>EMAIL</b>
+                            <i>shahsawar.dev@gmail.com</i>
+                        </a>
+                        <a href="tel:+923438925150" class="nx-mini" data-cursor="hover">
+                            <span>02</span>
+                            <b>PHONE</b>
+                            <i>+92 343 8925150</i>
+                        </a>
+                        <div class="nx-mini">
+                            <span>03</span>
+                            <b>LOCATION</b>
+                            <i>Pakistan</i>
+                        </div>
+                    </div>
+
+                    <!-- Contact Form -->
+                    <form class="nx-contact-form" id="contactForm" action="https://formspree.io/f/meevnwzk" method="POST">
+                        <div class="nx-field">
+                            <label for="cf-name">NAME</label>
+                            <input type="text" id="cf-name" name="name" placeholder="YOUR NAME" required>
+                            <span class="nx-field-error" role="alert"></span>
+                        </div>
+                        <div class="nx-field">
+                            <label for="cf-email">EMAIL</label>
+                            <input type="email" id="cf-email" name="_replyto" placeholder="YOUR EMAIL" required>
+                            <span class="nx-field-error" role="alert"></span>
+                        </div>
+                        <div class="nx-field">
+                            <label for="cf-subject">SUBJECT</label>
+                            <input type="text" id="cf-subject" name="subject" placeholder="SUBJECT" required>
+                            <span class="nx-field-error" role="alert"></span>
+                        </div>
+                        <div class="nx-field">
+                            <label for="cf-message">MESSAGE</label>
+                            <textarea id="cf-message" name="message" rows="4" placeholder="YOUR MESSAGE" required></textarea>
+                            <span class="nx-field-error" role="alert"></span>
+                        </div>
+                        <button type="submit" class="nx-btn">SEND TRANSMISSION</button>
+                    </form>
+                </div>
+
+                <!-- Dedicated Robot Stage on Right -->
+                <div class="nx-contact-stage nx-reveal" aria-hidden="true"></div>
+            </div>
+        </section>
+
+        <!-- Cyber Footer -->
+        <footer class="nx-footer">
+            <div class="nx-footer-container">
+                <div class="nx-footer-brand">
+                    <span class="nx-footer-logo">ORAKZAI<span>.IO</span></span>
+                    <p class="nx-footer-copy">© 2026 Shahsawar. All rights reserved.</p>
+                </div>
+                
+                <div class="nx-footer-socials">
+                    <a href="https://x.com/orakzai_io" target="_blank" rel="noopener noreferrer" class="nx-social-link" aria-label="X (Twitter)" data-cursor="hover">
+                        <i class="fa-brands fa-x-twitter"></i>
+                    </a>
+                    <a href="https://www.linkedin.com/in/orakzai-io" target="_blank" rel="noopener noreferrer" class="nx-social-link" aria-label="LinkedIn" data-cursor="hover">
+                        <i class="fab fa-linkedin-in"></i>
+                    </a>
+                    <a href="https://huggingface.co/orakzai-io" target="_blank" rel="noopener noreferrer" class="nx-social-link" aria-label="Hugging Face" data-cursor="hover">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12.025 1.13c-5.77 0-10.449 4.647-10.449 10.378 0 1.112.178 2.181.503 3.185.064-.222.203-.444.416-.577a.96.96 0 0 1 .524-.15c.293 0 .584.124.84.284.278.173.48.408.71.694.226.282.458.611.684.951v-.014c.017-.324.106-.622.264-.874s.403-.487.762-.543c.3-.047.596.06.787.203s.31.313.4.467c.15.257.212.468.233.542.01.026.653 1.552 1.657 2.54.616.605 1.01 1.223 1.082 1.912.055.537-.096 1.059-.38 1.572.637.121 1.294.187 1.967.187.657 0 1.298-.063 1.921-.178-.287-.517-.44-1.041-.384-1.581.07-.69.465-1.307 1.081-1.913 1.004-.987 1.647-2.513 1.657-2.539.021-.074.083-.285.233-.542.09-.154.208-.323.4-.467a1.08 1.08 0 0 1 .787-.203c.359.056.604.29.762.543s.247.55.265.874v.015c.225-.34.457-.67.683-.952.23-.286.432-.52.71-.694.257-.16.547-.284.84-.285a.97.97 0 0 1 .524.151c.228.143.373.388.43.625l.006.04a10.3 10.3 0 0 0 .534-3.273c0-5.731-4.678-10.378-10.449-10.378M8.327 6.583a1.5 1.5 0 0 1 .713.174 1.487 1.487 0 0 1 .617 2.013c-.183.343-.762-.214-1.102-.094-.38.134-.532.914-.917.71a1.487 1.487 0 0 1 .69-2.803m7.486 0a1.487 1.487 0 0 1 .689 2.803c-.385.204-.536-.576-.916-.71-.34-.12-.92.437-1.103.094a1.487 1.487 0 0 1 .617-2.013 1.5 1.5 0 0 1 .713-.174m-10.68 1.55a.96.96 0 1 1 0 1.921.96.96 0 0 1 0-1.92m13.838 0a.96.96 0 1 1 0 1.92.96.96 0 0 1 0-1.92M8.489 11.458c.588.01 1.965 1.157 3.572 1.164 1.607-.007 2.984-1.155 3.572-1.164.196-.003.305.12.305.454 0 .886-.424 2.328-1.563 3.202-.22-.756-1.396-1.366-1.63-1.32q-.011.001-.02.006l-.044.026-.01.008-.03.024q-.018.017-.035.036l-.032.04a1 1 0 0 0-.058.09l-.014.025q-.049.088-.11.19a1 1 0 0 1-.083.116 1.2 1.2 0 0 1-.173.18q-.035.029-.075.058a1.3 1.3 0 0 1-.251-.243 1 1 0 0 1-.076-.107c-.124-.193-.177-.363-.337-.444-.034-.016-.104-.008-.2.022q-.094.03-.216.087-.06.028-.125.063l-.13.074q-.067.04-.136.086a3 3 0 0 0-.135.096 3 3 0 0 0-.26.219 2 2 0 0 0-.12.121 2 2 0 0 0-.106.128l-.002.002a2 2 0 0 0-.09.132l-.001.001a1.2 1.2 0 0 0-.105.212q-.013.036-.024.073c-1.139-.875-1.563-2.317-1.563-3.203 0-.334.109-.457.305-.454m.836 10.354c.824-1.19.766-2.082-.365-3.194-1.13-1.112-1.789-2.738-1.789-2.738s-.246-.945-.806-.858-.97 1.499.202 2.362c1.173.864-.233 1.45-.685.64-.45-.812-1.683-2.896-2.322-3.295s-1.089-.175-.938.647 2.822 2.813 2.562 3.244-1.176-.506-1.176-.506-2.866-2.567-3.49-1.898.473 1.23 2.037 2.16c1.564.932 1.686 1.178 1.464 1.53s-3.675-2.511-4-1.297c-.323 1.214 3.524 1.567 3.287 2.405-.238.839-2.71-1.587-3.216-.642-.506.946 3.49 2.056 3.522 2.064 1.29.33 4.568 1.028 5.713-.624m5.349 0c-.824-1.19-.766-2.082.365-3.194 1.13-1.112 1.789-2.738 1.789-2.738s.246-.945.806-.858.97 1.499-.202 2.362c-1.173.864.233 1.45.685.64.451-.812 1.683-2.896 2.322-3.295s1.089-.175.938.647-2.822 2.813-2.562 3.244 1.176-.506 1.176-.506 2.866-2.567 3.49-1.898-.473 1.23-2.037 2.16c-1.564.932-1.686 1.178-1.464 1.53s3.675-2.511 4-1.297c.323 1.214-3.524 1.567-3.287 2.405.238.839 2.71-1.587 3.216-.642.506.946-3.49 2.056-3.522 2.064-1.29.33-4.568 1.028-5.713-.624"/></svg>
+                    </a>
+                    <a href="https://www.instagram.com/orakzai.io/" target="_blank" rel="noopener noreferrer" class="nx-social-link" aria-label="Instagram" data-cursor="hover">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                    <a href="https://github.com/orakzai-io" target="_blank" rel="noopener noreferrer" class="nx-social-link" aria-label="GitHub" data-cursor="hover">
+                        <i class="fab fa-github"></i>
+                    </a>
+                </div>
+            </div>
+        </footer>
+
+        <div class="nx-strip">
+            <div class="left"><b>ORAKZAI.IO</b>&nbsp;//&nbsp;BOTRON ACTIVE&nbsp;·&nbsp;<span id="nx-fps" class="live">-- FPS</span></div>
+            <div class="mid">STATUS: IDLE — <span class="nx-scroll-arrow">AWAITING SCROLL</span></div>
+            <div class="right">MOUSE <span id="nx-mouse" class="live">0,0</span> · CURSOR TRK</div>
+        </div>
+    </div>
+
+    <!-- Dependency imports (three/gsap/lenis) now resolve via npm + Vite.
+         The old CDN importmap was removed during the Vite migration. -->
+
+    <!-- Active BOTRON engine (ES modules; entry: js/main.js) -->
+    <script type="module" src="js/main.js"></script>
+    <script type="module" src="js/ui/ui.js"></script>
+    <script type="module" src="js/ui/skills-globe.js"></script>
+
+    <!-- UI runtime lives entirely in js/ui/ui.js now — the legacy inline copy
+         that used to be duplicated here was removed. -->
+</body>
+</html>
