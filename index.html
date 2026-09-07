@@ -865,6 +865,11 @@
           justify-content: center !important;
         }
       }
+
+      } /* closes the @media (max-width: 900px) opened at line ~746 — browsers
+           implicitly closed it at end-of-stylesheet; Vite/PostCSS requires
+           this to be explicit (no visual behavior change) */
+
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="css/nexus.css">
