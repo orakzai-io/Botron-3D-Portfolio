@@ -59,6 +59,12 @@ export class SkillsGlobe {
 
     this.ctx = this.canvas.getContext('2d');
     this.container = this.canvas.parentElement;
+
+    // Low-power mode (phones/tablets): 1x backing store, no canvas shadows,
+    // ~30fps cap. Detected via the primary pointer (coarse = touch device),
+    // NOT viewport width, so a narrow desktop window keeps full quality.
+    this.lowPower = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+    this._lastT = 0;
     this.activeCategory = 'all';
     this.hoveredSkill = null;
     this.selectedSkill = SKILLS_DATA[0]; // default to OpenAI / primary
@@ -116,7 +122,7 @@ export class SkillsGlobe {
 
   initCanvasSize() {
     const rect = this.container.getBoundingClientRect();
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const dpr = this.lowPower ? 1 : Math.min(window.devicePixelRatio || 1, 2);
     this.width = rect.width || 420;
     this.height = rect.height || 420;
 
@@ -248,22 +254,35 @@ export class SkillsGlobe {
     if (iconEl) iconEl.textContent = skill.icon || '⚡';
   }
 
-  render() {
-    this.pulseTime += 0.02;
+  render(now) {
+    // Low-power: cap at ~30fps (skip every other rAF tick at 60Hz). Physics and
+    // pulse are scaled by `step` so animation speed stays real-time at half rate.
+    const step = this.lowPower ? 2 : 1;
+    if (this.lowPower) {
+      const t = now || performance.now();
+      if (t - this._lastT < 33) {
+        if (this.isRunning) this.rafId = requestAnimationFrame(this.render);
+        return;
+      }
+      this._lastT = t;
+    }
+
+    this.pulseTime += 0.02 * step;
 
     // Physics inertia & dampening
     if (!this.isDragging) {
       if (this.hoveredSkill) {
         // Smoothly pause on hover
-        this.velX *= 0.88;
-        this.velY *= 0.88;
+        const damp = Math.pow(0.88, step);
+        this.velX *= damp;
+        this.velY *= damp;
       } else {
         // Blend back toward auto-orbit velocity
-        this.velX += (this.targetVelX - this.velX) * 0.03;
-        this.velY += (this.targetVelY - this.velY) * 0.03;
+        this.velX += (this.targetVelX - this.velX) * 0.03 * step;
+        this.velY += (this.targetVelY - this.velY) * 0.03 * step;
       }
-      this.rotX += this.velX;
-      this.rotY += this.velY;
+      this.rotX += this.velX * step;
+      this.rotY += this.velY * step;
     }
 
     const ctx = this.ctx;
@@ -364,6 +383,7 @@ export class SkillsGlobe {
     const pulse = Math.sin(this.pulseTime * 1.5) * 0.12 + 0.95;
     const fastPulse = Math.sin(this.pulseTime * 3) * 0.08 + 1.0;
     const r = radius * pulse;
+    const S = this.lowPower ? 0 : 1; // shadowBlur multiplier: 0 = no software blur on mobile
 
     ctx.save();
 
@@ -387,7 +407,7 @@ export class SkillsGlobe {
     nucleusGrad.addColorStop(1, 'rgba(139, 92, 246, 0)');
     ctx.fillStyle = nucleusGrad;
     ctx.shadowColor = '#00f0ff';
-    ctx.shadowBlur = 24;
+    ctx.shadowBlur = 24 * S;
     ctx.beginPath();
     ctx.arc(cx, cy, nucleusR, 0, Math.PI * 2);
     ctx.fill();
@@ -405,7 +425,7 @@ export class SkillsGlobe {
       ctx.lineWidth = 1.6;
       ctx.strokeStyle = orb.color;
       ctx.shadowColor = orb.glow;
-      ctx.shadowBlur = 14;
+      ctx.shadowBlur = 14 * S;
       if (orb.dash.length) ctx.setLineDash(orb.dash);
 
       ctx.beginPath();
@@ -420,7 +440,7 @@ export class SkillsGlobe {
       ctx.setLineDash([]);
       ctx.fillStyle = '#ffffff';
       ctx.shadowColor = orb.color;
-      ctx.shadowBlur = 12;
+      ctx.shadowBlur = 12 * S;
       ctx.beginPath();
       ctx.arc(ex, ey, 3.2, 0, Math.PI * 2);
       ctx.fill();
@@ -432,7 +452,7 @@ export class SkillsGlobe {
     ctx.lineWidth = 1;
     ctx.strokeStyle = 'rgba(0, 240, 255, 0.5)';
     ctx.shadowColor = '#00f0ff';
-    ctx.shadowBlur = 6;
+    ctx.shadowBlur = 6 * S;
     ctx.beginPath();
     ctx.arc(cx, cy, 8, 0, Math.PI * 2);
     ctx.stroke();
@@ -456,6 +476,7 @@ export class SkillsGlobe {
 
   drawNodeBadge(ctx, node, isHovered, isSelected) {
     const colors = CATEGORY_COLORS[node.category] || CATEGORY_COLORS.ai;
+    const S = this.lowPower ? 0 : 1; // shadowBlur multiplier: 0 = no software blur on mobile
     const fontSize = Math.round(11 * Math.max(0.72, Math.min(1.2, node.scale)));
     ctx.font = `600 ${fontSize}px "Inter", -apple-system, sans-serif`;
 
@@ -485,11 +506,11 @@ export class SkillsGlobe {
     if (isHovered) {
       ctx.fillStyle = 'rgba(10, 18, 36, 0.92)';
       ctx.shadowColor = colors.main;
-      ctx.shadowBlur = 16;
+      ctx.shadowBlur = 16 * S;
     } else if (isSelected) {
       ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
       ctx.shadowColor = colors.main;
-      ctx.shadowBlur = 8;
+      ctx.shadowBlur = 8 * S;
     } else {
       ctx.fillStyle = 'rgba(8, 12, 22, 0.7)';
       ctx.shadowBlur = 0;
@@ -510,7 +531,7 @@ export class SkillsGlobe {
     ctx.arc(dotX, dotY, dotR, 0, Math.PI * 2);
     ctx.fillStyle = isHovered ? '#ffffff' : colors.dot;
     ctx.shadowColor = colors.main;
-    ctx.shadowBlur = isHovered ? 10 : 4;
+    ctx.shadowBlur = (isHovered ? 10 : 4) * S;
     ctx.fill();
 
     // Text Label

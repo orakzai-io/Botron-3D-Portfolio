@@ -366,9 +366,13 @@ export function createRobot({ scene, renderer, modelUrl, mouse, gazeState, story
     });
   }
 
-  // --- Model load ---
+  // --- Model load (deferred off the critical path) ---
+  // The 583 kB GLB used to start fetching during module evaluation, competing
+  // with first paint. Kick it off once the main thread goes idle instead — the
+  // bot already pops in asynchronously, so a slightly later spawn is invisible.
   const loader = new GLTFLoader();
   loader.setMeshoptDecoder(MeshoptDecoder);
+  const startLoading = () =>
   loader.load(
     modelUrl,
     (gltf) => {
@@ -412,6 +416,13 @@ export function createRobot({ scene, renderer, modelUrl, mouse, gazeState, story
       console.error("Model load failed (robot will not spawn):", err.message || err);
     }
   );
+
+  // Defer until the main thread is idle (after first paint); timeout guarantees
+  // it still runs on busy devices. Falls back to setTimeout where unsupported.
+  const kickIdle = window.requestIdleCallback
+    ? (cb) => window.requestIdleCallback(cb, { timeout: 2500 })
+    : (cb) => setTimeout(cb, 1200);
+  kickIdle(startLoading);
 
   let robotYaw = 0;
 

@@ -19,12 +19,14 @@ const mouse = { targetX: 0, targetY: 0, currentX: 0, currentY: 0 };
 window.addEventListener("mousemove", (e) => {
   mouse.targetX = (e.clientX / window.innerWidth) * 2 - 1;
   mouse.targetY = -(e.clientY / window.innerHeight) * 2 + 1;
-});
+}, { passive: true });
 
 // Camera story owns the intro + the Lenis/GSAP scrub loop.
 const story = createCameraStory({ camera, controls });
 
-createDebugOverlay({ camera, controls, renderer });
+// Dev-only: camera/draw-call overlay (press "D"). Vite replaces import.meta.env.DEV
+// with false in prod builds, tree-shaking debug-camera.js out of the bundle.
+if (import.meta.env.DEV) createDebugOverlay({ camera, controls, renderer });
 // gaze reads the robot model via a getter so it can be created before the robot.
 const gaze = createGaze({
   camera,

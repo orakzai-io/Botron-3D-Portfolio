@@ -1800,17 +1800,44 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
   .nx-btn,
   .nx-filter-pill,
   .nx-telemetry-hud,
-  .nx-proj-card,
   .nx-timeline-card,
-  .nx-quotes-card {
+  .nx-quote,
+  .nx-proj,
+  .nx-mini {
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
     background: rgba(8, 12, 22, 0.94) !important;
   }
 
-  .nx-proj-card,
+  .nx-strip {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: rgba(6, 8, 12, 0.94) !important;
+  }
+
+  .nx-drawer {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: rgba(6, 9, 16, 0.97) !important;
+  }
+
+  .nx-footer {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: rgba(5, 7, 12, 0.94) !important;
+  }
+
   .nx-timeline-card,
-  .nx-quotes-card {
+  .nx-proj,
+  .nx-quote {
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6) !important;
+  }
+
+  /* 3. Ambient aurora: keep the gradient, drop the 90px blur + infinite
+     animation (two 62vw fixed layers re-rastering under the WebGL canvas) */
+  body::before,
+  body::after {
+    filter: none !important;
+    animation: none !important;
   }
 }

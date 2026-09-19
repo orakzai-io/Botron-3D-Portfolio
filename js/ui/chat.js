@@ -317,7 +317,7 @@ export function initChat() {
     }
   }
 
-  messagesContainer.addEventListener("scroll", updateScrollBtn);
+  messagesContainer.addEventListener("scroll", updateScrollBtn, { passive: true });
 
   if (scrollBtn) {
     scrollBtn.addEventListener("click", () => {
