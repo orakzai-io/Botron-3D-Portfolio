@@ -10,16 +10,44 @@
     const dot = cursor.querySelector('.nx-cursor-dot');
     const ring = cursor.querySelector('.nx-cursor-ring');
     let mx = innerWidth / 2, my = innerHeight / 2;
-    let dx = mx, dy = my, rx = mx, ry = my;
-    addEventListener('mousemove', (e) => { mx = e.clientX; my = e.clientY; });
+    let rx = mx, ry = my;
+
+    let isRolling = false;
+
     const roll = () => {
-      dx += (mx - dx) * 0.32; dy += (my - dy) * 0.32;
-      rx += (mx - rx) * 0.12; ry += (my - ry) * 0.12;
-      if (dot) dot.style.transform = 'translate3d(' + dx + 'px,' + dy + 'px,0)';
-      if (ring) ring.style.transform = 'translate3d(' + rx + 'px,' + ry + 'px,0)';
-      requestAnimationFrame(roll);
+      const dx = mx - rx;
+      const dy = my - ry;
+      rx += dx * 0.28;
+      ry += dy * 0.28;
+      if (ring) ring.style.transform = `translate3d(${rx}px,${ry}px,0)`;
+
+      // Sleep the loop once reticle ring converges on the pointer
+      if (Math.abs(dx) > 0.1 || Math.abs(dy) > 0.1) {
+        requestAnimationFrame(roll);
+      } else {
+        isRolling = false;
+        rx = mx;
+        ry = my;
+        if (ring) ring.style.transform = `translate3d(${rx}px,${ry}px,0)`;
+      }
     };
-    requestAnimationFrame(roll);
+
+    const wakeRoll = () => {
+      if (!isRolling) {
+        isRolling = true;
+        requestAnimationFrame(roll);
+      }
+    };
+
+    addEventListener('mousemove', (e) => {
+      mx = e.clientX;
+      my = e.clientY;
+      // Instant 0ms response for the aiming dot
+      if (dot) dot.style.transform = `translate3d(${mx}px,${my}px,0)`;
+      wakeRoll();
+    }, { passive: true });
+
+    wakeRoll();
     const hoverEls = 'a, button, .nx-chip, .nx-mini, .nx-proj, .nx-filter-pill, .nx-telemetry-hud';
     document.addEventListener('mouseover', (e) => {
       if (e.target.closest && e.target.closest(hoverEls)) cursor.classList.add('is-hover');
@@ -148,7 +176,7 @@
       });
       if (!isValid) return;
 
-      const btn = contactForm.querySelector('button[type="submit"]');
+        const btn = contactForm.querySelector('button[type="submit"]');
       const label = btn.textContent;
       btn.disabled = true;
       btn.textContent = 'TRANSMITTING…';
@@ -167,6 +195,46 @@
         btn.disabled = false;
         btn.textContent = label;
       }, 3000);
+    });
+  }
+
+  // ── Mobile hamburger menu ──────────────────────────────────────────────
+  const burger = document.getElementById('nx-burger');
+  const drawer = document.getElementById('nx-drawer');
+
+  if (burger && drawer) {
+    const open = () => {
+      burger.classList.add('is-open');
+      drawer.classList.add('is-open');
+      burger.setAttribute('aria-expanded', 'true');
+      drawer.setAttribute('aria-hidden', 'false');
+    };
+    const close = () => {
+      burger.classList.remove('is-open');
+      drawer.classList.remove('is-open');
+      burger.setAttribute('aria-expanded', 'false');
+      drawer.setAttribute('aria-hidden', 'true');
+    };
+
+    burger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      burger.classList.contains('is-open') ? close() : open();
+    });
+
+    // Close when any drawer link is tapped
+    drawer.querySelectorAll('a').forEach((link) => {
+      link.addEventListener('click', () => {
+        close();
+      });
+    });
+
+    // Close on outside tap
+    document.addEventListener('click', (e) => {
+      if (drawer.classList.contains('is-open') &&
+          !drawer.contains(e.target) &&
+          !burger.contains(e.target)) {
+        close();
+      }
     });
   }
 })();

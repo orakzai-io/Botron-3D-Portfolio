@@ -7,3 +7,12 @@ dist/
 # Logs & misc
 *.log
 .DS_Store
+.env
+.env.*
+__pycache__/
+*.pyc
+venv/
+.venv/
+
+# HF deploy temp worktree (created by scripts/deploy-hf.ps1)
+.hf-deploy/

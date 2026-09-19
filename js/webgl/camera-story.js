@@ -5,7 +5,7 @@ import * as THREE from "three";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Lenis from "lenis";
-import { POSES, INTRO_DURATION, MOBILE_BREAKPOINT, ROBOT_BASE_X_DESKTOP } from "./config.js";
+import { POSES, MOBILE_BREAKPOINT, ROBOT_BASE_X_DESKTOP } from "./config.js";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -24,12 +24,6 @@ export function createCameraStory({ camera, controls }) {
     });
   };
 
-  // Intro framing: a face close-up staged right of center, sweeping out to the hero.
-  const startCamPos = new THREE.Vector3(ROBOT_BASE_X_DESKTOP, 82, 65);
-  const startCamTarget = new THREE.Vector3(ROBOT_BASE_X_DESKTOP, 80, 0);
-  const endCamPos = new THREE.Vector3(-6, 70, 300);
-  const endCamTarget = new THREE.Vector3(-6, 64, 0);
-
   // Shared state, read by gaze.js + robot.js (+ main.js render loop).
   const state = {
     scrollDrift: 0,
@@ -44,12 +38,11 @@ export function createCameraStory({ camera, controls }) {
   function relayout() {
     const mobile = window.innerWidth <= MOBILE_BREAKPOINT;
     state.robotBaseX = mobile ? 0 : ROBOT_BASE_X_DESKTOP;
-    startCamPos.x = startCamTarget.x = mobile ? 0 : ROBOT_BASE_X_DESKTOP;
     recollectBeats();
   }
 
   // Snaps the camera to a scroll Y across the 5-beat tour (camera + gaze beat).
-    function applyCameraFromScroll(y) {
+  function applyCameraFromScroll(y) {
     if (beats.length < 2) return;
     const vh = window.innerHeight || 1;
     const max = Math.max(1, document.documentElement.scrollHeight - vh);
@@ -103,31 +96,17 @@ export function createCameraStory({ camera, controls }) {
     }
   }
 
-  // ---------- Cinematic intro (face close-up → hero pose) ----------
-  let introActive = true;
-  let introStart = null;
-
-  // story.update() is called from the render loop. Returns true while the intro
-  // is still running (so the caller can skip the scroll-driven camera). After the
-  // intro, Lenis + ScrollTrigger own the camera via applyCameraFromScroll().
-  function update(elapsed) {
-    if (!introActive) return false;
-    if (introStart === null) introStart = elapsed;
-    const progress = Math.min((elapsed - introStart) / INTRO_DURATION, 1.0);
-    const ease = 1 - Math.pow(1 - progress, 3);
-    camera.position.lerpVectors(startCamPos, endCamPos, ease);
-    controls.target.lerpVectors(startCamTarget, endCamTarget, ease);
-    if (progress >= 1.0) {
-      introActive = false;
-      applyCameraFromScroll(window.scrollY || 0); // snap to the current beat, then GSAP takes over
-      document.body.classList.add("intro-complete");
-      controls.update();
-    }
-    return introActive;
+  // story.update() no-op since intro is removed; camera is immediately scroll-driven
+  function update() {
+    return false;
   }
 
   // ---------- Lenis + GSAP smooth-scroll stack ----------
-  const lenis = new Lenis({ lerp: 0.09, smoothWheel: true });
+  const lenis = new Lenis({
+    lerp: 0.09,
+    smoothWheel: true,
+    syncTouch: false, // Ensures mobile touch scrolling uses native GPU compositor momentum
+  });
   lenis.on("scroll", ScrollTrigger.update);          // keep GSAP scrub in sync with Lenis
   gsap.ticker.add((time) => lenis.raf(time * 1000)); // drive Lenis through GSAP's ticker
   gsap.ticker.lagSmoothing(0);
@@ -139,13 +118,12 @@ export function createCameraStory({ camera, controls }) {
     end: () => ScrollTrigger.maxScroll(window),
     scrub: 1,
     onUpdate: (self) => {
-      if (introActive) return; // intro owns the camera until it finishes
       applyCameraFromScroll(self.scroll());
     },
   });
 
   // Top-nav anchors hijack to Lenis (Lenis disables native smooth scrolling).
-  document.querySelectorAll(".nx-nav-link").forEach((a) => {
+  document.querySelectorAll(".nx-nav-link, .nx-drawer-link").forEach((a) => {
     a.addEventListener("click", (e) => {
       const href = a.getAttribute("href");
       if (href && href.startsWith("#")) {
@@ -155,14 +133,16 @@ export function createCameraStory({ camera, controls }) {
     });
   });
 
+
   const onResize = () => {
     relayout();
+    applyCameraFromScroll(window.scrollY || 0);
     ScrollTrigger.refresh();
   };
 
   relayout();
-  camera.position.copy(startCamPos);
-  controls.target.copy(startCamTarget);
+  applyCameraFromScroll(window.scrollY || 0);
+  document.body.classList.add("intro-complete");
   controls.update();
 
   return { state, beats, relayout, update, onResize };

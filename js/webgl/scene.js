@@ -11,9 +11,11 @@ import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
 import { BLOOM_ENABLED } from "./config.js";
 
 export function setupScene({ container }) {
+  const isMobile = typeof window !== "undefined" && window.innerWidth <= 768;
+
   // --- Renderer (low-power + medium precision for zero fan noise) ---
   const renderer = new THREE.WebGLRenderer({
-    antialias: true,
+    antialias: false,
     powerPreference: "low-power",
     precision: "mediump",
   });
@@ -21,7 +23,7 @@ export function setupScene({ container }) {
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.0));
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.0;
-  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.enabled = !isMobile;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   renderer.shadowMap.autoUpdate = false; // update only when the scene updates
   container.appendChild(renderer.domElement);
@@ -62,6 +64,10 @@ export function setupScene({ container }) {
   cyanFill.position.set(60, 140, 260);
   scene.add(cyanFill);
 
+  const violetFill = new THREE.DirectionalLight(0xa78bfa, 0.55);
+  violetFill.position.set(-180, 80, 220);
+  scene.add(violetFill);
+
   const fill = new THREE.AmbientLight(0x3c4658, 0.35);
   scene.add(fill);
 
@@ -93,7 +99,7 @@ export function setupScene({ container }) {
 
   const glowRing = new THREE.Mesh(
     new THREE.RingGeometry(26, 30, 72),
-    new THREE.MeshBasicMaterial({ color: 0x00f0ff, transparent: true, opacity: 0.05, depthWrite: false, side: THREE.DoubleSide })
+    new THREE.MeshBasicMaterial({ color: 0xa78bfa, transparent: true, opacity: 0.06, depthWrite: false, side: THREE.DoubleSide })
   );
   glowRing.rotation.x = -Math.PI / 2;
   glowRing.position.y = -0.38;
@@ -101,7 +107,7 @@ export function setupScene({ container }) {
 
   // --- Floating silver dust ---
   const pGeo = new THREE.BufferGeometry();
-  const pCount = 380;
+  const pCount = isMobile ? 70 : 380;
   const pPos = new Float32Array(pCount * 3);
   for (let i = 0; i < pCount; i++) {
     pPos[i * 3 + 0] = (Math.random() - 0.5) * 1400;

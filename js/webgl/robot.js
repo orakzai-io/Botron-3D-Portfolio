@@ -1,6 +1,170 @@
 // js/webgl/robot.js
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
+import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
+
+// Exponential decay damping: 100% framerate-independent, never overshoots
+function damp(current, target, lambda, dt) {
+  return THREE.MathUtils.lerp(current, target, 1 - Math.exp(-lambda * dt));
+}
+
+// Reverses triangle winding so a geometry baked with a mirrored
+// (negative-determinant) matrix stays front-facing.
+// Why: the renderer compensates for mirrored nodes at draw time via
+// `frontFaceCW = object.matrixWorld.determinant() < 0` (WebGLRenderer.js),
+// but baking that mirror into the geometry with applyMatrix4() — which fixes
+// positions/normals but NOT the index — leaves the winding reversed on a merged
+// mesh whose own determinant is positive. Result: backface culling makes the
+// part render see-through ("white"). Flipping the index restores it.
+// Safe to mutate: mergeByPivot always works on BufferGeometry.clone()s, whose
+// index is deep-cloned (BufferGeometry.copy -> setIndex(index.clone())).
+function flipWinding(geo) {
+  const index = geo.getIndex();
+  if (index) {
+    const a = index.array;
+    for (let i = 0; i < a.length; i += 3) {
+      const t = a[i + 1]; a[i + 1] = a[i + 2]; a[i + 2] = t;
+    }
+    index.needsUpdate = true;
+    return;
+  }
+  // Non-indexed fallback: swap the 2nd/3rd vertex of every triangle.
+  for (const key in geo.attributes) {
+    const attr = geo.attributes[key];
+    for (let i = 0; i < attr.count; i += 3) {
+      for (let k = 0; k < attr.itemSize; k++) {
+        const saved = attr.getComponent(i + 1, k);
+        attr.setComponent(i + 1, k, attr.getComponent(i + 2, k));
+        attr.setComponent(i + 2, k, saved);
+      }
+    }
+    attr.needsUpdate = true;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Runtime geometry merge — reduces draw calls from ~83 → ~5
+// Called once after the GLTFLoader has fully decoded the model (so all
+// KHR_mesh_quantization int16 attributes are already Float32 in Three.js).
+// ---------------------------------------------------------------------------
+function mergeByPivot(model, headBone, handNodes) {
+  // Collect the 3 animated pivots. Everything else is STATIC.
+  const pivots = new Set([headBone, ...handNodes].filter(Boolean));
+
+  // For each mesh, find which pivot (if any) owns it.
+  function getOwnerPivot(obj) {
+    let cur = obj.parent;
+    while (cur && cur !== model) {
+      if (pivots.has(cur)) return cur;
+      cur = cur.parent;
+    }
+    return null; // static
+  }
+
+  // Bucket: Map<pivot|null, Map<material, Mesh[]>>
+  const buckets = new Map();
+  const addToBucket = (pivot, mesh) => {
+    if (!buckets.has(pivot)) buckets.set(pivot, new Map());
+    const mat = mesh.material;
+    if (!buckets.get(pivot).has(mat)) buckets.get(pivot).set(mat, []);
+    buckets.get(pivot).get(mat).push(mesh);
+  };
+
+  // Collect all meshes, skip our JS eye panels
+  const toDispose = [];
+  model.traverse((obj) => {
+    if (!obj.isMesh || obj.userData.isNxEye) return;
+    // Skip baked eye meshes (EyeGlow_DotMatrix material) — they're dead weight
+    if (obj.material && obj.material.name === "EyeGlow_DotMatrix") {
+      toDispose.push(obj);
+      return;
+    }
+    addToBucket(getOwnerPivot(obj), obj);
+  });
+
+  // Merge each bucket
+  const mergedMeshes = [];
+  for (const [pivot, matMap] of buckets) {
+    const parent = pivot || model;
+    for (const [mat, meshes] of matMap) {
+      if (meshes.length === 1) {
+        // Nothing to merge — keep as-is
+        mergedMeshes.push(meshes[0]);
+        continue;
+      }
+
+      // Bake each mesh's world transform relative to parent into its geometry
+      const geos = [];
+      for (const mesh of meshes) {
+        const geo = mesh.geometry.clone();
+
+        // Convert any normalized int16 attributes to Float32 BEFORE applyMatrix4
+        // (applyMatrix4 on a normalized Int16Array causes silent corruption)
+        for (const name of ["position", "normal"]) {
+          const attr = geo.attributes[name];
+          if (!attr) continue;
+          if (!(attr.array instanceof Float32Array)) {
+            const f32 = new Float32Array(attr.count * attr.itemSize);
+            for (let i = 0; i < attr.count; i++) {
+              for (let k = 0; k < attr.itemSize; k++) {
+                f32[i * attr.itemSize + k] = attr.getComponent(i, k);
+              }
+            }
+            geo.setAttribute(name, new THREE.BufferAttribute(f32, attr.itemSize));
+          }
+        }
+
+        // Bake world-to-parent-local transform
+        mesh.updateWorldMatrix(true, false);
+        parent.updateWorldMatrix(true, false);
+        const rel = new THREE.Matrix4()
+          .copy(parent.matrixWorld)
+          .invert()
+          .multiply(mesh.matrixWorld);
+        geo.applyMatrix4(rel);
+
+        // Mirrored parts (the GLB's scale.x = -1 nodes, e.g. the left arm and
+        // left leg) reverse winding when baked — flip it back or they get
+        // backface-culled and render white/see-through.
+        if (rel.determinant() < 0) flipWinding(geo);
+
+        // Strip uv if untextured to avoid mergeGeometries attribute mismatch
+        if (!mat.map) geo.deleteAttribute("uv");
+
+        geos.push(geo);
+      }
+
+      const merged = mergeGeometries(geos, false);
+      if (!merged) {
+        // Attribute mismatch fallback — keep originals, log warning
+        console.warn("[nexbot] mergeGeometries returned null for", mat.name, "— keeping originals");
+        meshes.forEach((m) => mergedMeshes.push(m));
+        geos.forEach((g) => g.dispose());
+        continue;
+      }
+
+      const mergedMesh = new THREE.Mesh(merged, mat);
+      mergedMesh.castShadow = true;
+      mergedMesh.receiveShadow = true;
+      parent.add(mergedMesh);
+      mergedMeshes.push(mergedMesh);
+
+      // Dispose originals (already detached; toDispose holds only baked eyes)
+      meshes.forEach((m) => {
+        m.parent && m.parent.remove(m);
+        m.geometry.dispose();
+      });
+      geos.forEach((g) => g.dispose());
+    }
+  }
+
+  // Remove dead baked eye meshes
+  toDispose.forEach((m) => {
+    m.parent && m.parent.remove(m);
+    m.geometry && m.geometry.dispose();
+  });
+}
 
 export function createRobot({ scene, renderer, modelUrl, mouse, gazeState, storyState, env }) {
   let robotModel = null;
@@ -38,7 +202,7 @@ export function createRobot({ scene, renderer, modelUrl, mouse, gazeState, story
     const aspect = canvas.width / canvas.height;
     mesh.scale.set(width, width / aspect, 1);
     mesh.material.map.needsUpdate = true;
-    mesh.userData.isNxEye = true; // never let the cleanup below hide OUR screens
+    mesh.userData.isNxEye = true; // marks our JS eye screens so the merge never touches them
     eyePanels.push(panel);
     return mesh;
   }
@@ -77,10 +241,23 @@ export function createRobot({ scene, renderer, modelUrl, mouse, gazeState, story
 
   // Bare dot-matrix eye — NO octagon bezel, NO cavity, just the crisp dots.
   function buildEyePanel(local, R) {
-    // Same visual width as the old inset screen (was R * 0.74 * 1.04).
     const screen = createDotPanelTexture(R * 0.9);
     screen.position.set(local.x, local.y, local.z + 0.05);
     return screen;
+  }
+
+  // Capture eye anchor world positions BEFORE any merging/deletion
+  // so buildEyes() always gets pixel-identical placement.
+  let capturedEyeAnchors = null;
+
+  function captureEyeAnchors() {
+    if (!headBone || !robotModel || capturedEyeAnchors) return;
+    robotModel.updateMatrixWorld(true);
+    if (eyeAnchorObjs.length >= 2) {
+      capturedEyeAnchors = eyeAnchorObjs
+        .map((o) => o.getWorldPosition(new THREE.Vector3()))
+        .sort((a, b) => a.x - b.x);
+    }
   }
 
   // Build BOTH angular dot-matrix eye panels, embedded into the face.
@@ -96,34 +273,16 @@ export function createRobot({ scene, renderer, modelUrl, mouse, gazeState, story
     const hcx = (head.min.x + head.max.x) * 0.5;
     const hcy = (head.min.y + head.max.y) * 0.5;
 
-    // Prefer anchoring on the model's cylindrical sensor housings.
     let anchors = null;
-    if (eyeAnchorObjs.length) {
-      // Nuke EVERY baked-in eye mesh in the eye band of the head, whatever it's
-      // named (cylinders, cubes, planes...). Skips the head shell itself (too
-      // big) and our own dot screens. Logs what it hid so it's debuggable.
-      const range = head.max.z - head.min.z;
-      headBone.traverse((o) => {
-        if (!o.isMesh || o.userData.isNxEye || !o.visible) return;
-        const b = new THREE.Box3().setFromObject(o);
-        const s = b.getSize(new THREE.Vector3());
-        const maxDim = Math.max(s.x, s.y, s.z);
-        if (maxDim >= Math.min(headW, headH) * 0.9) return; // the head shell
-        const c = b.getCenter(new THREE.Vector3());
-        const inEyeBand =
-          Math.abs(c.y - hcy) <= headH * 0.3 &&
-          c.z > head.min.z + range * 0.35; // front of the face only
-        if (inEyeBand) {
-          o.visible = false;
-          console.info("[nexbot] hid baked-in eye mesh:", o.name || o.type);
-        }
-      });
-      const list = eyeAnchorObjs
-        .map((o) => o.getWorldPosition(new THREE.Vector3()))
-        .filter((p) => p.x >= head.min.x && p.x <= head.max.x && p.y >= head.min.y && p.y <= head.max.y)
-        .sort((a, b) => a.x - b.x);
+
+    // Use pre-captured anchor positions if available (survives the merge/delete)
+    if (capturedEyeAnchors && capturedEyeAnchors.length >= 2) {
+      const list = capturedEyeAnchors
+        .filter((p) => p.x >= head.min.x && p.x <= head.max.x && p.y >= head.min.y && p.y <= head.max.y);
       if (list.length >= 2) anchors = [list[0], list[list.length - 1]];
     }
+
+    // Fallback: heuristic placement
     if (!anchors) {
       const ex = headW * 0.22;
       anchors = [
@@ -139,17 +298,21 @@ export function createRobot({ scene, renderer, modelUrl, mouse, gazeState, story
     eyesReady = true;
   }
 
-  // Stepped gaze-tracking + hard-edged blink, driven each frame.
+  // Stepped gaze-tracking + hard-edged blink
+  let _lastEyeKey = -1;
+
   function updateEyes(t) {
     if (eyePanels.length === 0) return;
 
-    // Hard blink roughly every ~3.2s, closed for a crisp 0.13s.
     const cycle = t % 3.2;
     const blink = cycle < 0.13;
 
-    // Quantize cursor [-1..1] into crisp grid steps (never smooth/blurry).
     const cC = Math.max(0, Math.min(5, Math.round((mouse.currentX * 0.5 + 0.5) * 5)));
     const cR = Math.max(0, Math.min(4, Math.round(((1 - mouse.currentY) * 0.5) * 4)));
+
+    const eyeKey = (cC << 4) | (cR << 1) | (blink ? 1 : 0);
+    if (eyeKey === _lastEyeKey) return;
+    _lastEyeKey = eyeKey;
 
     eyePanels.forEach((p) => drawDotGrid(p, cC, cR, blink));
   }
@@ -162,8 +325,8 @@ export function createRobot({ scene, renderer, modelUrl, mouse, gazeState, story
     const box = new THREE.Box3().setFromObject(robotModel);
     const cx = (box.min.x + box.max.x) * 0.5;
     const H = box.max.y - box.min.y;
-    const lowY = box.min.y + H * 0.3;  // skip legs/feet
-    const topY = box.max.y - H * 0.2;  // skip head
+    const lowY = box.min.y + H * 0.3;
+    const topY = box.max.y - H * 0.2;
     const maxW = box.max.x - box.min.x;
 
     const width = (o) => {
@@ -171,8 +334,6 @@ export function createRobot({ scene, renderer, modelUrl, mouse, gazeState, story
       return b.max.x - b.min.x;
     };
 
-    // Climb to the outermost ancestor that is still entirely one side of the
-    // model, but STOP early (<=30% width) so we animate a forearm/hand subtree.
     const climb = (o) => {
       let cur = o;
       while (
@@ -200,18 +361,14 @@ export function createRobot({ scene, renderer, modelUrl, mouse, gazeState, story
     });
 
     handNodes = [left, right].filter((n) => n && n !== robotModel);
-    // Remember the model's own pose so we animate ADDITIVELY and never fight it.
     handNodes.forEach((n) => {
       n.userData.baseRot = { x: n.rotation.x, y: n.rotation.y, z: n.rotation.z };
     });
-
   }
 
   // --- Model load ---
-  // The .glb is fetched as a content-hashed asset (Vite `?url` import) instead
-  // of being base64-embedded in the JS bundle — keeps the bundle small and the
-  // model cached independently of code changes.
   const loader = new GLTFLoader();
+  loader.setMeshoptDecoder(MeshoptDecoder);
   loader.load(
     modelUrl,
     (gltf) => {
@@ -226,24 +383,31 @@ export function createRobot({ scene, renderer, modelUrl, mouse, gazeState, story
         if (!headBone && (lowerName.includes("head") || lowerName.includes("neck"))) {
           headBone = obj;
         }
-        // Collect cylindrical parts (likely the eye housings) for eye anchoring.
         if (/cylin/i.test(lowerName)) eyeAnchorObjs.push(obj);
       });
+
       const box = new THREE.Box3().setFromObject(model);
       const size = box.getSize(new THREE.Vector3());
       const center = box.getCenter(new THREE.Vector3());
       model.position.sub(center);
       model.position.x += initialBaseX;
-      initialBaseY = model.position.y - 40; // Shifted slightly down
+      initialBaseY = model.position.y - 40;
       const maxDim = Math.max(size.x, size.y, size.z);
       const scale = 220 / maxDim;
       model.scale.setScalar(scale);
       scene.add(model);
-      renderer.shadowMap.needsUpdate = true; // Update static shadow map once loaded
 
-      // Locate the hands for the gentle idle sway.
+      // Step 1: capture eye anchor positions BEFORE merge deletes anything
       findHandNodes();
+      captureEyeAnchors();
+
+      // Step 2: runtime merge — 83 draws → ~5
+      mergeByPivot(model, headBone, handNodes);
+
+      // Step 3: update shadow map once from merged geometry
+      renderer.shadowMap.needsUpdate = true;
     },
+    undefined,
     (err) => {
       console.error("Model load failed (robot will not spawn):", err.message || err);
     }
@@ -251,42 +415,41 @@ export function createRobot({ scene, renderer, modelUrl, mouse, gazeState, story
 
   let robotYaw = 0;
 
-    // --- Per-frame rig update ---
-  function update(elapsedTime) {
+  // --- Per-frame rig update ---
+  function update(elapsedTime, dt = 0.016) {
     if (!robotModel) return;
 
-    // Show/hide the whole model based on the active beat. While it's hidden we
-    // short-circuit ALL per-frame work (eye-panel redraws, head/hand/body rig
-    // math, glow/particle spin) to keep the GPU idle on non-header sections.
     const visible = storyState && storyState.botVisible !== false;
     if (robotModel.visible !== visible) robotModel.visible = visible;
     if (!visible) return;
 
-    // Build the eye panels once the model + head are available.
     if (!eyesReady && headBone) buildEyes();
     updateEyes(elapsedTime);
 
-    // Subtle floating / breathing hover effect + horizontal drift with scroll
     robotModel.position.y = initialBaseY + Math.sin(elapsedTime * 2.0) * 2.5;
     robotModel.position.x = storyState.robotBaseX + storyState.scrollDrift * 46;
     robotModel.position.z = 0;
     if (env.glowRing) env.glowRing.material.opacity = 0.05 + Math.sin(elapsedTime * 1.6) * 0.025;
-    if (env.particles) env.particles.rotation.y += 0.0012;
+    if (env.particles) env.particles.rotation.y += 0.07 * dt;
 
-    // Head gaze — mouse in the hero; content-gaze during scroll beats.
     if (headBone) {
       if (storyState.gazeBeatIndex === 0) {
-        headBone.rotation.y = mouse.currentX * 0.45;   // ~25 deg
-        headBone.rotation.x = -mouse.currentY * 0.3;   // ~17 deg
-        headBone.rotation.z = -mouse.currentX * 0.1;   // subtle natural roll
+        headBone.rotation.y = mouse.currentX * 0.45;
+        headBone.rotation.x = -mouse.currentY * 0.3;
+        headBone.rotation.z = -mouse.currentX * 0.1;
+      } else if (storyState.activeBeatId === 'contact') {
+        headBone.rotation.y = damp(headBone.rotation.y, -0.65, 5.0, dt);
+        headBone.rotation.x = damp(headBone.rotation.x, -0.05, 5.0, dt);
+        headBone.rotation.z = damp(headBone.rotation.z, 0, 3.5, dt);
       } else {
-        headBone.rotation.y += (THREE.MathUtils.clamp(gazeState.yaw * 1.5, -1.1, 1.1) - headBone.rotation.y) * 0.07;
-        headBone.rotation.x += (THREE.MathUtils.clamp(gazeState.pitch * 1.2, -0.45, 0.45) - headBone.rotation.x) * 0.07;
-        headBone.rotation.z *= 0.95; // ease out any roll
+        const targetY = THREE.MathUtils.clamp(gazeState.yaw * 1.5, -1.1, 1.1);
+        const targetX = THREE.MathUtils.clamp(gazeState.pitch * 1.2, -0.45, 0.45);
+        headBone.rotation.y = damp(headBone.rotation.y, targetY, 4.5, dt);
+        headBone.rotation.x = damp(headBone.rotation.x, targetX, 4.5, dt);
+        headBone.rotation.z = damp(headBone.rotation.z, 0, 3.5, dt);
       }
     }
 
-    // Hands — same cursor tech as the head, plus a gentle mirrored sway.
     if (handNodes.length === 2) {
       handNodes.forEach((h, i) => {
         const dir = i === 0 ? 1 : -1;
@@ -297,16 +460,20 @@ export function createRobot({ scene, renderer, modelUrl, mouse, gazeState, story
       });
     }
 
-    // Body turn — subtle in hero (mouse), content-gaze during scroll beats.
     if (storyState.gazeBeatIndex === 0) {
       robotModel.rotation.y = mouse.currentX * 0.06 + Math.sin(elapsedTime * 0.5) * 0.04;
       robotModel.rotation.x = -mouse.currentY * 0.04;
       robotModel.rotation.z = mouse.currentX * -0.04;
       robotYaw = robotModel.rotation.y;
-    } else {
-      robotYaw += (gazeState.yaw - robotYaw) * 0.06;
+    } else if (storyState.activeBeatId === 'contact') {
+      robotYaw = damp(robotYaw, -0.30, 3.8, dt);
       robotModel.rotation.y = robotYaw;
-      robotModel.rotation.x = Math.sin(elapsedTime * 0.5) * 0.01; // idle breath
+      robotModel.rotation.x = Math.sin(elapsedTime * 0.5) * 0.01;
+      robotModel.rotation.z = 0;
+    } else {
+      robotYaw = damp(robotYaw, gazeState.yaw, 3.8, dt);
+      robotModel.rotation.y = robotYaw;
+      robotModel.rotation.x = Math.sin(elapsedTime * 0.5) * 0.01;
       robotModel.rotation.z = 0;
     }
   }
@@ -317,3 +484,4 @@ export function createRobot({ scene, renderer, modelUrl, mouse, gazeState, story
     update,
   };
 }
+

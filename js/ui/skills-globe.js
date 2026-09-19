@@ -43,12 +43,13 @@ export const SKILLS_DATA = [
   { id: 'pgadmin', name: 'pgAdmin', category: 'tools', catLabel: 'Tools & Workflow', level: 80, icon: '📊', desc: 'Database administration, query execution analysis & indexing review' }
 ];
 
+// Two-color contract: cyan × violet only — categories differ by shade/depth, never hue.
 const CATEGORY_COLORS = {
   ai: { main: '#00f0ff', glow: 'rgba(0, 240, 255, 0.45)', bg: 'rgba(0, 240, 255, 0.12)', dot: '#00f0ff' },
-  backend: { main: '#38bdf8', glow: 'rgba(56, 189, 248, 0.45)', bg: 'rgba(56, 189, 248, 0.12)', dot: '#38bdf8' },
-  devops: { main: '#10b981', glow: 'rgba(16, 185, 129, 0.45)', bg: 'rgba(16, 185, 129, 0.12)', dot: '#10b981' },
-  frontend: { main: '#a855f7', glow: 'rgba(168, 85, 247, 0.45)', bg: 'rgba(168, 85, 247, 0.12)', dot: '#a855f7' },
-  tools: { main: '#f59e0b', glow: 'rgba(245, 158, 11, 0.45)', bg: 'rgba(245, 158, 11, 0.12)', dot: '#f59e0b' }
+  backend: { main: '#67e8f9', glow: 'rgba(103, 232, 249, 0.45)', bg: 'rgba(103, 232, 249, 0.12)', dot: '#67e8f9' },
+  devops: { main: '#a78bfa', glow: 'rgba(167, 139, 250, 0.45)', bg: 'rgba(167, 139, 250, 0.12)', dot: '#a78bfa' },
+  frontend: { main: '#c4b5fd', glow: 'rgba(196, 181, 253, 0.45)', bg: 'rgba(196, 181, 253, 0.12)', dot: '#c4b5fd' },
+  tools: { main: '#8b5cf6', glow: 'rgba(139, 92, 246, 0.45)', bg: 'rgba(139, 92, 246, 0.12)', dot: '#8b5cf6' }
 };
 
 export class SkillsGlobe {
@@ -83,7 +84,9 @@ export class SkillsGlobe {
     this.bindEvents();
     this.updateTelemetryCard(this.selectedSkill);
     this.render = this.render.bind(this);
-    this.rafId = requestAnimationFrame(this.render);
+    this.isRunning = false;
+    this.render(); // Draw initial static frame immediately
+    this.initIntersectionObserver();
   }
 
   buildNodes() {
@@ -352,7 +355,9 @@ export class SkillsGlobe {
       this.drawNodeBadge(ctx, node, node === this.hoveredSkill, node === this.selectedSkill);
     });
 
-    this.rafId = requestAnimationFrame(this.render);
+    if (this.isRunning) {
+      this.rafId = requestAnimationFrame(this.render);
+    }
   }
 
   drawCyberCore(ctx, cx, cy, radius) {
@@ -365,8 +370,8 @@ export class SkillsGlobe {
     // 1. Radiant Outer Energy Flare & Nebula Glow
     const outerGrad = ctx.createRadialGradient(cx, cy, 2, cx, cy, r * 1.6);
     outerGrad.addColorStop(0, 'rgba(0, 240, 255, 0.45)');
-    outerGrad.addColorStop(0.25, 'rgba(168, 85, 247, 0.28)');
-    outerGrad.addColorStop(0.55, 'rgba(56, 189, 248, 0.12)');
+    outerGrad.addColorStop(0.25, 'rgba(167, 139, 250, 0.28)');
+    outerGrad.addColorStop(0.55, 'rgba(103, 232, 249, 0.12)');
     outerGrad.addColorStop(1, 'rgba(3, 7, 18, 0)');
     ctx.fillStyle = outerGrad;
     ctx.beginPath();
@@ -378,8 +383,8 @@ export class SkillsGlobe {
     const nucleusGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, nucleusR);
     nucleusGrad.addColorStop(0, '#ffffff');
     nucleusGrad.addColorStop(0.35, '#00f0ff');
-    nucleusGrad.addColorStop(0.7, '#818cf8');
-    nucleusGrad.addColorStop(1, 'rgba(168, 85, 247, 0)');
+    nucleusGrad.addColorStop(0.7, '#a78bfa');
+    nucleusGrad.addColorStop(1, 'rgba(139, 92, 246, 0)');
     ctx.fillStyle = nucleusGrad;
     ctx.shadowColor = '#00f0ff';
     ctx.shadowBlur = 24;
@@ -390,9 +395,9 @@ export class SkillsGlobe {
     // 3. Multi-Axis 3D Atomic Orbit Rings
     const orbits = [
       { rx: r * 1.05, ry: r * 0.38, angle: this.rotY * 0.6, color: '#00f0ff', glow: 'rgba(0, 240, 255, 0.7)', dash: [], speed: 1.2 },
-      { rx: r * 0.95, ry: r * 0.35, angle: -this.rotX * 0.8 + 1.05, color: '#c084fc', glow: 'rgba(192, 132, 252, 0.7)', dash: [6, 6], speed: 1.6 },
-      { rx: r * 0.90, ry: r * 0.42, angle: this.rotY * 0.5 - 1.05, color: '#38bdf8', glow: 'rgba(56, 189, 248, 0.7)', dash: [], speed: 0.9 },
-      { rx: r * 0.75, ry: r * 0.30, angle: this.pulseTime * 0.4, color: '#f43f5e', glow: 'rgba(244, 63, 94, 0.65)', dash: [4, 4], speed: 2.1 }
+      { rx: r * 0.95, ry: r * 0.35, angle: -this.rotX * 0.8 + 1.05, color: '#c4b5fd', glow: 'rgba(196, 181, 253, 0.7)', dash: [6, 6], speed: 1.6 },
+      { rx: r * 0.90, ry: r * 0.42, angle: this.rotY * 0.5 - 1.05, color: '#67e8f9', glow: 'rgba(103, 232, 249, 0.7)', dash: [], speed: 0.9 },
+      { rx: r * 0.75, ry: r * 0.30, angle: this.pulseTime * 0.4, color: '#8b5cf6', glow: 'rgba(139, 92, 246, 0.65)', dash: [4, 4], speed: 2.1 }
     ];
 
     orbits.forEach((orb) => {
@@ -536,8 +541,50 @@ export class SkillsGlobe {
     ctx.restore();
   }
 
+  start() {
+    if (!this.isRunning) {
+      this.isRunning = true;
+      this.rafId = requestAnimationFrame(this.render);
+    }
+  }
+
+  stop() {
+    this.isRunning = false;
+    if (this.rafId) {
+      cancelAnimationFrame(this.rafId);
+      this.rafId = null;
+    }
+  }
+
+  initIntersectionObserver() {
+    const target = this.container || this.canvas;
+    if (!target) {
+      this.start();
+      return;
+    }
+
+    if ('IntersectionObserver' in window) {
+      this.observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            this.start();
+          } else {
+            this.stop();
+          }
+        });
+      }, {
+        rootMargin: '140px 0px', // start rendering 140px before entering viewport for instant seamless experience
+        threshold: 0
+      });
+      this.observer.observe(target);
+    } else {
+      this.start();
+    }
+  }
+
   destroy() {
-    if (this.rafId) cancelAnimationFrame(this.rafId);
+    this.stop();
+    if (this.observer) this.observer.disconnect();
   }
 }
 

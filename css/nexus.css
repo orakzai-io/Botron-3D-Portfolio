@@ -3,7 +3,9 @@
    Loaded last so it cleanly overrides the boilerplate UI.
    ============================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap');
+/* Fonts are loaded via <link rel="stylesheet"> in index.html <head>
+   (preconnect + single css2 request) — @import here caused a serial
+   CSS → fonts-CSS → font-files waterfall that delayed first paint. */
 
 :root {
   --bg: #04050a;
@@ -22,7 +24,10 @@
   --font-ui: 'JetBrains Mono', monospace;
   --font-body: 'Inter', -apple-system, sans-serif;
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
-  --danger: #ff4d5e;
+  --danger: #00f0ff; /* two-color contract: validation reuses the cyan atom */
+  /* accent atoms — cyan is the single UI accent (violet lives only in the bot scene & skills globe).
+     Every cyan in the UI derives from these two shades; no one-off cyan hexes anywhere else. */
+  --cyan-soft: #67e8f9;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -56,7 +61,9 @@ body {
 }
 .nx-fx::after {
   content: ""; position: absolute; inset: 0;
-  background: radial-gradient(ellipse at 50% 42%, transparent 55%, rgba(0, 0, 0, 0.74) 100%);
+  background:
+    radial-gradient(ellipse at 50% 42%, rgba(0, 240, 255, 0.028) 0%, transparent 55%),
+    radial-gradient(ellipse at 50% 42%, transparent 55%, rgba(2, 8, 14, 0.78) 100%);
 }
 
 /* boot sequence overlay */
@@ -85,8 +92,8 @@ body.intro-complete .nx-boot { opacity: 0; visibility: hidden; }
 .nx-cursor-ring {
   position: fixed; width: 28px; height: 28px; margin: -14px 0 0 -14px;
   border: 1px solid rgba(232, 237, 244, 0.5); border-radius: 50%;
-  transition: width 0.22s var(--ease), height 0.22s var(--ease),
-              margin 0.22s var(--ease), border-color 0.22s, box-shadow 0.22s;
+  transition: width 0.15s var(--ease), height 0.15s var(--ease),
+              margin 0.15s var(--ease), border-color 0.15s, box-shadow 0.15s, scale 0.15s ease;
   display: grid; place-items: center;
 }
 .nx-cursor-ring i { position: absolute; background: rgba(232, 237, 244, 0.55); }
@@ -95,10 +102,10 @@ body.intro-complete .nx-boot { opacity: 0; visibility: hidden; }
 .nx-cursor-ring i:nth-child(3) { width: 100%; height: 1px; transform: translateY(-50%); }
 .nx-cursor-ring i:nth-child(4) { width: 100%; height: 1px; transform: translateY(50%); }
 .nx-cursor.is-hover .nx-cursor-ring {
-  width: 46px; height: 46px; margin: -23px 0 0 -23px;
+  width: 44px; height: 44px; margin: -22px 0 0 -22px;
   border-color: var(--cyan-dim); box-shadow: 0 0 16px var(--cyan-dim);
 }
-.nx-cursor.is-down .nx-cursor-ring { transform: scale(0.8); }
+.nx-cursor.is-down .nx-cursor-ring { scale: 0.8; }
 
 @keyframes nxAppear { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
 @keyframes nxRise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
@@ -161,10 +168,100 @@ body.intro-complete .nx-nav { opacity: 1; transform: none; }
   .nx-nav-links { gap: clamp(0.6rem, 2vw, 1.2rem); }
   .nx-nav-link { font-size: 0.62rem; letter-spacing: 0.16em; }
 }
-@media (max-width: 720px) {
-  .nx-nav { flex-wrap: wrap; gap: 0.4rem; }
-  .nx-nav-links { gap: 0.4rem; }
-  .nx-nav-link { font-size: 0.56rem; letter-spacing: 0.12em; }
+
+/* ── Mobile hamburger nav ─────────────────────────────────── */
+/* Mobile-only elements hidden by default on desktop */
+.nx-status-mobile { display: none; }
+/* Hamburger button — hidden on desktop */
+.nx-burger {
+  display: none;
+  flex-direction: column; justify-content: center; align-items: center;
+  gap: 5px; width: 36px; height: 36px; cursor: pointer;
+  background: rgba(255,255,255,0.04); border: 1px solid var(--line);
+  border-radius: 8px; padding: 0; flex-shrink: 0;
+  transition: background 0.25s, border-color 0.25s;
+  -webkit-tap-highlight-color: transparent;
+}
+.nx-burger:hover, .nx-burger:focus { background: rgba(0,240,255,0.07); border-color: rgba(0,240,255,0.35); }
+.nx-burger span {
+  display: block; width: 18px; height: 1.5px;
+  background: var(--silver-2); border-radius: 2px;
+  transform-origin: center;
+  transition: transform 0.35s var(--ease), opacity 0.25s, width 0.25s;
+}
+/* X state when open */
+.nx-burger.is-open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+.nx-burger.is-open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+.nx-burger.is-open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
+/* Mobile nav drawer */
+.nx-nav-drawer {
+  display: none;
+  position: absolute; top: 100%; left: 0; width: 100%;
+  background: rgba(6, 9, 16, 0.97);
+  backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+  border-bottom: 1px solid var(--line);
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 0.42s cubic-bezier(0.22,1,0.36,1);
+}
+.nx-nav-drawer.is-open { max-height: 480px; }
+.nx-nav-drawer ul {
+  list-style: none;
+  display: flex; flex-direction: column;
+  padding: 0.6rem 0 0.8rem;
+}
+.nx-nav-drawer ul li { opacity: 0; transform: translateX(-14px); transition: opacity 0.3s var(--ease), transform 0.3s var(--ease); }
+.nx-nav-drawer.is-open ul li { opacity: 1; transform: none; }
+.nx-nav-drawer.is-open ul li:nth-child(1) { transition-delay: 0.04s; }
+.nx-nav-drawer.is-open ul li:nth-child(2) { transition-delay: 0.08s; }
+.nx-nav-drawer.is-open ul li:nth-child(3) { transition-delay: 0.12s; }
+.nx-nav-drawer.is-open ul li:nth-child(4) { transition-delay: 0.16s; }
+.nx-nav-drawer.is-open ul li:nth-child(5) { transition-delay: 0.20s; }
+.nx-nav-drawer.is-open ul li:nth-child(6) { transition-delay: 0.24s; }
+.nx-nav-drawer.is-open ul li:nth-child(7) { transition-delay: 0.28s; }
+.nx-nav-drawer.is-open ul li:nth-child(8) { transition-delay: 0.32s; }
+.nx-nav-drawer a {
+  display: flex; align-items: center; gap: 0.8rem;
+  padding: 0.82rem clamp(1.25rem, 5vw, 2rem);
+  font-family: var(--font-ui); font-size: 0.8rem; letter-spacing: 0.22em;
+  color: var(--silver-3); text-decoration: none;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  transition: color 0.2s, background 0.2s;
+}
+.nx-nav-drawer a::before { content: "›"; color: var(--cyan); font-size: 1rem; line-height: 1; }
+.nx-nav-drawer a:hover, .nx-nav-drawer a:active { color: var(--silver); background: rgba(0,240,255,0.05); }
+.nx-nav-drawer ul li:last-child a { border-bottom: none; }
+
+@media (max-width: 768px) {
+  .nx-nav {
+    flex-wrap: nowrap;
+    gap: 0;
+    padding: 0.75rem clamp(1rem, 4vw, 1.5rem);
+    position: fixed; /* ensure drawer is relative to nav */
+  }
+  /* Brand takes all space; status + burger go to the right */
+  .nx-brand { flex: 1 1 auto; }
+  /* Hide desktop link list */
+  .nx-nav-links { display: none; }
+  /* Hide desktop status on mobile, shown differently */
+  .nx-status { display: none; }
+  /* Show burger */
+  .nx-burger { display: flex; margin-left: 0.75rem; }
+  /* Show mobile status pill smaller */
+  .nx-status-mobile {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    font-family: var(--font-ui); font-size: 0.6rem; letter-spacing: 0.14em;
+    color: var(--cyan); white-space: nowrap;
+  }
+  .nx-status-mobile-dot {
+    width: 5px; height: 5px; border-radius: 50%; background: var(--cyan);
+    box-shadow: 0 0 7px var(--cyan); animation: pulse 2.2s infinite; flex-shrink: 0;
+  }
+  /* Show drawer */
+  .nx-nav-drawer { display: block; }
+  /* Hair progress bar stays full-width */
+  .nx-hair { bottom: -1px; }
 }
 
 .nx-hair {
@@ -227,6 +324,12 @@ body.intro-complete .nx-copy .nx-in { animation-play-state: running; }
   filter: drop-shadow(0 0 26px rgba(180, 196, 214, 0.14));
 }
 .nx-caret { color: var(--cyan); -webkit-text-fill-color: var(--cyan); animation: blink 1.1s steps(1) infinite; }
+
+/* terminal caret blink — hard on/off, no fade (used by hero caret + boot caret) */
+@keyframes blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
 
 .nx-role {
   font-family: var(--font-ui); font-size: 0.72rem; letter-spacing: 0.18em;
@@ -305,6 +408,13 @@ body.intro-complete .nx-copy .nx-in { animation-play-state: running; }
 .nx-bubble--hero.is-visible {
   opacity: 1;
   pointer-events: auto;
+  cursor: pointer;
+  transition: opacity 0.5s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.nx-bubble--hero.is-visible:hover {
+  border-color: rgba(0, 240, 255, 0.65);
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.85), 0 0 30px rgba(0, 240, 255, 0.35);
 }
 
 /* Hard override: bot is off this beat — bubble is gone no matter what */
@@ -624,6 +734,15 @@ html.nx-cursor-on .nx-cursor { display: block; }
 .nx-nav, .nx-brand, .nx-nav-links, .nx-status, .nx-actions,
 .nx-beat-copy, .nx-chip, .nx-mini, .nx-proj, .nx-timeline, .nx-timeline-card, .nx-quotes-viewport, .nx-contact,
 .nx-filter-bar, .nx-filter-pill, .nx-telemetry-hud, .nx-skills-stage, #skills-globe { pointer-events: auto; }
+
+/* BOTRON chat — always interactive regardless of overlay stacking */
+.nx-chat-fab,
+.nx-chat-window,
+.nx-chat-window *,
+.nx-chat-input,
+.nx-chat-send-btn,
+.nx-chat-close-btn,
+.nx-chat-chip { pointer-events: auto !important; }
 
 /* ============================================================
    Lenis smooth-scroll (wired up in js/webgl/camera-story.js).
@@ -1166,7 +1285,7 @@ html.lenis body { height: auto; }
   font-family: var(--font-disp);
   font-size: 0.85rem;
   font-weight: 600;
-  color: var(--silver);
+  color: var(--cyan); /* matches the experience-section identity accent */
   letter-spacing: 0.01em;
 }
 .nx-author-role {
@@ -1344,7 +1463,7 @@ html.lenis body { height: auto; }
 .nx-field.has-error input,
 .nx-field.has-error textarea {
   border-color: var(--danger);
-  box-shadow: 0 0 0 3px rgba(255, 77, 94, 0.12);
+  box-shadow: 0 0 0 3px rgba(0, 240, 255, 0.10);
 }
 .nx-field.has-error .nx-field-error {
   opacity: 1;
@@ -1362,7 +1481,7 @@ html.lenis body { height: auto; }
   border-top: 1px solid var(--line-2);
   background: rgba(5, 7, 12, 0.88);
   backdrop-filter: blur(16px);
-  padding: 2.2rem 0 calc(2.5rem + 35px);
+  padding: 20px 0 calc(20px + 35px);
   pointer-events: auto;
 }
 .nx-footer-container {
@@ -1483,5 +1602,215 @@ html.lenis body { height: auto; }
 @media (max-width: 640px) {
   .nx-proj-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+/* ============================================================
+   ENHANCEMENT LAYER — cyan UI polish (violet reserved for bot scene & skills atom)
+   Appended last so it wins over everything above.
+   ============================================================ */
+
+/* --- ambient aurora atmosphere (drifts behind the 3D stage) --- */
+body::before, body::after {
+  content: "";
+  position: fixed;
+  z-index: 0;
+  width: 62vw;
+  height: 62vw;
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(90px);
+}
+body::before {
+  top: -24vw; right: -16vw;
+  background: radial-gradient(circle, rgba(0, 240, 255, 0.13), transparent 65%);
+  animation: auroraDrift1 26s ease-in-out infinite alternate;
+}
+body::after {
+  bottom: -28vw; left: -20vw;
+  background: radial-gradient(circle, rgba(0, 240, 255, 0.08), transparent 65%);
+  animation: auroraDrift2 34s ease-in-out infinite alternate;
+}
+@keyframes auroraDrift1 { to { transform: translate3d(-6vw, 5vw, 0) scale(1.12); opacity: 0.4; } }
+@keyframes auroraDrift2 { to { transform: translate3d(5vw, -4vw, 0) scale(1.1); opacity: 0.42; } }
+
+/* --- selection, scrollbar, focus rings --- */
+::selection { background: rgba(0, 240, 255, 0.2); color: #fff; }
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(0, 240, 255, 0.45), rgba(103, 232, 249, 0.35));
+  border-radius: 6px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, rgba(0, 240, 255, 0.7), rgba(103, 232, 249, 0.6));
+}
+a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible {
+  outline: 2px solid var(--cyan-dim);
+  outline-offset: 3px;
+}
+
+/* --- nav: gradient hover underline --- */
+.nx-nav-link::after { background: linear-gradient(90deg, var(--cyan), rgba(103, 232, 249, 0.4), transparent); }
+
+/* --- hero: accent gradient on the name (caret stays OUTSIDE the clip
+   so its opacity blink actually toggles — a background-clip:text parent
+   paints the glyph shape through the mask and defeats child opacity) --- */
+.nx-title-name {
+  background: linear-gradient(100deg, #f2f7fa 8%, var(--cyan-soft) 78%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+.nx-caret {
+  color: var(--cyan);
+  -webkit-text-fill-color: var(--cyan);
+  animation: nxCaretBlink 1.1s steps(1) infinite;
+}
+@keyframes nxCaretBlink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+/* --- buttons: sheen sweep + dual-accent glow --- */
+.nx-btn { position: relative; overflow: hidden; }
+.nx-btn::after {
+  content: "";
+  position: absolute;
+  top: 0; left: -70%;
+  width: 45%; height: 100%;
+  background: linear-gradient(105deg, transparent, rgba(255, 255, 255, 0.16), transparent);
+  transform: skewX(-22deg);
+  transition: left 0.65s var(--ease);
+  pointer-events: none;
+}
+.nx-btn:hover::after { left: 135%; }
+.nx-btn:hover {
+  border-color: rgba(0, 240, 255, 0.45);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5), 0 0 22px rgba(0, 240, 255, 0.16), 0 0 34px rgba(0, 240, 255, 0.08);
+}
+.nx-actions .nx-btn:not(.nx-btn--ghost),
+.nx-contact-form .nx-btn {
+  background: linear-gradient(135deg, rgba(0, 240, 255, 0.13), rgba(103, 232, 249, 0.13));
+  border-color: rgba(0, 240, 255, 0.35);
+}
+.nx-actions .nx-btn:not(.nx-btn--ghost):hover,
+.nx-contact-form .nx-btn:hover {
+  background: linear-gradient(135deg, rgba(0, 240, 255, 0.22), rgba(103, 232, 249, 0.22));
+  border-color: rgba(0, 240, 255, 0.6);
+}
+/* --- tags: hover accent --- */
+.nx-tag { transition: all 0.25s var(--ease); }
+.nx-tag:hover {
+  color: var(--silver);
+  border-color: rgba(0, 240, 255, 0.4);
+  background: rgba(0, 240, 255, 0.06);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(0, 240, 255, 0.12);
+}
+
+/* --- cards: quiet education-style treatment (subtle silver hairline, soft shadow) --- */
+.nx-proj, .nx-timeline-card, .nx-quote, .nx-telemetry-hud {
+  border: 1px solid var(--line);
+  background: linear-gradient(135deg, rgba(13, 17, 26, 0.55), rgba(7, 9, 15, 0.72));
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+}
+.nx-proj:hover, .nx-timeline-card:hover, .nx-quote:hover {
+  border-color: var(--line-2);
+  background: linear-gradient(135deg, rgba(17, 22, 33, 0.62), rgba(9, 12, 19, 0.78));
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+  transform: translateY(-4px);
+}
+
+/* --- section titles: subtle accent gradient text --- */
+.nx-beat-title {
+  background: linear-gradient(95deg, #ffffff 18%, var(--cyan-soft) 92%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 26px rgba(0, 240, 255, 0.14);
+}
+
+/* --- timeline: gradient spine, accent dots, violet alternation --- */
+.nx-timeline::before {
+  background: linear-gradient(180deg, transparent, rgba(0, 240, 255, 0.35) 8%, rgba(103, 232, 249, 0.42) 50%, rgba(0, 240, 255, 0.35) 92%, transparent);
+}
+.nx-timeline-dot { background: linear-gradient(135deg, var(--cyan), var(--cyan-soft)); }
+.nx-timeline-item:nth-child(even) .nx-timeline-dot {
+  background: linear-gradient(135deg, var(--cyan-soft), var(--cyan));
+  box-shadow: 0 0 0 4px rgba(0, 240, 255, 0.14), 0 0 12px var(--cyan);
+}
+.nx-timeline-item:nth-child(even) .nx-timeline-date {
+  color: var(--cyan);
+  border-color: var(--cyan-dim);
+  background: rgba(0, 240, 255, 0.07);
+}
+
+/* --- telemetry HUD accent bar --- */
+.nx-telemetry-hud::before { background: linear-gradient(180deg, var(--cyan), var(--cyan-soft)); }
+
+/* --- filter pill active: dual glow --- */
+.nx-filter-pill.active { box-shadow: 0 0 0 1px rgba(0, 240, 255, 0.35), 0 0 18px rgba(0, 240, 255, 0.22), 0 0 38px rgba(0, 240, 255, 0.10); }
+
+/* --- quotes carousel --- */
+.nx-quotes-dot.active { background: linear-gradient(90deg, var(--cyan), var(--cyan-soft)); }
+.nx-quotes-arrow:hover {
+  border-color: rgba(0, 240, 255, 0.5);
+  color: var(--cyan);
+  box-shadow: 0 0 16px rgba(0, 240, 255, 0.18), 0 0 26px rgba(0, 240, 255, 0.08);
+}
+
+/* --- contact form focus: dual-accent ring --- */
+.nx-field input:focus, .nx-field textarea:focus {
+  border-color: rgba(0, 240, 255, 0.45);
+  box-shadow: 0 0 0 3px rgba(0, 240, 255, 0.1), 0 0 22px rgba(0, 240, 255, 0.08);
+}
+
+/* --- footer: gradient hairline + social glow --- */
+.nx-footer {
+  border-top: 1px solid transparent;
+  background:
+    linear-gradient(rgba(5, 7, 12, 0.88), rgba(5, 7, 12, 0.88)) padding-box,
+    linear-gradient(90deg, transparent, rgba(0, 240, 255, 0.50), transparent) border-box;
+}
+.nx-social-link:hover {
+  box-shadow: 0 4px 16px rgba(0, 240, 255, 0.2), 0 0 26px rgba(0, 240, 255, 0.08);
+}
+
+/* --- reduced motion: disable ambient drift + sheen --- */
+@media (prefers-reduced-motion: reduce) {
+  body::before, body::after { animation: none; }
+  .nx-btn::after { display: none; }
+}
+
+/* ==========================================================================
+   LOW-GPU & MOBILE ULTRA-FAST PERFORMANCE OPTIMIZATIONS
+   ========================================================================== */
+
+/* 1. Off-screen narrative beats layout skipping */
+.nx-beat {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 750px;
+}
+
+/* 2. Mobile glassmorphism blur optimization (saves GPU raster passes on mobile) */
+@media (max-width: 768px) {
+  .nx-nav,
+  .nx-bubble,
+  .nx-btn,
+  .nx-filter-pill,
+  .nx-telemetry-hud,
+  .nx-proj-card,
+  .nx-timeline-card,
+  .nx-quotes-card {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: rgba(8, 12, 22, 0.94) !important;
+  }
+
+  .nx-proj-card,
+  .nx-timeline-card,
+  .nx-quotes-card {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6) !important;
   }
 }

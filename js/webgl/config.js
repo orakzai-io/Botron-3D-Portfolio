@@ -2,7 +2,7 @@
 // Single place for all tuning knobs: camera poses, gaze targets, perf limits.
 
 export const BLOOM_ENABLED = false;
-export const TARGET_FPS = 40;          // render-loop throttle
+export const TARGET_FPS = 30;          // render-loop throttle (30fps - low CPU mode)
 export const MOBILE_BREAKPOINT = 900;  // below this, hero re-centers
 export const ROBOT_BASE_X_DESKTOP = 58; // right-of-center staging (desktop)
 export const INTRO_DURATION = 5;     // seconds for the intro pull-back
@@ -31,11 +31,11 @@ export const GAZE_TARGETS = {
   projects: ".nx-beat-copy",
   education: ".nx-beat-copy",
   testimonials: ".nx-beat-copy",
-  contact: ".nx-beat-copy",
+  contact: ".nx-contact-stage",
 };
 
 // Extra yaw bias per beat (gaze units). Positive = head turns further
 // screen-right, negative = further left. 0 / missing = current behavior.
 export const GAZE_YAW_BIAS = {
-  contact: 0.15,
+  contact: 0.35,
 };
