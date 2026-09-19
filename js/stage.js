@@ -1,4 +1,4 @@
-// js/main.js — NEXBOT entry point.
+// js/stage.js — NEXBOT engine (imported by js/main.js).
 // Glues the WebGL scene, scroll-driven camera story, robot, gaze, and UI
 // telemetry together, then drives the (FPS-throttled) render loop.
 import * as THREE from "three";
@@ -12,7 +12,7 @@ import nexbotModelUrl from "./data/nexbot.glb?url";
 import { TARGET_FPS } from "./webgl/config.js";
 
 const container = document.getElementById("stage-container");
-const { renderer, scene, camera, controls, composer, glowRing, particles } = setupScene({ container });
+const { renderer, scene, camera, controls, glowRing, particles } = setupScene({ container });
 
 // Shared, smoothed mouse state (currentX/Y are the lerped normalized values).
 const mouse = { targetX: 0, targetY: 0, currentX: 0, currentY: 0 };
@@ -215,7 +215,6 @@ window.addEventListener("resize", () => {
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.0));
-  if (composer) composer.setSize(window.innerWidth, window.innerHeight);
   story.onResize?.(); // camera-story re-collects beats + refreshes ScrollTrigger
 });
 
@@ -291,8 +290,7 @@ function animate(currentTime) {
   controls.update();
   telemetry.update();
 
-  if (composer) composer.render();
-  else renderer.render(scene, camera);
+  renderer.render(scene, camera);
 }
 
 // Start the loop via rAF so the first frame receives a valid timestamp.

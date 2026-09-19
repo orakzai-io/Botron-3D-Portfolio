@@ -1,11 +1,9 @@
 // js/webgl/config.js
 // Single place for all tuning knobs: camera poses, gaze targets, perf limits.
 
-export const BLOOM_ENABLED = false;
 export const TARGET_FPS = 30;          // render-loop throttle (30fps - low CPU mode)
 export const MOBILE_BREAKPOINT = 900;  // below this, hero re-centers
 export const ROBOT_BASE_X_DESKTOP = 58; // right-of-center staging (desktop)
-export const INTRO_DURATION = 5;     // seconds for the intro pull-back
 
 // One camera pose per story beat. c = camera position [x,y,z], t = look-at [x,y,z].
 // `bot` = whether the NEXBOT 3D model is rendered during this beat (false hides it
