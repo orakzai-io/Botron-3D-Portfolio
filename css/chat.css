@@ -515,7 +515,7 @@
 }
 
 /* Mobile Low-GPU optimization for chat copilot */
-@media (max-width: 768px) {
+@media (hover: none) and (pointer: coarse) {
   .nx-chat-fab,
   .nx-chat-window {
     backdrop-filter: none !important;

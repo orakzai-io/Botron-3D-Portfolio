@@ -9,7 +9,7 @@ import { createRobot } from "./webgl/robot.js";
 import { createTelemetry } from "./webgl/telemetry.js";
 import { createDebugOverlay } from "./webgl/debug-camera.js"; // <--- NEW
 import nexbotModelUrl from "./data/nexbot.glb?url";
-import { TARGET_FPS } from "./webgl/config.js";
+import { TARGET_FPS, IS_LOW_POWER } from "./webgl/config.js";
 
 const container = document.getElementById("stage-container");
 const { renderer, scene, camera, controls, glowRing, particles } = setupScene({ container });
@@ -223,7 +223,7 @@ window.addEventListener("resize", () => {
 // --- Render loop (Adaptive GPU sleeping, FPS-throttled, paused when tab is hidden) ---
 const clock = new THREE.Clock();
 let lastRenderTime = 0;
-const isMobile = typeof window !== "undefined" && window.innerWidth <= 768;
+const isMobile = IS_LOW_POWER;
 const activeFPS = isMobile ? 24 : TARGET_FPS;
 const frameInterval = 1000 / activeFPS;
 

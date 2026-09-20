@@ -5,6 +5,12 @@ export const TARGET_FPS = 30;          // render-loop throttle (30fps - low CPU 
 export const MOBILE_BREAKPOINT = 900;  // below this, hero re-centers
 export const ROBOT_BASE_X_DESKTOP = 58; // right-of-center staging (desktop)
 
+// Perf gate: touch-primary devices (phones/tablets). Pointer-based, so it also
+// catches landscape phones (~850-930 CSS px, which a width breakpoint misses)
+// and never trips on a narrow desktop window. Evaluated once at load.
+export const IS_LOW_POWER = typeof window !== "undefined" &&
+  window.matchMedia("(hover: none) and (pointer: coarse)").matches;
+
 // One camera pose per story beat. c = camera position [x,y,z], t = look-at [x,y,z].
 // `bot` = whether the NEXBOT 3D model is rendered during this beat (false hides it
 // and skips its per-frame updates to save GPU).

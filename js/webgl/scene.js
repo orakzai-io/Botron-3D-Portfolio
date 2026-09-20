@@ -4,9 +4,10 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+import { IS_LOW_POWER } from "./config.js";
 
 export function setupScene({ container }) {
-  const isMobile = typeof window !== "undefined" && window.innerWidth <= 768;
+  const isMobile = IS_LOW_POWER;
 
   // --- Renderer (low-power + medium precision for zero fan noise) ---
   const renderer = new THREE.WebGLRenderer({
@@ -66,15 +67,19 @@ export function setupScene({ container }) {
   const fill = new THREE.AmbientLight(0x3c4658, 0.35);
   scene.add(fill);
 
-  // --- Contact-shadow ground plane ---
-  const ground = new THREE.Mesh(
-    new THREE.PlaneGeometry(2400, 2400),
-    new THREE.ShadowMaterial({ opacity: 0.32 })
-  );
-  ground.rotation.x = -Math.PI / 2;
-  ground.position.y = -0.5;
-  ground.receiveShadow = true;
-  scene.add(ground);
+  // --- Contact-shadow ground plane (only where shadows actually render) ---
+  // With shadowMap disabled, ShadowMaterial draws nothing visible but still
+  // costs a transparent full-screen-ish pass every frame — so don't create it.
+  if (!isMobile) {
+    const ground = new THREE.Mesh(
+      new THREE.PlaneGeometry(2400, 2400),
+      new THREE.ShadowMaterial({ opacity: 0.32 })
+    );
+    ground.rotation.x = -Math.PI / 2;
+    ground.position.y = -0.5;
+    ground.receiveShadow = true;
+    scene.add(ground);
+  }
 
   // --- Infinite silver grid (dissolves into the fog) ---
   const grid = new THREE.GridHelper(2600, 64, 0x3a4552, 0x1c222b);

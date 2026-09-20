@@ -1794,7 +1794,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
 }
 
 /* 2. Mobile glassmorphism blur optimization (saves GPU raster passes on mobile) */
-@media (max-width: 768px) {
+@media (hover: none) and (pointer: coarse) {
   .nx-nav,
   .nx-bubble,
   .nx-btn,
