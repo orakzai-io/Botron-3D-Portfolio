@@ -124,14 +124,60 @@ VITE_RAG_API_URL=http://localhost:8000/chat
 │   └── knowledge.py      # the indexed knowledge chunks
 ```
 
+
+> **Not in this repository.** `.prettierrc.json` / `.prettierignore` are a personal
+> formatting preference and are excluded locally, as is `docs/` (internal
+> architecture notes). Prettier still runs without them using its defaults, so
+> `npm run format` works for anyone who clones.
+
 > **Two `assets` directories, on purpose.** `assets/` holds files the bundler
 > processes — they are imported in JS, content-hashed, and emitted to `dist/assets/`.
 > `public/` holds files Vite copies through untouched, at their exact path. The
 > resume PDF lives in `public/assets/` because it is linked with a plain
 > `<a href>`, which the bundler cannot see or process.
 
-**More:** [frontend/README.md](frontend/README.md) &middot;
-[backend/README.md](backend/README.md)
+**More:** [backend/README.md](backend/README.md) — the RAG service in depth.
+
+## How it works
+
+### Boot sequence
+
+Load order is deliberate: `index.html` paints immediately (content, not a spinner),
+`boot-gate.js` owns the reveal and releases on `document.fonts.ready`, then `main.js`
+waits two `requestAnimationFrame` ticks so at least one frame is on screen before the
+3D chunk downloads. The bot scales in from 0.2 when it lands, so the late arrival reads
+as a feature rather than a pop. `BOOT_MAX_MS` hard-releases the overlay at 3.5s even if
+the model has not arrived.
+
+### Performance decisions
+
+These were measured, not guessed:
+
+- **Low-power render path** — `powerPreference: 'low-power'`, antialiasing and shadow
+  maps off, no ground plane, 70 dust particles.
+- **Adaptive frame rate** — 60 FPS while scrolling, touching or tracking the cursor;
+  20 FPS idle. A constant 60 wastes battery on a page nobody is animating.
+- **`content-visibility` disabled on mobile** — `contain-intrinsic-size: 1px 750px`
+  substitutes a fixed 750px box when a section scrolls away. On a phone these sections
+  are *taller* than 750px, so scrolling swapped real content for placeholders and
+  produced phantom gaps.
+- **`100svh`, not `100vh`** — `100vh` is the *tall* viewport on mobile (it includes the
+  area under the collapsing URL bar), so every section overhung the screen. An
+  `@supports` fallback covers older iOS.
+- **Assets are Vite imports** — the photos use real `import` statements. A bare
+  `"assets/photo.webp"` string is invisible to the bundler: it works in dev and 404s in
+  `dist/`. This was a real bug, found by inspecting build output rather than source.
+- **No `backdrop-filter`** — frosted glass re-blurs everything behind it every frame,
+  over an animating WebGL canvas.
+
+### Mobile
+
+Safe-area insets on the FAB, status strip and chat window. The chat FAB collapses to a
+52px circle after 3.5s at ≤900px — expanded on load, because the 3D speech bubble that
+normally reveals it is hidden below that width. That breakpoint is deliberately locked to
+the bubble rule; when they drifted apart, 601–900px screens (most phones, all tablets)
+got neither affordance. The status bar's `MOUSE 0,0 · CURSOR TRK` readout is hidden on
+coarse pointers, where there is no cursor to track.
 
 ## Deployment
 
