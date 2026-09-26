@@ -44,7 +44,7 @@ hasn't arrived, so a slow network degrades to "page then bot" instead of a hang.
 | `js/ui/chat.js` | BOTRON: warm-up, fetch, photo layer, HTML sanitiser, lightbox |
 | `js/ui/skills-globe.js` | 2D-canvas 3D projection of the skills graph |
 | `css/base.css` | Reset, design tokens, typography |
-| `css/nexus.css` | Components, sections, the mobile layer |
+| `css/theme.css` | Components, sections, the mobile layer |
 | `css/chat.css` | Chat window, FAB, photo lightbox |
 
 ## Performance decisions
@@ -53,7 +53,7 @@ These were measured or benchmarked, not guessed:
 
 **Low-power render path.** The renderer requests `powerPreference: 'low-power'`,
 disables antialiasing and shadow maps, omits the ground plane, and runs 70 atmosphere
-particles (a richer 380-particle tier is preserved in [../docs/quality-tiers.md](../docs/quality-tiers.md)).
+particles. A richer 380-particle tier can be restored from `docs/quality-tiers.md`, which is kept out of the published repo.
 
 **Adaptive frame rate.** 60 FPS while scrolling, touching or tracking the cursor;
 20 FPS when idle. A constant 60 wastes battery for a page nobody is animating.
@@ -73,8 +73,7 @@ works in dev and 404s in `dist/`. This was a real bug, caught by inspecting the 
 output rather than the source.
 
 **No `backdrop-filter`.** Frosted glass re-blurs everything painted behind it, every
-frame, over an animating WebGL canvas. It was removed in favour of opaque panels; see
-[../docs/quality-tiers.md](../docs/quality-tiers.md) for the archive.
+frame, over an animating WebGL canvas. It was removed in favour of opaque panels.
 
 ## Mobile specifics
 

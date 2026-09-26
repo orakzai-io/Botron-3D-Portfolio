@@ -58,7 +58,7 @@ the image is deterministic.
   deterministic photo layer
 - **Skills globe** — mathematical 3D projection on a 2D canvas, zero extra WebGL contexts
 - **Adaptive performance** — 60 FPS while interacting, 20 FPS idle, deliberate
-  low-power render path (see [docs/quality-tiers.md](docs/quality-tiers.md))
+  low-power render path, chosen deliberately for battery and thermal headroom
 - **Mobile-tuned** — safe-area insets, collapse-to-circle FAB, `100svh` beats,
   touch-only states
 
@@ -106,27 +106,32 @@ VITE_RAG_API_URL=http://localhost:8000/chat
 ├── index.html            # single page, all sections
 ├── css/
 │   ├── base.css          # resets, tokens, typography
-│   ├── nexus.css         # design system, sections, enhancement layer
+│   ├── theme.css         # design system, sections, enhancement layer
 │   └── chat.css          # BOTRON chat UI
 ├── js/
 │   ├── main.js           # entry: progressive hydration
 │   ├── boot-gate.js      # owns the reveal, releases on fonts
 │   ├── stage.js          # WebGL stage orchestration
-│   ├── data/botron.glb   # 322 KB, Meshopt-compressed
+│   ├── models/botron.glb   # 322 KB, Meshopt-compressed
 │   ├── webgl/            # scene, robot, gaze, camera story, telemetry
 │   └── ui/               # chat, skills globe, UI wiring
-├── assets/               # project screenshots, photos, fonts
+├── assets/               # project screenshots, photos, fonts (Vite-imported)
+├── public/                # files served verbatim, NOT processed by Vite
+│   └── assets/Shahsawar.dev.pdf
 ├── backend/              # FastAPI RAG service  (see backend/README.md)
 │   ├── main.py           # /chat, /health, request model
 │   ├── rag.py            # retrieval: dense + TF-IDF, relevance floor
 │   └── knowledge.py      # the indexed knowledge chunks
-└── docs/                 # architecture notes
 ```
 
+> **Two `assets` directories, on purpose.** `assets/` holds files the bundler
+> processes — they are imported in JS, content-hashed, and emitted to `dist/assets/`.
+> `public/` holds files Vite copies through untouched, at their exact path. The
+> resume PDF lives in `public/assets/` because it is linked with a plain
+> `<a href>`, which the bundler cannot see or process.
+
 **More:** [frontend/README.md](frontend/README.md) &middot;
-[backend/README.md](backend/README.md) &middot;
-[docs/architecture.md](docs/architecture.md) &middot;
-[docs/quality-tiers.md](docs/quality-tiers.md)
+[backend/README.md](backend/README.md)
 
 ## Deployment
 

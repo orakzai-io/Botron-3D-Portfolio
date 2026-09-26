@@ -507,7 +507,7 @@ export class SkillsGlobe {
     });
 
     // Filter Buttons
-    const filterButtons = document.querySelectorAll('.nx-filter-pill');
+    const filterButtons = document.querySelectorAll('.bt-filter-pill');
     filterButtons.forEach((btn) => {
       btn.addEventListener('click', (e) => {
         filterButtons.forEach((b) => b.classList.remove('active'));
@@ -533,12 +533,12 @@ export class SkillsGlobe {
     if (!skill) return;
     const colors = CATEGORY_COLORS[skill.category] || CATEGORY_COLORS.ai;
 
-    const nameEl = document.getElementById('nx-telemetry-name');
-    const catEl = document.getElementById('nx-telemetry-cat');
-    const levelEl = document.getElementById('nx-telemetry-level');
-    const barEl = document.getElementById('nx-telemetry-bar');
-    const descEl = document.getElementById('nx-telemetry-desc');
-    const iconEl = document.getElementById('nx-telemetry-icon');
+    const nameEl = document.getElementById('bt-telemetry-name');
+    const catEl = document.getElementById('bt-telemetry-cat');
+    const levelEl = document.getElementById('bt-telemetry-level');
+    const barEl = document.getElementById('bt-telemetry-bar');
+    const descEl = document.getElementById('bt-telemetry-desc');
+    const iconEl = document.getElementById('bt-telemetry-icon');
 
     if (nameEl) nameEl.textContent = skill.name;
     if (catEl) {

@@ -1,5 +1,5 @@
 {
-  "name": "modern-portfolio",
+  "name": "botron-3d-portfolio",
   "private": true,
   "version": "1.0.0",
   "type": "module",
@@ -9,8 +9,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "fonts": "node scripts/fetch-fonts.mjs",
-    "format": "prettier --write \"js/**/*.js\"",
-    "format:check": "prettier --check \"js/**/*.js\""
+    "format": "prettier --write \"js/**/*.js\" \"css/**/*.css\" \"*.{html,json}\" \"backend/**/*.py\"",
+    "format:check": "prettier --check \"js/**/*.js\" \"css/**/*.css\" \"*.{html,json}\" \"backend/**/*.py\""
   },
   "dependencies": {
     "gsap": "3.12.5",

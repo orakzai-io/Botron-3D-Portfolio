@@ -3,12 +3,12 @@
 (function () {
   const fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
   const root = document.documentElement;
-  if (fine) root.classList.add('nx-cursor-on');
+  if (fine) root.classList.add('bt-cursor-on');
 
-  const cursor = document.getElementById('nx-cursor');
+  const cursor = document.getElementById('bt-cursor');
   if (fine && cursor) {
-    const dot = cursor.querySelector('.nx-cursor-dot');
-    const ring = cursor.querySelector('.nx-cursor-ring');
+    const dot = cursor.querySelector('.bt-cursor-dot');
+    const ring = cursor.querySelector('.bt-cursor-ring');
     let mx = innerWidth / 2,
       my = innerHeight / 2;
     let rx = mx,
@@ -58,7 +58,7 @@
     );
 
     wakeRoll();
-    const hoverEls = 'a, button, .nx-chip, .nx-mini, .nx-proj, .nx-filter-pill, .nx-telemetry-hud';
+    const hoverEls = 'a, button, .bt-chip, .bt-mini, .bt-proj, .bt-filter-pill, .bt-telemetry-hud';
     document.addEventListener('mouseover', (e) => {
       if (e.target.closest && e.target.closest(hoverEls)) cursor.classList.add('is-hover');
     });
@@ -73,7 +73,7 @@
   // scroll progress hairline under the nav — cached document height +
   // compositor-only scaleX write, so scrolling never pairs a layout read
   // (scrollHeight) with a style write (width) on the same tick.
-  const hair = document.getElementById('nx-hair');
+  const hair = document.getElementById('bt-hair');
   if (hair) {
     hair.style.width = '100%'; // CSS keeps this too; set defensively
     let _max = 1;
@@ -121,17 +121,17 @@
     },
     { threshold: 0.22 }
   );
-  document.querySelectorAll('.nx-beat, .nx-reveal').forEach((el) => io.observe(el));
+  document.querySelectorAll('.bt-beat, .bt-reveal').forEach((el) => io.observe(el));
 
   // ============================================================
   // Testimonials carousel — prev/next + dots, 6s auto-advance
   // paused on hover and whenever the viewport is off-screen.
   // ============================================================
-  const quoteViewport = document.querySelector('.nx-quotes-viewport');
+  const quoteViewport = document.querySelector('.bt-quotes-viewport');
   if (quoteViewport) {
-    const track = quoteViewport.querySelector('.nx-quotes-track');
-    const slides = quoteViewport.querySelectorAll('.nx-quote');
-    const dotsEl = quoteViewport.querySelector('.nx-quotes-dots');
+    const track = quoteViewport.querySelector('.bt-quotes-track');
+    const slides = quoteViewport.querySelectorAll('.bt-quote');
+    const dotsEl = quoteViewport.querySelector('.bt-quotes-dots');
     const prevBtn = quoteViewport.querySelector('[data-action="prev"]');
     const nextBtn = quoteViewport.querySelector('[data-action="next"]');
 
@@ -146,7 +146,7 @@
         slides.forEach((_, i) => {
           const dot = document.createElement('button');
           dot.type = 'button';
-          dot.className = 'nx-quotes-dot' + (i === 0 ? ' active' : '');
+          dot.className = 'bt-quotes-dot' + (i === 0 ? ' active' : '');
           dot.setAttribute('aria-label', 'Go to slide ' + (i + 1));
           dot.addEventListener('click', () => go(i));
           dotsEl.appendChild(dot);
@@ -209,10 +209,10 @@
     contactForm.noValidate = true;
 
     const clearFieldError = (input) => {
-      const field = input ? input.closest('.nx-field') : null;
+      const field = input ? input.closest('.bt-field') : null;
       if (!field || !field.classList.contains('has-error')) return;
       field.classList.remove('has-error');
-      const errEl = field.querySelector('.nx-field-error');
+      const errEl = field.querySelector('.bt-field-error');
       if (errEl) errEl.textContent = '';
     };
 
@@ -234,8 +234,8 @@
 
       checks.forEach((c) => {
         const input = document.getElementById(c.id);
-        const field = input ? input.closest('.nx-field') : null;
-        const errEl = field ? field.querySelector('.nx-field-error') : null;
+        const field = input ? input.closest('.bt-field') : null;
+        const errEl = field ? field.querySelector('.bt-field-error') : null;
         if (!field || !errEl) return;
         field.classList.remove('has-error');
         errEl.textContent = '';
@@ -275,8 +275,8 @@
   }
 
   // ── Mobile hamburger menu ──────────────────────────────────────────────
-  const burger = document.getElementById('nx-burger');
-  const drawer = document.getElementById('nx-drawer');
+  const burger = document.getElementById('bt-burger');
+  const drawer = document.getElementById('bt-drawer');
 
   if (burger && drawer) {
     const open = () => {

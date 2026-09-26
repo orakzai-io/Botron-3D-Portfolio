@@ -13,12 +13,12 @@
 // subtracting a script-start t0 would undercount by the whole JS parse.
 //
 // index.html carries the nets for the "bundle never evaluated" case (a failed
-// SCRIPT error listener + an 8s backstop) and sets window.__nxBootInit's
+// SCRIPT error listener + an 8s backstop) and sets window.__bBootInit's
 // counterpart state; this module owns the reveal from the moment it evaluates
-// and marks that with window.__nxBootInit / window.__nxBootDone.
+// and marks that with window.__bBootInit / window.__bBootDone.
 import { BOOT_MIN_MS, BOOT_MAX_MS, BOOT_FONTS_TIMEOUT_MS } from './webgl/config.js';
 
-window.__nxBootInit = true;
+window.__bBootInit = true;
 
 // Progressive hydration: release on fonts ONLY (≤ BOOT_FONTS_TIMEOUT_MS plus a
 // few frame ticks). The stage chunk hydrates right after the shell paints, and
@@ -32,7 +32,7 @@ let released = false;
 function release() {
   if (released) return;
   released = true;
-  window.__nxBootDone = true;
+  window.__bBootDone = true;
   window.removeEventListener('visibilitychange', onVisibilityChange);
   document.body.classList.add('intro-complete');
   if (import.meta.env.DEV) {

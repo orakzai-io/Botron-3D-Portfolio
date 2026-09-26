@@ -12,8 +12,8 @@ CHUNKS = [
         "content": (
             "If the visitor asks for a photo, picture, portrait, image or snapshot of Shahsawar (including \"swimming photo\", \"chess photo\", or just \"swimming\"/\"chess\" when clearly about an image), reply with an html <img> tag and no other words.\n"
             "Choose the file by topic: assets/professionalpic.webp for a general portrait or headshot; assets/swimmingpic.webp for swimming, medals, coaching or athletics; assets/chesspic.webp for chess. Emit all three in that order only if they ask for every photo.\n"
-            "Every tag must carry class=\"nx-chat-photo\", alt text describing the photo, and loading=\"lazy\". Example:\n"
-            '<img class="nx-chat-photo" src="assets/professionalpic.webp" alt="Shahsawar Orakzai in a suit and tie" loading="lazy">'
+            "Every tag must carry class=\"bt-chat-photo\", alt text describing the photo, and loading=\"lazy\". Example:\n"
+            '<img class="bt-chat-photo" src="assets/professionalpic.webp" alt="Shahsawar Orakzai in a suit and tie" loading="lazy">'
             "Never describe a photograph in words and never invent any other image URL.\n"
         )
     },    {

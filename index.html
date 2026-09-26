@@ -9,7 +9,7 @@
 
     <!-- Quality tiers were removed on purpose: the site ships ONE look on every
          device (flat panels, no CSS glass blur, the low-power 3D path). The old
-         gate script that put an nx-lite class on <html>, the weak-device
+         gate script that put an bt-lite class on <html>, the weak-device
          heuristic, the ?quality=lite|full overrides and the FPS watchdog are all
          deleted. See docs/quality-tiers.md for the removed code and how to
          restore the glass design if you ever want it back. -->
@@ -20,18 +20,18 @@
     <link rel="preload" href="assets/fonts/jetbrains-mono-latin.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="assets/fonts/space-grotesk-latin.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="css/fonts.css">
-    <link rel="stylesheet" href="css/nexus.css">
+    <link rel="stylesheet" href="css/theme.css">
     <link rel="stylesheet" href="css/chat.css">
     <!-- Preload the 322 KB 3D bot model at HIGH priority: downloads concurrently
          with the initial bundle so the bot is cached by the time Three.js mounts.
          Starved/data-saver links still drop it via the script below. -->
-    <link id="nx-glb-preload" rel="preload" href="./js/data/botron.glb" as="fetch" type="model/gltf-binary" crossorigin fetchpriority="high">
+    <link id="bt-glb-preload" rel="preload" href="./js/models/botron.glb" as="fetch" type="model/gltf-binary" crossorigin fetchpriority="high">
     <script>
         (function () {
             try {
                 var c = navigator.connection || navigator.mozConnection || navigator.webkitConnection || {};
                 if (c.saveData || /(^|-)2g|3g/.test(c.effectiveType || "")) {
-                    var el = document.getElementById("nx-glb-preload");
+                    var el = document.getElementById("bt-glb-preload");
                     if (el && el.parentNode) el.parentNode.removeChild(el);
                 }
             } catch (e) { /* best effort only */ }
@@ -40,20 +40,20 @@
 </head>
 
 <body>
-    <div class="nx-fx" aria-hidden="true"></div>
-    <div class="nx-boot" id="nx-boot" aria-hidden="true">
-        <p>&gt; nexus_bios v2.0 — booting</p>
+    <div class="bt-fx" aria-hidden="true"></div>
+    <div class="bt-boot" id="bt-boot" aria-hidden="true">
+        <p>&gt; botron_core v2.0 — booting</p>
         <p>&gt; calibrate_eyes .......... OK</p>
         <p>&gt; mount_arms ............. OK</p>
-        <p>&gt; handshake_with_human ..... <span class="nx-boot-caret">▊</span></p>
+        <p>&gt; handshake_with_human ..... <span class="bt-boot-caret">▊</span></p>
     </div>
     <script>
         // Boot-gate handoff. js/boot-gate.js owns the reveal once it evaluates,
         // but on slow connections the bundle (~795 kB of JS) may not have run
         // when these nets fire — so they only cover the catastrophic paths.
-        var __nxBootReveal = function() {
-            if (window.__nxBootDone) return;
-            window.__nxBootDone = true;
+        var __bBootReveal = function() {
+            if (window.__bBootDone) return;
+            window.__bBootDone = true;
             document.body.classList.add("intro-complete");
         };
         // Net 1: errors. Capture phase catches resource errors too; a runtime
@@ -62,28 +62,28 @@
             if (e.target && e.target !== window) {
                 // only a failed SCRIPT lifts the boot screen — a broken image
                 // or stylesheet must not reveal an unfinished site early
-                if (e.target.tagName === "SCRIPT") __nxBootReveal();
+                if (e.target.tagName === "SCRIPT") __bBootReveal();
                 return;
             }
             // runtime exception: matters only if the gate never initialized
-            if (!window.__nxBootInit) __nxBootReveal();
+            if (!window.__bBootInit) __bBootReveal();
         }, true);
         // Net 2: pathological stall (hanging fetch, eval throw with no error
         // event, gate bug). The gate's own BOOT_MAX_MS (3.5s) covers the normal
         // path; this only exists for the case where the gate never ran.
-        setTimeout(__nxBootReveal, 8000);
+        setTimeout(__bBootReveal, 8000);
 
         // HF Space iframe fix: IntersectionObserver may not fire inside sandboxed iframes.
         // After 2.5s, force-reveal any sections that are still hidden.
         setTimeout(function() {
-            document.querySelectorAll('.nx-reveal, .nx-beat').forEach(function(el) {
+            document.querySelectorAll('.bt-reveal, .bt-beat').forEach(function(el) {
                 el.classList.add('is-in');
             });
         }, 2500);
     </script>
-    <div class="nx-cursor" id="nx-cursor" aria-hidden="true">
-        <span class="nx-cursor-ring"><i></i><i></i><i></i><i></i></span>
-        <span class="nx-cursor-dot"></span>
+    <div class="bt-cursor" id="bt-cursor" aria-hidden="true">
+        <span class="bt-cursor-ring"><i></i><i></i><i></i><i></i></span>
+        <span class="bt-cursor-dot"></span>
     </div>
 
     <!-- 3D Stage Container (Fixed 3D Canvas Stage) -->
@@ -92,154 +92,156 @@
     <!-- UI Overlay Layer -->
     <div class="ui-overlay">
         <!-- BOTRON mouth-tracking speech bubble (JS drives its position) -->
-        <div class="nx-bubble nx-bubble--hero" id="botron-bubble" aria-live="polite">
-            <span class="nx-bubble-dot"></span>
+        <div class="bt-bubble bt-bubble--hero" id="botron-bubble" aria-live="polite">
+            <span class="bt-bubble-dot"></span>
             <p>// I'M BOTRON • ASK ME ANYTHING <span style="color:var(--cyan, #00f0ff)">[CLICK TO CHAT]</span></p>
         </div>
         <!-- Glassmorphic Navbar -->
-        <nav class="nx-nav" id="nx-nav">
-            <a href="#hero" class="nx-brand">
-                <span class="nx-cube" aria-hidden="true"><i></i><i></i><i></i></span>
-                <span class="nx-brand-name">ORAKZAI<span>.IO</span></span>
+        <nav class="bt-nav" id="bt-nav">
+            <a href="#hero" class="bt-brand">
+                <span class="bt-cube" aria-hidden="true"><i></i><i></i><i></i></span>
+                <span class="bt-brand-name">ORAKZAI<span>.IO</span></span>
             </a>
             <!-- Desktop links -->
-            <ul class="nx-nav-links">
-                <li><a class="nx-nav-link" href="#hero" data-cursor="hover">HOME</a></li>
-                <li><a class="nx-nav-link" href="#about" data-cursor="hover">ABOUT</a></li>
-                <li><a class="nx-nav-link" href="#skills" data-cursor="hover">SKILLS</a></li>
-                <li><a class="nx-nav-link" href="#experience" data-cursor="hover">EXPERIENCE</a></li>
-                <li><a class="nx-nav-link" href="#projects" data-cursor="hover">WORK</a></li>
-                <li><a class="nx-nav-link" href="#education" data-cursor="hover">EDUCATION</a></li>
-                <li><a class="nx-nav-link" href="#testimonials" data-cursor="hover">TESTIMONIALS</a></li>
-                <li><a class="nx-nav-link" href="#contact" data-cursor="hover">CONTACT</a></li>
+            <ul class="bt-nav-links">
+                <li><a class="bt-nav-link" href="#hero" data-cursor="hover">HOME</a></li>
+                <li><a class="bt-nav-link" href="#about" data-cursor="hover">ABOUT</a></li>
+                <li><a class="bt-nav-link" href="#skills" data-cursor="hover">SKILLS</a></li>
+                <li><a class="bt-nav-link" href="#experience" data-cursor="hover">EXPERIENCE</a></li>
+                <li><a class="bt-nav-link" href="#projects" data-cursor="hover">WORK</a></li>
+                <li><a class="bt-nav-link" href="#education" data-cursor="hover">EDUCATION</a></li>
+                <li><a class="bt-nav-link" href="#testimonials" data-cursor="hover">TESTIMONIALS</a></li>
+                <li><a class="bt-nav-link" href="#contact" data-cursor="hover">CONTACT</a></li>
             </ul>
             <!-- Desktop status pill -->
-            <div class="nx-status"><span class="nx-status-dot"></span>SYSTEM ONLINE</div>
+            <div class="bt-status"><span class="bt-status-dot"></span>SYSTEM ONLINE</div>
             <!-- Mobile: status pill (compact) + hamburger -->
-            <span class="nx-status-mobile" aria-hidden="true">
-                <span class="nx-status-mobile-dot"></span>SYS ONLINE
+            <span class="bt-status-mobile" aria-hidden="true">
+                <span class="bt-status-mobile-dot"></span>SYS ONLINE
             </span>
-            <button class="nx-burger" id="nx-burger" aria-label="Open navigation" aria-expanded="false" aria-controls="nx-drawer">
+            <button class="bt-burger" id="bt-burger" aria-label="Open navigation" aria-expanded="false" aria-controls="bt-drawer">
                 <span></span><span></span><span></span>
             </button>
             <!-- Mobile drawer (hidden on desktop) -->
-            <div class="nx-nav-drawer" id="nx-drawer" aria-hidden="true">
+            <div class="bt-nav-drawer" id="bt-drawer" aria-hidden="true">
                 <ul>
-                    <li><a href="#hero" class="nx-drawer-link">HOME</a></li>
-                    <li><a href="#about" class="nx-drawer-link">ABOUT</a></li>
-                    <li><a href="#skills" class="nx-drawer-link">SKILLS</a></li>
-                    <li><a href="#experience" class="nx-drawer-link">EXPERIENCE</a></li>
-                    <li><a href="#projects" class="nx-drawer-link">WORK</a></li>
-                    <li><a href="#education" class="nx-drawer-link">EDUCATION</a></li>
-                    <li><a href="#testimonials" class="nx-drawer-link">TESTIMONIALS</a></li>
-                    <li><a href="#contact" class="nx-drawer-link">CONTACT</a></li>
+                    <li><a href="#hero" class="bt-drawer-link">HOME</a></li>
+                    <li><a href="#about" class="bt-drawer-link">ABOUT</a></li>
+                    <li><a href="#skills" class="bt-drawer-link">SKILLS</a></li>
+                    <li><a href="#experience" class="bt-drawer-link">EXPERIENCE</a></li>
+                    <li><a href="#projects" class="bt-drawer-link">WORK</a></li>
+                    <li><a href="#education" class="bt-drawer-link">EDUCATION</a></li>
+                    <li><a href="#testimonials" class="bt-drawer-link">TESTIMONIALS</a></li>
+                    <li><a href="#contact" class="bt-drawer-link">CONTACT</a></li>
                 </ul>
             </div>
-            <span class="nx-hair" id="nx-hair" aria-hidden="true"></span>
+            <span class="bt-hair" id="bt-hair" aria-hidden="true"></span>
         </nav>
 
 
         <!-- Hero Section -->
-        <section class="nx-hero" id="hero">
-            <div class="nx-hero-grid">
-                <div class="nx-copy">
-                    <p class="nx-eyebrow nx-in">hello_world // orakzai.io &bull; aka "shaso"</p>
-                    <h1 class="nx-title nx-in">
-                        <span class="nx-title-line">SHAHSAWAR</span>
-                        <span class="nx-title-line nx-title-line--last"><span class="nx-title-name">ORAKZAI</span><span
-                                class="nx-caret">_</span></span>
+        <section class="bt-hero" id="hero">
+            <div class="bt-hero-grid">
+                <div class="bt-copy">
+                    <p class="bt-eyebrow bt-in">hello_world // orakzai.io &bull; aka "shaso"</p>
+                    <h1 class="bt-title bt-in">
+                        <span class="bt-title-line">SHAHSAWAR</span>
+                        <span class="bt-title-line bt-title-line--last"><span class="bt-title-name">ORAKZAI</span><span
+                                class="bt-caret">_</span></span>
                     </h1>
-                    <p class="nx-role nx-in">AUTONOMOUS AGENTS · RAG SYSTEMS · FULL-STACK</p>
-                    <p class="nx-desc nx-in">Full-Stack AI Engineer architecting high-performance APIs, production RAG
+                    <p class="bt-role bt-in">AUTONOMOUS AGENTS · RAG SYSTEMS · FULL-STACK</p>
+                    <p class="bt-desc bt-in">Full-Stack AI Engineer architecting high-performance APIs, production RAG
                         pipelines, and intelligent web applications. Driven to build scalable, robust systems that solve
                         real-world problems.</p>
-                    <div class="nx-actions nx-in">
-                        <a class="nx-btn" href="#contact">INITIATE CONTACT</a>
-                        <a class="nx-btn nx-btn--ghost" href="assets/Shahsawar.dev.pdf" download>RESUME</a>
+                    <div class="bt-actions bt-in">
+                        <a class="bt-btn" href="#contact">INITIATE CONTACT</a>
+                        <!-- Plain href: the bundler cannot process this, so the PDF is served from
+                             public/ verbatim. See the README on the two assets dirs. -->
+                        <a class="bt-btn bt-btn--ghost" href="assets/Shahsawar.dev.pdf" download>RESUME</a>
                     </div>
-                    <p class="nx-scrollcue nx-in">SCROLL — BOTRON WILL GUIDE YOU<span class="nx-scroll-arrow">▾</span>
+                    <p class="bt-scrollcue bt-in">SCROLL — BOTRON WILL GUIDE YOU<span class="bt-scroll-arrow">▾</span>
                     </p>
                 </div>
-                <div class="nx-stage" aria-hidden="true"></div>
+                <div class="bt-stage" aria-hidden="true"></div>
             </div>
         </section>
 
         <!-- About & Core Specs Section -->
-        <section class="nx-beat" id="about">
-            <div class="nx-beat-grid">
-                <div class="nx-beat-copy nx-reveal">
-                    <p class="nx-kicker">01 — THE CREATOR</p>
-                    <h2 class="nx-beat-title">HUMAN, BEHIND THE MACHINE</h2>
-                    <p class="nx-beat-txt">Long before writing code, my life was measured in hundredths of a second.
+        <section class="bt-beat" id="about">
+            <div class="bt-beat-grid">
+                <div class="bt-beat-copy bt-reveal">
+                    <p class="bt-kicker">01 — THE CREATOR</p>
+                    <h2 class="bt-beat-title">HUMAN, BEHIND THE MACHINE</h2>
+                    <p class="bt-beat-txt">Long before writing code, my life was measured in hundredths of a second.
                         Spending ten years on starting blocks as a <strong>National Swimmer and Gold Medalist</strong>
                         taught me that discipline is a daily standard, not a switch you flip. Today, as a
                         <strong>Full-Stack AI Engineer</strong> and Computer Science student (<strong>4.0
                             CGPA</strong>), I bring that same obsession with precision to software. I don't just consume
                         AI APIs. I build the systems that power them, from <strong>sub-250ms RAG pipelines</strong> on
                         pgvector to async ingestion handling <strong>50k+ daily records</strong> in production.</p>
-                    <p class="nx-beat-txt" style="margin-top:1rem">Beyond engineering, I believe the best builders
+                    <p class="bt-beat-txt" style="margin-top:1rem">Beyond engineering, I believe the best builders
                         understand people. As IT Manager and Head Coach for the KP Swimming Association, mentoring
                         <strong>30+ competitive swimmers</strong> has taught me real-time leadership, patience, and
                         clear communication under pressure. When I step away from the terminal, you will usually find me
                         across a chessboard, training the same tactical foresight and pattern recognition I rely on to
                         architect software.</p>
-                    <div class="nx-tags">
-                        <span class="nx-tag">WEBGL</span>
-                        <span class="nx-tag">AI PIPELINES</span>
-                        <span class="nx-tag">FULL-STACK</span>
-                        <span class="nx-tag">UX MOTION</span>
+                    <div class="bt-tags">
+                        <span class="bt-tag">WEBGL</span>
+                        <span class="bt-tag">AI PIPELINES</span>
+                        <span class="bt-tag">FULL-STACK</span>
+                        <span class="bt-tag">UX MOTION</span>
                     </div>
                 </div>
-                <div class="nx-stage" aria-hidden="true"></div>
+                <div class="bt-stage" aria-hidden="true"></div>
             </div>
         </section>
 
-        <section class="nx-beat nx-beat--skills" id="skills">
-            <div class="nx-beat-grid nx-skills-grid">
-                <div class="nx-beat-copy nx-reveal">
-                    <p class="nx-kicker">02 — SYSTEM SPECIFICATIONS</p>
-                    <h2 class="nx-beat-title">SKILLS MATRIX</h2>
+        <section class="bt-beat bt-beat--skills" id="skills">
+            <div class="bt-beat-grid bt-skills-grid">
+                <div class="bt-beat-copy bt-reveal">
+                    <p class="bt-kicker">02 — SYSTEM SPECIFICATIONS</p>
+                    <h2 class="bt-beat-title">SKILLS MATRIX</h2>
 
                     <!-- Category Filter Tabs -->
-                    <div class="nx-filter-bar">
-                        <button type="button" class="nx-filter-pill active" data-category="all">ALL (25)</button>
-                        <button type="button" class="nx-filter-pill" data-category="ai">AI & LLM (9)</button>
-                        <button type="button" class="nx-filter-pill" data-category="backend">BACKEND (7)</button>
-                        <button type="button" class="nx-filter-pill" data-category="devops">DEVOPS (4)</button>
-                        <button type="button" class="nx-filter-pill" data-category="frontend">FRONTEND (5)</button>
-                        <button type="button" class="nx-filter-pill" data-category="tools">TOOLS (4)</button>
+                    <div class="bt-filter-bar">
+                        <button type="button" class="bt-filter-pill active" data-category="all">ALL (25)</button>
+                        <button type="button" class="bt-filter-pill" data-category="ai">AI & LLM (9)</button>
+                        <button type="button" class="bt-filter-pill" data-category="backend">BACKEND (7)</button>
+                        <button type="button" class="bt-filter-pill" data-category="devops">DEVOPS (4)</button>
+                        <button type="button" class="bt-filter-pill" data-category="frontend">FRONTEND (5)</button>
+                        <button type="button" class="bt-filter-pill" data-category="tools">TOOLS (4)</button>
                     </div>
 
                     <!-- Live Skill Telemetry HUD Card -->
-                    <div class="nx-telemetry-hud" id="nx-telemetry-hud">
-                        <div class="nx-telemetry-header">
-                            <div class="nx-telemetry-badge">
-                                <span class="nx-telemetry-icon" id="nx-telemetry-icon">⚡</span>
-                                <span class="nx-telemetry-cat" id="nx-telemetry-cat">AI & LLM</span>
+                    <div class="bt-telemetry-hud" id="bt-telemetry-hud">
+                        <div class="bt-telemetry-header">
+                            <div class="bt-telemetry-badge">
+                                <span class="bt-telemetry-icon" id="bt-telemetry-icon">⚡</span>
+                                <span class="bt-telemetry-cat" id="bt-telemetry-cat">AI & LLM</span>
                             </div>
-                            <div class="nx-telemetry-status">
-                                <span class="nx-telemetry-dot"></span>
-                                <span class="nx-telemetry-level" id="nx-telemetry-level">99%</span>
+                            <div class="bt-telemetry-status">
+                                <span class="bt-telemetry-dot"></span>
+                                <span class="bt-telemetry-level" id="bt-telemetry-level">99%</span>
                             </div>
                         </div>
-                        <h3 class="nx-telemetry-title" id="nx-telemetry-name">OpenAI API</h3>
-                        <p class="nx-telemetry-desc" id="nx-telemetry-desc">GPT-4o/o1 reasoning, tool-calling pipelines
+                        <h3 class="bt-telemetry-title" id="bt-telemetry-name">OpenAI API</h3>
+                        <p class="bt-telemetry-desc" id="bt-telemetry-desc">GPT-4o/o1 reasoning, tool-calling pipelines
                             & system guardrails</p>
-                        <div class="nx-telemetry-meter">
-                            <div class="nx-telemetry-fill" id="nx-telemetry-bar" style="width: 99%;"></div>
+                        <div class="bt-telemetry-meter">
+                            <div class="bt-telemetry-fill" id="bt-telemetry-bar" style="width: 99%;"></div>
                         </div>
-                        <div class="nx-telemetry-hint">HOVER OR DRAG 3D GLOBE TO INSPECT NODES</div>
+                        <div class="bt-telemetry-hint">HOVER OR DRAG 3D GLOBE TO INSPECT NODES</div>
                     </div>
                 </div>
 
                 <!-- 3D Holographic Globe Stage -->
-                <div class="nx-skills-stage" id="skills-globe-container">
-                    <div class="nx-globe-reticle">
-                        <span class="nx-globe-tag">// 3D MATRIX HUD //</span>
-                        <span class="nx-globe-coords">LAT: 34.01° · LON: 71.52°</span>
+                <div class="bt-skills-stage" id="skills-globe-container">
+                    <div class="bt-globe-reticle">
+                        <span class="bt-globe-tag">// 3D MATRIX HUD //</span>
+                        <span class="bt-globe-coords">LAT: 34.01° · LON: 71.52°</span>
                     </div>
                     <canvas id="skills-globe"></canvas>
-                    <div class="nx-globe-drag-hint">
+                    <div class="bt-globe-drag-hint">
                         <span>‹ DRAG TO ROTATE · HOVER TO INSPECT ›</span>
                     </div>
                 </div>
@@ -247,76 +249,76 @@
         </section>
 
         <!-- Experience & Career Section -->
-        <section class="nx-beat nx-beat--dashboard" id="experience">
-            <div class="nx-beat-grid">
-                <div class="nx-beat-copy nx-reveal">
-                    <p class="nx-kicker">03 — CAREER PATH</p>
-                    <h2 class="nx-beat-title">EXPERIENCE</h2>
-                    <p class="nx-beat-txt">Work that stuck. A chronological log of roles, problems owned, and impact
+        <section class="bt-beat bt-beat--dashboard" id="experience">
+            <div class="bt-beat-grid">
+                <div class="bt-beat-copy bt-reveal">
+                    <p class="bt-kicker">03 — CAREER PATH</p>
+                    <h2 class="bt-beat-title">EXPERIENCE</h2>
+                    <p class="bt-beat-txt">Work that stuck. A chronological log of roles, problems owned, and impact
                         measured.</p>
                 </div>
-                <div class="nx-timeline nx-reveal">
+                <div class="bt-timeline bt-reveal">
                     <!-- Role 01 : Full-stack AI Engineer -->
-                    <div class="nx-timeline-item">
-                        <span class="nx-timeline-dot" aria-hidden="true"></span>
-                        <span class="nx-timeline-date">Present</span>
-                        <article class="nx-timeline-card">
-                            <span class="nx-card-status"><span class="nx-pulse-light"></span>SYS_LOG // ACTIVE</span>
-                            <h3 class="nx-role">Full-stack AI Engineer</h3>
-                            <h4 class="nx-org">Independent Freelancer · Remote</h4>
-                            <p class="nx-beat-txt">Delivered 5+ full-stack AI applications integrating LLMs and vector
+                    <div class="bt-timeline-item">
+                        <span class="bt-timeline-dot" aria-hidden="true"></span>
+                        <span class="bt-timeline-date">Present</span>
+                        <article class="bt-timeline-card">
+                            <span class="bt-card-status"><span class="bt-pulse-light"></span>SYS_LOG // ACTIVE</span>
+                            <h3 class="bt-role">Full-stack AI Engineer</h3>
+                            <h4 class="bt-org">Independent Freelancer · Remote</h4>
+                            <p class="bt-beat-txt">Delivered 5+ full-stack AI applications integrating LLMs and vector
                                 databases (pgvector/Qdrant), with 100% on-time completion. Built scalable FastAPI
                                 backends supporting sub-200ms average response times and zero-downtime production
                                 deployments.</p>
-                            <div class="nx-tags">
-                                <span class="nx-tag">FastAPI</span>
-                                <span class="nx-tag">LLMs</span>
-                                <span class="nx-tag">pgvector</span>
-                                <span class="nx-tag">Qdrant</span>
-                                <span class="nx-tag">TypeScript</span>
-                                <span class="nx-tag">Docker</span>
+                            <div class="bt-tags">
+                                <span class="bt-tag">FastAPI</span>
+                                <span class="bt-tag">LLMs</span>
+                                <span class="bt-tag">pgvector</span>
+                                <span class="bt-tag">Qdrant</span>
+                                <span class="bt-tag">TypeScript</span>
+                                <span class="bt-tag">Docker</span>
                             </div>
                         </article>
                     </div>
                     <!-- Role 02 : Python Developer Intern -->
-                    <div class="nx-timeline-item">
-                        <span class="nx-timeline-dot" aria-hidden="true"></span>
-                        <span class="nx-timeline-date">Dec 2025 – Feb 2026</span>
-                        <article class="nx-timeline-card">
-                            <span class="nx-card-status"><span class="nx-pulse-light nx-pulse-light--dim"></span>SYS_LOG
+                    <div class="bt-timeline-item">
+                        <span class="bt-timeline-dot" aria-hidden="true"></span>
+                        <span class="bt-timeline-date">Dec 2025 – Feb 2026</span>
+                        <article class="bt-timeline-card">
+                            <span class="bt-card-status"><span class="bt-pulse-light bt-pulse-light--dim"></span>SYS_LOG
                                 // COMPLETED</span>
-                            <h3 class="nx-role">Python Developer Intern</h3>
-                            <h4 class="nx-org">MINDGIGS · Peshawar, Pakistan</h4>
-                            <p class="nx-beat-txt">Engineered high-throughput REST APIs with FastAPI and asyncio,
+                            <h3 class="bt-role">Python Developer Intern</h3>
+                            <h4 class="bt-org">MINDGIGS · Peshawar, Pakistan</h4>
+                            <p class="bt-beat-txt">Engineered high-throughput REST APIs with FastAPI and asyncio,
                                 lifting throughput ~40% under strict Pydantic schema validation. Integrated local Intel
                                 Small LLMs and built Dockerized scraping pipelines processing 20k+ daily records.</p>
-                            <div class="nx-tags">
-                                <span class="nx-tag">Python</span>
-                                <span class="nx-tag">FastAPI</span>
-                                <span class="nx-tag">Asyncio</span>
-                                <span class="nx-tag">Pydantic</span>
-                                <span class="nx-tag">Intel SLMs</span>
-                                <span class="nx-tag">Web Scraping</span>
-                                <span class="nx-tag">Docker</span>
+                            <div class="bt-tags">
+                                <span class="bt-tag">Python</span>
+                                <span class="bt-tag">FastAPI</span>
+                                <span class="bt-tag">Asyncio</span>
+                                <span class="bt-tag">Pydantic</span>
+                                <span class="bt-tag">Intel SLMs</span>
+                                <span class="bt-tag">Web Scraping</span>
+                                <span class="bt-tag">Docker</span>
                             </div>
                         </article>
                     </div>
                     <!-- Role 03 : Swimming Coach & IT Manager -->
-                    <div class="nx-timeline-item">
-                        <span class="nx-timeline-dot" aria-hidden="true"></span>
-                        <span class="nx-timeline-date">Present (Seasonal)</span>
-                        <article class="nx-timeline-card">
-                            <span class="nx-card-status"><span class="nx-pulse-light"></span>SYS_LOG // SEASONAL</span>
-                            <h3 class="nx-role">Swimming Coach & IT Manager</h3>
-                            <h4 class="nx-org">KP Swimming Association · Peshawar, Pakistan</h4>
-                            <p class="nx-beat-txt">National swimmer for 10 years (10+ medals incl. gold at National
+                    <div class="bt-timeline-item">
+                        <span class="bt-timeline-dot" aria-hidden="true"></span>
+                        <span class="bt-timeline-date">Present (Seasonal)</span>
+                        <article class="bt-timeline-card">
+                            <span class="bt-card-status"><span class="bt-pulse-light"></span>SYS_LOG // SEASONAL</span>
+                            <h3 class="bt-role">Swimming Coach & IT Manager</h3>
+                            <h4 class="bt-org">KP Swimming Association · Peshawar, Pakistan</h4>
+                            <p class="bt-beat-txt">National swimmer for 10 years (10+ medals incl. gold at National
                                 Juniors). As IT manager, digitized records for 200+ athletes and automated admin
                                 workflows, cutting processing time 90%. Coached 30+ swimmers to regional podiums.</p>
-                            <div class="nx-tags">
-                                <span class="nx-tag">Database Management</span>
-                                <span class="nx-tag">Workflow Automation</span>
-                                <span class="nx-tag">Leadership</span>
-                                <span class="nx-tag">Coaching</span>
+                            <div class="bt-tags">
+                                <span class="bt-tag">Database Management</span>
+                                <span class="bt-tag">Workflow Automation</span>
+                                <span class="bt-tag">Leadership</span>
+                                <span class="bt-tag">Coaching</span>
                             </div>
                         </article>
                     </div>
@@ -325,117 +327,117 @@
         </section>
 
         <!-- Projects Section -->
-        <section class="nx-beat nx-beat--dashboard" id="projects">
-            <div class="nx-beat-grid">
-                <div class="nx-beat-copy nx-reveal">
-                    <p class="nx-kicker">04 — DEPLOYED MISSIONS</p>
-                    <h2 class="nx-beat-title">SELECTED WORK</h2>
-                    <p class="nx-beat-txt">A few things worth showing twice.</p>
+        <section class="bt-beat bt-beat--dashboard" id="projects">
+            <div class="bt-beat-grid">
+                <div class="bt-beat-copy bt-reveal">
+                    <p class="bt-kicker">04 — DEPLOYED MISSIONS</p>
+                    <h2 class="bt-beat-title">SELECTED WORK</h2>
+                    <p class="bt-beat-txt">A few things worth showing twice.</p>
                 </div>
-                <div class="nx-proj-grid nx-reveal">
+                <div class="bt-proj-grid bt-reveal">
                     <!-- П.01 REDNOTE -->
-                    <article class="nx-proj nx-reveal">
-                        <div class="nx-proj-thumb">
+                    <article class="bt-proj bt-reveal">
+                        <div class="bt-proj-thumb">
                             <img src="assets/rednote.webp" alt="REDNOTE screenshot" width="1919" height="836" loading="lazy">
-                            <div class="nx-proj-thumb-overlay">
-                                <div class="nx-proj-header">
-                                    <span class="nx-proj-mission">// MISSION: REDNOTE //</span>
-                                    <span class="nx-proj-status">[ONLINE]</span>
+                            <div class="bt-proj-thumb-overlay">
+                                <div class="bt-proj-header">
+                                    <span class="bt-proj-mission">// MISSION: REDNOTE //</span>
+                                    <span class="bt-proj-status">[ONLINE]</span>
                                 </div>
                             </div>
                         </div>
-                        <div class="nx-proj-body">
-                            <span class="nx-proj-idx">П.01</span>
+                        <div class="bt-proj-body">
+                            <span class="bt-proj-idx">П.01</span>
                             <div>
                                 <h3>REDNOTE</h3>
-                                <p class="nx-beat-txt">Full-stack RAG document assistant with pgvector semantic search —
+                                <p class="bt-beat-txt">Full-stack RAG document assistant with pgvector semantic search —
                                     sub-250ms responses across 10k+ chunks. JWT auth + AI agents + Docker CI/CD (deploys
                                     in under 3 min).</p>
-                                <div class="nx-tags">
-                                    <span class="nx-tag">Python</span>
-                                    <span class="nx-tag">FastAPI</span>
-                                    <span class="nx-tag">AI Agents</span>
-                                    <span class="nx-tag">pgvector</span>
-                                    <span class="nx-tag">PostgreSQL</span>
-                                    <span class="nx-tag">TypeScript</span>
-                                    <span class="nx-tag">Docker</span>
-                                    <span class="nx-tag">CI/CD</span>
+                                <div class="bt-tags">
+                                    <span class="bt-tag">Python</span>
+                                    <span class="bt-tag">FastAPI</span>
+                                    <span class="bt-tag">AI Agents</span>
+                                    <span class="bt-tag">pgvector</span>
+                                    <span class="bt-tag">PostgreSQL</span>
+                                    <span class="bt-tag">TypeScript</span>
+                                    <span class="bt-tag">Docker</span>
+                                    <span class="bt-tag">CI/CD</span>
                                 </div>
-                                <div class="nx-proj-cta">
-                                    <a class="nx-btn nx-btn--ghost" href="https://github.com/orakzai-io/Rednote.git"
+                                <div class="bt-proj-cta">
+                                    <a class="bt-btn bt-btn--ghost" href="https://github.com/orakzai-io/Rednote.git"
                                         target="_blank" rel="noopener">CODE ↗</a>
-                                    <a class="nx-btn nx-btn--ghost" href="https://orakzai-io-rednote.hf.space"
+                                    <a class="bt-btn bt-btn--ghost" href="https://orakzai-io-rednote.hf.space"
                                         target="_blank" rel="noopener">LIVE ↗</a>
                                 </div>
                             </div>
                         </div>
                     </article>
                     <!-- П.02 ASYNC SCRAPER -->
-                    <article class="nx-proj nx-reveal">
-                        <div class="nx-proj-thumb">
+                    <article class="bt-proj bt-reveal">
+                        <div class="bt-proj-thumb">
                             <img src="assets/scraper.webp" alt="Async Web Scraper screenshot" width="1857" height="893" loading="lazy">
-                            <div class="nx-proj-thumb-overlay">
-                                <div class="nx-proj-header">
-                                    <span class="nx-proj-mission">// MISSION: ASYNC_SCRAPER //</span>
-                                    <span class="nx-proj-status">[ONLINE]</span>
+                            <div class="bt-proj-thumb-overlay">
+                                <div class="bt-proj-header">
+                                    <span class="bt-proj-mission">// MISSION: ASYNC_SCRAPER //</span>
+                                    <span class="bt-proj-status">[ONLINE]</span>
                                 </div>
                             </div>
                         </div>
-                        <div class="nx-proj-body">
-                            <span class="nx-proj-idx">П.02</span>
+                        <div class="bt-proj-body">
+                            <span class="bt-proj-idx">П.02</span>
                             <div>
                                 <h3>ASYNC WEB SCRAPER</h3>
-                                <p class="nx-beat-txt">Async pipeline processing 50k+ web pages into PostgreSQL at 99.2%
+                                <p class="bt-beat-txt">Async pipeline processing 50k+ web pages into PostgreSQL at 99.2%
                                     success, rate-limited via Groq LLM + n8n. TypeScript monitoring dashboard, 3s
                                     polling, 90% less manual verification.</p>
-                                <div class="nx-tags">
-                                    <span class="nx-tag">Python</span>
-                                    <span class="nx-tag">n8n</span>
-                                    <span class="nx-tag">Asyncio</span>
-                                    <span class="nx-tag">Groq LLM</span>
-                                    <span class="nx-tag">PostgreSQL</span>
-                                    <span class="nx-tag">TypeScript</span>
-                                    <span class="nx-tag">Docker</span>
+                                <div class="bt-tags">
+                                    <span class="bt-tag">Python</span>
+                                    <span class="bt-tag">n8n</span>
+                                    <span class="bt-tag">Asyncio</span>
+                                    <span class="bt-tag">Groq LLM</span>
+                                    <span class="bt-tag">PostgreSQL</span>
+                                    <span class="bt-tag">TypeScript</span>
+                                    <span class="bt-tag">Docker</span>
                                 </div>
-                                <div class="nx-proj-cta">
-                                    <a class="nx-btn nx-btn--ghost"
+                                <div class="bt-proj-cta">
+                                    <a class="bt-btn bt-btn--ghost"
                                         href="https://github.com/orakzai-io/Async-Web-Scraper.git" target="_blank"
                                         rel="noopener">CODE ↗</a>
-                                    <a class="nx-btn nx-btn--ghost" href="https://orakzai-io-async-web-scraper.hf.space"
+                                    <a class="bt-btn bt-btn--ghost" href="https://orakzai-io-async-web-scraper.hf.space"
                                         target="_blank" rel="noopener">LIVE ↗</a>
                                 </div>
                             </div>
                         </div>
                     </article>
                     <!-- П.03 VAULTGUARD -->
-                    <article class="nx-proj nx-reveal">
-                        <div class="nx-proj-thumb">
+                    <article class="bt-proj bt-reveal">
+                        <div class="bt-proj-thumb">
                             <img src="assets/password_manager.webp" alt="VaultGuard screenshot" width="1890" height="849" loading="lazy">
-                            <div class="nx-proj-thumb-overlay">
-                                <div class="nx-proj-header">
-                                    <span class="nx-proj-mission">// MISSION: VAULTGUARD //</span>
-                                    <span class="nx-proj-status">[STANDBY]</span>
+                            <div class="bt-proj-thumb-overlay">
+                                <div class="bt-proj-header">
+                                    <span class="bt-proj-mission">// MISSION: VAULTGUARD //</span>
+                                    <span class="bt-proj-status">[STANDBY]</span>
                                 </div>
                             </div>
                         </div>
-                        <div class="nx-proj-body">
-                            <span class="nx-proj-idx">П.03</span>
+                        <div class="bt-proj-body">
+                            <span class="bt-proj-idx">П.03</span>
                             <div>
                                 <h3>VAULTGUARD</h3>
-                                <p class="nx-beat-txt">PBKDF2 master-key + client-side AES-256 security platform.
+                                <p class="bt-beat-txt">PBKDF2 master-key + client-side AES-256 security platform.
                                     Zero-knowledge credential vaulting, sub-50ms encryption latency, PostgreSQL-backed.
                                 </p>
-                                <div class="nx-tags">
-                                    <span class="nx-tag">Python</span>
-                                    <span class="nx-tag">JavaScript</span>
-                                    <span class="nx-tag">AES-256</span>
-                                    <span class="nx-tag">PostgreSQL</span>
-                                    <span class="nx-tag">Docker</span>
+                                <div class="bt-tags">
+                                    <span class="bt-tag">Python</span>
+                                    <span class="bt-tag">JavaScript</span>
+                                    <span class="bt-tag">AES-256</span>
+                                    <span class="bt-tag">PostgreSQL</span>
+                                    <span class="bt-tag">Docker</span>
                                 </div>
-                                <div class="nx-proj-cta">
-                                    <a class="nx-btn nx-btn--ghost" href="https://github.com/orakzai-io/Vault-Guard.git"
+                                <div class="bt-proj-cta">
+                                    <a class="bt-btn bt-btn--ghost" href="https://github.com/orakzai-io/Vault-Guard.git"
                                         target="_blank" rel="noopener">CODE ↗</a>
-                                    <a class="nx-btn nx-btn--ghost"
+                                    <a class="bt-btn bt-btn--ghost"
                                         href="https://youtu.be/-OcbtZTuibo?si=o0BBKnni7OCR09bJ" target="_blank"
                                         rel="noopener">VIDEO ↗</a>
                                 </div>
@@ -443,31 +445,31 @@
                         </div>
                     </article>
                     <!-- П.04 THIS PORTFOLIO -->
-                    <article class="nx-proj nx-reveal">
-                        <div class="nx-proj-thumb">
+                    <article class="bt-proj bt-reveal">
+                        <div class="bt-proj-thumb">
                             <img src="assets/3d-portfolio.webp" alt="3D Portfolio screenshot" width="1910" height="841" loading="lazy">
-                            <div class="nx-proj-thumb-overlay">
-                                <div class="nx-proj-header">
-                                    <span class="nx-proj-mission">// MISSION: PORTFOLIO_3D //</span>
-                                    <span class="nx-proj-status">[ACTIVE]</span>
+                            <div class="bt-proj-thumb-overlay">
+                                <div class="bt-proj-header">
+                                    <span class="bt-proj-mission">// MISSION: PORTFOLIO_3D //</span>
+                                    <span class="bt-proj-status">[ACTIVE]</span>
                                 </div>
                             </div>
                         </div>
-                        <div class="nx-proj-body">
-                            <span class="nx-proj-idx">П.04</span>
+                        <div class="bt-proj-body">
+                            <span class="bt-proj-idx">П.04</span>
                             <div>
                                 <h3>THIS PORTFOLIO</h3>
-                                <p class="nx-beat-txt">A living 3D WebGL portfolio — GLTF bot with procedural eyes, gaze
+                                <p class="bt-beat-txt">A living 3D WebGL portfolio — GLTF bot with procedural eyes, gaze
                                     tracking and a scroll-driven cinematic camera.</p>
-                                <div class="nx-tags">
-                                    <span class="nx-tag">Three.js</span>
-                                    <span class="nx-tag">WebGL</span>
-                                    <span class="nx-tag">JavaScript</span>
-                                    <span class="nx-tag">Vite</span>
-                                    <span class="nx-tag">CSS3</span>
+                                <div class="bt-tags">
+                                    <span class="bt-tag">Three.js</span>
+                                    <span class="bt-tag">WebGL</span>
+                                    <span class="bt-tag">JavaScript</span>
+                                    <span class="bt-tag">Vite</span>
+                                    <span class="bt-tag">CSS3</span>
                                 </div>
-                                <div class="nx-proj-cta">
-                                    <a class="nx-btn nx-btn--ghost"
+                                <div class="bt-proj-cta">
+                                    <a class="bt-btn bt-btn--ghost"
                                         href="https://github.com/orakzai-io/Personal-Portfolio.git" target="_blank"
                                         rel="noopener">CODE ↗</a>
                                 </div>
@@ -479,48 +481,48 @@
         </section>
 
         <!-- Education & Certifications Section -->
-        <section class="nx-beat nx-beat--dashboard" id="education">
-            <div class="nx-beat-grid">
-                <div class="nx-beat-copy nx-reveal">
-                    <p class="nx-kicker">05 — CREDENTIALS</p>
-                    <h2 class="nx-beat-title">EDUCATION / CERTIFICATION</h2>
-                    <p class="nx-beat-txt">The credentials behind the code.</p>
+        <section class="bt-beat bt-beat--dashboard" id="education">
+            <div class="bt-beat-grid">
+                <div class="bt-beat-copy bt-reveal">
+                    <p class="bt-kicker">05 — CREDENTIALS</p>
+                    <h2 class="bt-beat-title">EDUCATION / CERTIFICATION</h2>
+                    <p class="bt-beat-txt">The credentials behind the code.</p>
                 </div>
-                <div class="nx-edu-grid nx-reveal">
-                    <article class="nx-edu nx-reveal">
-                        <div class="nx-edu-header">
-                            <span class="nx-edu-type">[ ACADEMIC NODE ]</span>
-                            <span class="nx-edu-status">// VERIFIED</span>
+                <div class="bt-edu-grid bt-reveal">
+                    <article class="bt-edu bt-reveal">
+                        <div class="bt-edu-header">
+                            <span class="bt-edu-type">[ ACADEMIC NODE ]</span>
+                            <span class="bt-edu-status">// VERIFIED</span>
                         </div>
-                        <p class="nx-kicker nx-kicker--sm">BSCS</p>
+                        <p class="bt-kicker bt-kicker--sm">BSCS</p>
                         <h3>Bachelor of Science in Computer Science</h3>
-                        <h4 class="nx-edu-school">University of Agriculture, Peshawar</h4>
-                        <p class="nx-beat-txt">Oct 2024 – Oct 2028 (Expected) · CGPA 4.0</p>
-                        <p class="nx-beat-txt">Coursework: Programming Fundamentals, DSA, OOP, Database Systems.</p>
+                        <h4 class="bt-edu-school">University of Agriculture, Peshawar</h4>
+                        <p class="bt-beat-txt">Oct 2024 – Oct 2028 (Expected) · CGPA 4.0</p>
+                        <p class="bt-beat-txt">Coursework: Programming Fundamentals, DSA, OOP, Database Systems.</p>
                     </article>
-                    <article class="nx-edu nx-reveal">
-                        <div class="nx-edu-header">
-                            <span class="nx-edu-type">[ CREDENTIAL NODE ]</span>
-                            <span class="nx-edu-status">// SECURE_HASH</span>
+                    <article class="bt-edu bt-reveal">
+                        <div class="bt-edu-header">
+                            <span class="bt-edu-type">[ CREDENTIAL NODE ]</span>
+                            <span class="bt-edu-status">// SECURE_HASH</span>
                         </div>
-                        <p class="nx-kicker nx-kicker--sm">CS50X</p>
+                        <p class="bt-kicker bt-kicker--sm">CS50X</p>
                         <h3>CS50X: Introduction to Computer Science</h3>
-                        <h4 class="nx-edu-school">Harvard University · Remote</h4>
-                        <p class="nx-beat-txt">Issued February 2026</p>
-                        <a class="nx-btn nx-btn--ghost nx-edu-verify"
+                        <h4 class="bt-edu-school">Harvard University · Remote</h4>
+                        <p class="bt-beat-txt">Issued February 2026</p>
+                        <a class="bt-btn bt-btn--ghost bt-edu-verify"
                             href="https://certificates.cs50.io/46d6924e-c5e2-49f5-8639-90d52ebb90d1.pdf" target="_blank"
                             rel="noopener">VERIFY ↗</a>
                     </article>
-                    <article class="nx-edu nx-reveal">
-                        <div class="nx-edu-header">
-                            <span class="nx-edu-type">[ CREDENTIAL NODE ]</span>
-                            <span class="nx-edu-status">// SECURE_HASH</span>
+                    <article class="bt-edu bt-reveal">
+                        <div class="bt-edu-header">
+                            <span class="bt-edu-type">[ CREDENTIAL NODE ]</span>
+                            <span class="bt-edu-status">// SECURE_HASH</span>
                         </div>
-                        <p class="nx-kicker nx-kicker--sm">CS50P</p>
+                        <p class="bt-kicker bt-kicker--sm">CS50P</p>
                         <h3>CS50P: Introduction to Programming with Python</h3>
-                        <h4 class="nx-edu-school">Harvard University · Remote</h4>
-                        <p class="nx-beat-txt">Issued October 2025</p>
-                        <a class="nx-btn nx-btn--ghost nx-edu-verify"
+                        <h4 class="bt-edu-school">Harvard University · Remote</h4>
+                        <p class="bt-beat-txt">Issued October 2025</p>
+                        <a class="bt-btn bt-btn--ghost bt-edu-verify"
                             href="https://certificates.cs50.io/9847b334-9e42-4281-a696-a6e5cc35b008.pdf" target="_blank"
                             rel="noopener">VERIFY ↗</a>
                     </article>
@@ -529,87 +531,87 @@
         </section>
 
         <!-- Testimonials Section -->
-        <section class="nx-beat nx-beat--dashboard" id="testimonials">
-            <div class="nx-beat-grid">
-                <div class="nx-beat-copy nx-reveal">
-                    <p class="nx-kicker">06 — REFERENCE FRAME</p>
-                    <h2 class="nx-beat-title">TESTIMONIALS</h2>
-                    <p class="nx-beat-txt">A few words that stuck around.</p>
+        <section class="bt-beat bt-beat--dashboard" id="testimonials">
+            <div class="bt-beat-grid">
+                <div class="bt-beat-copy bt-reveal">
+                    <p class="bt-kicker">06 — REFERENCE FRAME</p>
+                    <h2 class="bt-beat-title">TESTIMONIALS</h2>
+                    <p class="bt-beat-txt">A few words that stuck around.</p>
                 </div>
-                <div class="nx-quotes-viewport nx-reveal">
-                    <div class="nx-quotes-track">
-                        <blockquote class="nx-quote">
-                            <div class="nx-quote-stars">★★★★★</div>
-                            <p class="nx-quote-body">"Shahsawar optimized our RAG search pipeline using pgvector and
+                <div class="bt-quotes-viewport bt-reveal">
+                    <div class="bt-quotes-track">
+                        <blockquote class="bt-quote">
+                            <div class="bt-quote-stars">★★★★★</div>
+                            <p class="bt-quote-body">"Shahsawar optimized our RAG search pipeline using pgvector and
                                 FastAPI, delivering sub-second response times across indexed document chunks."</p>
-                            <footer class="nx-quote-author">
-                                <div class="nx-avatar-slot" title="Add photo: set background-image on this div">VP</div>
-                                <div class="nx-author-info">
-                                    <span class="nx-author-name">Vivek Pippala</span>
-                                    <span class="nx-author-role">AI Engineer</span>
+                            <footer class="bt-quote-author">
+                                <div class="bt-avatar-slot" title="Add photo: set background-image on this div">VP</div>
+                                <div class="bt-author-info">
+                                    <span class="bt-author-name">Vivek Pippala</span>
+                                    <span class="bt-author-role">AI Engineer</span>
                                 </div>
-                                <span class="nx-quote-platform">// UPWORK</span>
+                                <span class="bt-quote-platform">// UPWORK</span>
                             </footer>
                         </blockquote>
-                        <blockquote class="nx-quote">
-                            <div class="nx-quote-stars">★★★★★</div>
-                            <p class="nx-quote-body">"His technical mastery of async Python, REST APIs, and Docker
+                        <blockquote class="bt-quote">
+                            <div class="bt-quote-stars">★★★★★</div>
+                            <p class="bt-quote-body">"His technical mastery of async Python, REST APIs, and Docker
                                 containerization significantly boosted our backend throughput."</p>
-                            <footer class="nx-quote-author">
-                                <div class="nx-avatar-slot" title="Add photo: set background-image on this div">AK</div>
-                                <div class="nx-author-info">
-                                    <span class="nx-author-name">Awais Khan</span>
-                                    <span class="nx-author-role">Software Engineer</span>
+                            <footer class="bt-quote-author">
+                                <div class="bt-avatar-slot" title="Add photo: set background-image on this div">AK</div>
+                                <div class="bt-author-info">
+                                    <span class="bt-author-name">Awais Khan</span>
+                                    <span class="bt-author-role">Software Engineer</span>
                                 </div>
-                                <span class="nx-quote-platform">// DIRECT</span>
+                                <span class="bt-quote-platform">// DIRECT</span>
                             </footer>
                         </blockquote>
-                        <blockquote class="nx-quote">
-                            <div class="nx-quote-stars">★★★★★</div>
-                            <p class="nx-quote-body">"One of the most talented full-stack devs I've worked with —
+                        <blockquote class="bt-quote">
+                            <div class="bt-quote-stars">★★★★★</div>
+                            <p class="bt-quote-body">"One of the most talented full-stack devs I've worked with —
                                 integrated modern LLM endpoints and TypeScript interfaces cleanly."</p>
-                            <footer class="nx-quote-author">
-                                <div class="nx-avatar-slot" title="Add photo: set background-image on this div">MH</div>
-                                <div class="nx-author-info">
-                                    <span class="nx-author-name">Muhammad Husnain</span>
-                                    <span class="nx-author-role">Web Developer</span>
+                            <footer class="bt-quote-author">
+                                <div class="bt-avatar-slot" title="Add photo: set background-image on this div">MH</div>
+                                <div class="bt-author-info">
+                                    <span class="bt-author-name">Muhammad Husnain</span>
+                                    <span class="bt-author-role">Web Developer</span>
                                 </div>
-                                <span class="nx-quote-platform">// DIRECT</span>
+                                <span class="bt-quote-platform">// DIRECT</span>
                             </footer>
                         </blockquote>
                     </div>
-                    <div class="nx-quotes-controls">
-                        <button class="nx-quotes-arrow" data-action="prev" type="button"
+                    <div class="bt-quotes-controls">
+                        <button class="bt-quotes-arrow" data-action="prev" type="button"
                             aria-label="Previous quote">‹</button>
-                        <div class="nx-quotes-dots" role="group" aria-label="Quote navigation"></div>
-                        <button class="nx-quotes-arrow" data-action="next" type="button"
+                        <div class="bt-quotes-dots" role="group" aria-label="Quote navigation"></div>
+                        <button class="bt-quotes-arrow" data-action="next" type="button"
                             aria-label="Next quote">›</button>
                     </div>
                 </div>
             </div>
         </section>
 
-        <section class="nx-beat nx-beat--contact" id="contact">
-            <div class="nx-beat-grid nx-contact-grid">
-                <div class="nx-beat-copy nx-contact-console nx-reveal">
-                    <p class="nx-kicker">07 — END OF TRANSMISSION</p>
-                    <h2 class="nx-beat-title">ESTABLISH CONTACT</h2>
-                    <p class="nx-beat-txt">Got an idea for something that moves, breathes, and translates? I'm online.
+        <section class="bt-beat bt-beat--contact" id="contact">
+            <div class="bt-beat-grid bt-contact-grid">
+                <div class="bt-beat-copy bt-contact-console bt-reveal">
+                    <p class="bt-kicker">07 — END OF TRANSMISSION</p>
+                    <h2 class="bt-beat-title">ESTABLISH CONTACT</h2>
+                    <p class="bt-beat-txt">Got an idea for something that moves, breathes, and translates? I'm online.
                     </p>
 
                     <!-- Contact Info Cards (3-card grid) -->
-                    <div class="nx-contact-info">
-                        <a href="mailto:shahsawar.dev@gmail.com" class="nx-mini" data-cursor="hover">
+                    <div class="bt-contact-info">
+                        <a href="mailto:shahsawar.dev@gmail.com" class="bt-mini" data-cursor="hover">
                             <span>01</span>
                             <b>EMAIL</b>
                             <i>shahsawar.dev@gmail.com</i>
                         </a>
-                        <a href="tel:+923438925150" class="nx-mini" data-cursor="hover">
+                        <a href="tel:+923438925150" class="bt-mini" data-cursor="hover">
                             <span>02</span>
                             <b>PHONE</b>
                             <i>+92 343 8925150</i>
                         </a>
-                        <div class="nx-mini">
+                        <div class="bt-mini">
                             <span>03</span>
                             <b>LOCATION</b>
                             <i>Pakistan</i>
@@ -617,47 +619,47 @@
                     </div>
 
                     <!-- Contact Form -->
-                    <form class="nx-contact-form" id="contactForm" action="https://formspree.io/f/meevnwzk"
+                    <form class="bt-contact-form" id="contactForm" action="https://formspree.io/f/meevnwzk"
                         method="POST">
-                        <div class="nx-field">
+                        <div class="bt-field">
                             <label for="cf-name">NAME</label>
                             <input type="text" id="cf-name" name="name" placeholder="YOUR NAME" required>
-                            <span class="nx-field-error" role="alert"></span>
+                            <span class="bt-field-error" role="alert"></span>
                         </div>
-                        <div class="nx-field">
+                        <div class="bt-field">
                             <label for="cf-email">EMAIL</label>
                             <input type="email" id="cf-email" name="_replyto" placeholder="YOUR EMAIL" required>
-                            <span class="nx-field-error" role="alert"></span>
+                            <span class="bt-field-error" role="alert"></span>
                         </div>
-                        <div class="nx-field">
+                        <div class="bt-field">
                             <label for="cf-subject">SUBJECT</label>
                             <input type="text" id="cf-subject" name="subject" placeholder="SUBJECT" required>
-                            <span class="nx-field-error" role="alert"></span>
+                            <span class="bt-field-error" role="alert"></span>
                         </div>
-                        <div class="nx-field">
+                        <div class="bt-field">
                             <label for="cf-message">MESSAGE</label>
                             <textarea id="cf-message" name="message" rows="4" placeholder="YOUR MESSAGE"
                                 required></textarea>
-                            <span class="nx-field-error" role="alert"></span>
+                            <span class="bt-field-error" role="alert"></span>
                         </div>
-                        <button type="submit" class="nx-btn">SEND TRANSMISSION</button>
+                        <button type="submit" class="bt-btn">SEND TRANSMISSION</button>
                     </form>
                 </div>
 
                 <!-- Dedicated Robot Stage on Right -->
-                <div class="nx-contact-stage nx-reveal" aria-hidden="true"></div>
+                <div class="bt-contact-stage bt-reveal" aria-hidden="true"></div>
             </div>
         </section>
 
         <!-- Cyber Footer -->
-        <footer class="nx-footer">
-            <div class="nx-footer-container">
-                <div class="nx-footer-brand">
-                    <p class="nx-footer-copy">© 2026 Shahsawar. All rights reserved.</p>
+        <footer class="bt-footer">
+            <div class="bt-footer-container">
+                <div class="bt-footer-brand">
+                    <p class="bt-footer-copy">© 2026 Shahsawar. All rights reserved.</p>
                 </div>
 
-                <div class="nx-footer-socials">
-                    <a href="https://x.com/orakzai_io" target="_blank" rel="noopener noreferrer" class="nx-social-link"
+                <div class="bt-footer-socials">
+                    <a href="https://x.com/orakzai_io" target="_blank" rel="noopener noreferrer" class="bt-social-link"
                         aria-label="X (Twitter)" data-cursor="hover">
                         <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">
                             <path
@@ -665,14 +667,14 @@
                         </svg>
                     </a>
                     <a href="https://www.linkedin.com/in/orakzai-io" target="_blank" rel="noopener noreferrer"
-                        class="nx-social-link" aria-label="LinkedIn" data-cursor="hover">
+                        class="bt-social-link" aria-label="LinkedIn" data-cursor="hover">
                         <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">
                             <path
                                 d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.225 0z" />
                         </svg>
                     </a>
                     <a href="https://huggingface.co/orakzai-io" target="_blank" rel="noopener noreferrer"
-                        class="nx-social-link" aria-label="Hugging Face" data-cursor="hover">
+                        class="bt-social-link" aria-label="Hugging Face" data-cursor="hover">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"
                             xmlns="http://www.w3.org/2000/svg">
                             <path
@@ -680,14 +682,14 @@
                         </svg>
                     </a>
                     <a href="https://www.instagram.com/orakzai.io/" target="_blank" rel="noopener noreferrer"
-                        class="nx-social-link" aria-label="Instagram" data-cursor="hover">
+                        class="bt-social-link" aria-label="Instagram" data-cursor="hover">
                         <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">
                             <path
                                 d="M12 0C8.74 0 8.333.015 7.053.072 5.775.132 4.905.333 4.14.63c-.789.306-1.459.717-2.126 1.384S.935 3.35.63 4.14C.333 4.905.131 5.775.072 7.053.012 8.333 0 8.74 0 12s.015 3.667.072 4.947c.06 1.277.261 2.148.558 2.913.306.788.717 1.459 1.384 2.126.667.666 1.336 1.079 2.126 1.384.766.296 1.636.499 2.913.558C8.333 23.988 8.74 24 12 24s3.667-.015 4.947-.072c1.277-.06 2.148-.262 2.913-.558.788-.306 1.459-.718 2.126-1.384.666-.667 1.079-1.335 1.384-2.126.296-.765.499-1.636.558-2.913.06-1.28.072-1.687.072-4.947s-.015-3.667-.072-4.947c-.06-1.277-.262-2.149-.558-2.913-.306-.789-.718-1.459-1.384-2.126C21.319 1.347 20.651.935 19.86.63c-.765-.297-1.636-.499-2.913-.558C15.667.012 15.26 0 12 0zm0 2.16c3.203 0 3.585.016 4.85.071 1.17.055 1.805.249 2.227.415.562.217.96.477 1.382.896.419.42.679.819.896 1.381.164.422.36 1.057.413 2.227.057 1.266.07 1.646.07 4.85s-.015 3.585-.074 4.85c-.061 1.17-.256 1.805-.421 2.227-.224.562-.479.96-.899 1.382-.419.419-.824.679-1.38.896-.42.164-1.065.36-2.235.413-1.274.057-1.649.07-4.859.07-3.211 0-3.586-.015-4.859-.074-1.171-.061-1.816-.256-2.236-.421-.569-.224-.96-.479-1.379-.899-.421-.419-.69-.824-.9-1.38-.165-.42-.359-1.065-.42-2.235-.045-1.26-.061-1.649-.061-4.844 0-3.196.016-3.586.061-4.861.061-1.17.255-1.814.42-2.234.21-.57.479-.96.9-1.381.419-.419.81-.689 1.379-.898.42-.166 1.051-.361 2.221-.421 1.275-.045 1.65-.06 4.859-.06l.045.03zm0 3.678c-3.405 0-6.162 2.76-6.162 6.162 0 3.405 2.76 6.162 6.162 6.162 3.405 0 6.162-2.76 6.162-6.162 0-3.405-2.76-6.162-6.162-6.162zM12 16c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4zm7.846-10.405c0 .795-.646 1.44-1.44 1.44-.795 0-1.44-.646-1.44-1.44 0-.794.646-1.439 1.44-1.439.793-.001 1.44.645 1.44 1.439z" />
                         </svg>
                     </a>
                     <a href="https://github.com/orakzai-io" target="_blank" rel="noopener noreferrer"
-                        class="nx-social-link" aria-label="GitHub" data-cursor="hover">
+                        class="bt-social-link" aria-label="GitHub" data-cursor="hover">
                         <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">
                             <path
                                 d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" />
@@ -698,44 +700,44 @@
         </footer>
 
         <!-- Floating RAG Chat FAB Trigger -->
-        <button class="nx-chat-fab" id="nx-chat-fab" aria-label="Open BOTRON" data-cursor="hover">
-            <span class="nx-chat-fab-dot"></span>
-            <span class="nx-chat-fab-icon">
+        <button class="bt-chat-fab" id="bt-chat-fab" aria-label="Open BOTRON" data-cursor="hover">
+            <span class="bt-chat-fab-dot"></span>
+            <span class="bt-chat-fab-icon">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                     stroke-linecap="round" stroke-linejoin="round">
                     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
                 </svg>
             </span>
-            <span class="nx-chat-fab-label">BOTRON</span>
+            <span class="bt-chat-fab-label">BOTRON</span>
         </button>
 
         <!-- BOTRON RAG Chat Window -->
-        <div class="nx-chat-window" id="nx-chat-window" role="dialog" aria-hidden="true"
+        <div class="bt-chat-window" id="bt-chat-window" role="dialog" aria-hidden="true"
             aria-label="BOTRON Chat">
-            <div class="nx-chat-header">
-                <div class="nx-chat-header-title">
-                    <div class="nx-chat-avatar">NX</div>
-                    <div class="nx-chat-meta">
+            <div class="bt-chat-header">
+                <div class="bt-chat-header-title">
+                    <div class="bt-chat-avatar">BT</div>
+                    <div class="bt-chat-meta">
                         <h4>BOTRON v1.0</h4>
                         <span>RAG // ONLINE</span>
                     </div>
                 </div>
-                <button class="nx-chat-close-btn" id="nx-chat-close-btn" aria-label="Close Chat">&times;</button>
+                <button class="bt-chat-close-btn" id="bt-chat-close-btn" aria-label="Close Chat">&times;</button>
             </div>
 
-            <div class="nx-chat-messages" id="nx-chat-messages">
-                <div class="nx-chat-msg nx-chat-msg--bot">
-                    <div class="nx-chat-bubble">
+            <div class="bt-chat-messages" id="bt-chat-messages">
+                <div class="bt-chat-msg bt-chat-msg--bot">
+                    <div class="bt-chat-bubble">
                         Greetings, human. I am <strong>BOTRON</strong>, Shahsawar's autonomous AI assistant. I've indexed his
                         entire portfolio, RAG systems, technical stack, and background into my knowledge base. How can I
                         assist you?
                     </div>
-                    <span class="nx-chat-time">SYS // READY</span>
+                    <span class="bt-chat-time">SYS // READY</span>
                 </div>
             </div>
 
             <!-- Scroll-to-bottom button (appears when scrolled up) -->
-            <button class="nx-chat-scroll-btn" id="nx-chat-scroll-btn" aria-label="Scroll to latest message">
+            <button class="bt-chat-scroll-btn" id="bt-chat-scroll-btn" aria-label="Scroll to latest message">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
                     stroke-linecap="round" stroke-linejoin="round">
                     <polyline points="6 9 12 15 18 9"></polyline>
@@ -744,21 +746,21 @@
             </button>
 
             <!-- Quick Inquiry Suggestions -->
-            <div class="nx-chat-suggestions" id="nx-chat-suggestions">
-                <button type="button" class="nx-chat-chip" data-query="Tell me about REDNOTE and RAG">⚡ REDNOTE
+            <div class="bt-chat-suggestions" id="bt-chat-suggestions">
+                <button type="button" class="bt-chat-chip" data-query="Tell me about REDNOTE and RAG">⚡ REDNOTE
                     RAG</button>
-                <button type="button" class="nx-chat-chip" data-query="What is Shahsawar's tech stack?">🛠️ Tech
+                <button type="button" class="bt-chat-chip" data-query="What is Shahsawar's tech stack?">🛠️ Tech
                     Stack</button>
-                <button type="button" class="nx-chat-chip" data-query="What is Shahsawar's background in swimming?">🏊
+                <button type="button" class="bt-chat-chip" data-query="What is Shahsawar's background in swimming?">🏊
                     Sports & Coaching</button>
-                <button type="button" class="nx-chat-chip" data-query="How can I contact Shahsawar?">📬 Contact</button>
+                <button type="button" class="bt-chat-chip" data-query="How can I contact Shahsawar?">📬 Contact</button>
             </div>
 
             <!-- Input Bar -->
-            <form class="nx-chat-input-bar" id="nx-chat-form" onsubmit="return false;">
-                <input type="text" class="nx-chat-input" id="nx-chat-input"
+            <form class="bt-chat-input-bar" id="bt-chat-form" onsubmit="return false;">
+                <input type="text" class="bt-chat-input" id="bt-chat-input"
                     placeholder="Ask BOTRON anything about Shahsawar..." autocomplete="off">
-                <button type="button" class="nx-chat-send-btn" id="nx-chat-send-btn" aria-label="Send Query">
+                <button type="button" class="bt-chat-send-btn" id="bt-chat-send-btn" aria-label="Send Query">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
                         stroke-linecap="round" stroke-linejoin="round">
                         <line x1="22" y1="2" x2="11" y2="13"></line>
@@ -768,10 +770,10 @@
             </form>
         </div>
 
-        <div class="nx-strip">
-            <div class="left">BOTRON ACTIVE&nbsp;·&nbsp;<span id="nx-fps" class="live">-- FPS</span>&nbsp;·&nbsp;<span id="nx-net" class="live">NET --</span></div>
-            <div class="mid">STATUS: IDLE — <span class="nx-scroll-arrow">AWAITING SCROLL</span></div>
-            <div class="right">MOUSE <span id="nx-mouse" class="live">0,0</span> · CURSOR TRK</div>
+        <div class="bt-strip">
+            <div class="left">BOTRON ACTIVE&nbsp;·&nbsp;<span id="bt-fps" class="live">-- FPS</span>&nbsp;·&nbsp;<span id="bt-net" class="live">NET --</span></div>
+            <div class="mid">STATUS: IDLE — <span class="bt-scroll-arrow">AWAITING SCROLL</span></div>
+            <div class="right">MOUSE <span id="bt-mouse" class="live">0,0</span> · CURSOR TRK</div>
         </div>
     </div>
 

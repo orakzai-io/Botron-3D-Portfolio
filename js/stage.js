@@ -7,7 +7,7 @@ import { createCameraStory } from './webgl/camera-story.js';
 import { createGaze } from './webgl/gaze.js';
 import { createRobot } from './webgl/robot.js';
 import { createTelemetry } from './webgl/telemetry.js';
-import botronModelUrl from './data/botron.glb?url';
+import botronModelUrl from './models/botron.glb?url';
 import { signalBoot } from './boot-gate.js';
 
 const container = document.getElementById('stage-container');
@@ -62,7 +62,7 @@ if (botronBubble && botronBubbleText) {
   let _feedbackTimer = null;
   botronBubble.addEventListener('click', () => {
     clearTimeout(_feedbackTimer);
-    const win = document.getElementById('nx-chat-window');
+    const win = document.getElementById('bt-chat-window');
     // If win has 'is-open', chat just opened -> show option to close
     // If win does NOT have 'is-open', chat just closed -> show option to reopen
     const isOpen = win && win.classList.contains('is-open');
@@ -320,7 +320,7 @@ function animate(currentTime) {
     _perfLogged = true;
     const glb = performance.getEntriesByType('resource').find((e) => /botron.*\.glb/.test(e.name));
     console.info(
-      '[nx] perf — bot on screen at ' + Math.round(performance.now()) + 'ms',
+      '[bt] perf — bot on screen at ' + Math.round(performance.now()) + 'ms',
       glb
         ? {
             glbMs: Math.round(glb.duration),

@@ -3,7 +3,7 @@
    ========================================================================== */
 
 /* Floating Launch Trigger Button (FAB) */
-.nx-chat-fab {
+.bt-chat-fab {
   position: fixed;
   bottom: 46px;
   right: 28px;
@@ -25,18 +25,18 @@
   user-select: none;
 }
 
-.nx-chat-fab:hover {
+.bt-chat-fab:hover {
   transform: translateY(-2px);
   border-color: rgba(0, 240, 255, 0.8);
   box-shadow: 0 14px 40px rgba(0, 0, 0, 0.85), 0 0 35px rgba(0, 240, 255, 0.4);
 }
 
-.nx-chat-fab:active {
+.bt-chat-fab:active {
   transform: translateY(0) scale(0.98);
 }
 
 /* Hidden at the footer so all social icons and copyright links are unobstructed */
-.nx-chat-fab.is-footer-hidden {
+.bt-chat-fab.is-footer-hidden {
   opacity: 0;
   transform: translateY(28px) scale(0.9);
   pointer-events: none !important;
@@ -44,16 +44,16 @@
   transition: opacity 0.3s ease, transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.35s;
 }
 
-.nx-chat-fab-dot {
+.bt-chat-fab-dot {
   width: 8px;
   height: 8px;
   border-radius: 50%;
   background: #00f0ff;
   box-shadow: 0 0 10px #00f0ff;
-  animation: nx-pulse-dot 1.8s infinite ease-in-out;
+  animation: bt-pulse-dot 1.8s infinite ease-in-out;
 }
 
-@keyframes nx-pulse-dot {
+@keyframes bt-pulse-dot {
 
   0%,
   100% {
@@ -69,7 +69,7 @@
   }
 }
 
-.nx-chat-fab-icon {
+.bt-chat-fab-icon {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -77,7 +77,7 @@
 }
 
 /* Chat Drawer / Window */
-.nx-chat-window {
+.bt-chat-window {
   position: fixed;
   bottom: 96px;
   right: 28px;
@@ -98,14 +98,14 @@
     visibility 0.35s;
 }
 
-.nx-chat-window.is-open {
+.bt-chat-window.is-open {
   opacity: 1;
   visibility: visible;
   transform: translateY(0) scale(1);
 }
 
 /* Chat Header */
-.nx-chat-header {
+.bt-chat-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -114,13 +114,13 @@
   border-bottom: 1px solid rgba(0, 240, 255, 0.15);
 }
 
-.nx-chat-header-title {
+.bt-chat-header-title {
   display: flex;
   align-items: center;
   gap: 0.65rem;
 }
 
-.nx-chat-avatar {
+.bt-chat-avatar {
   width: 32px;
   height: 32px;
   border-radius: 8px;
@@ -136,7 +136,7 @@
   box-shadow: 0 0 12px rgba(0, 240, 255, 0.2);
 }
 
-.nx-chat-meta h4 {
+.bt-chat-meta h4 {
   margin: 0;
   font-family: 'Space Grotesk', var(--font-body, sans-serif);
   font-size: 0.85rem;
@@ -145,7 +145,7 @@
   color: #fff;
 }
 
-.nx-chat-meta span {
+.bt-chat-meta span {
   display: block;
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.62rem;
@@ -154,7 +154,7 @@
   opacity: 0.85;
 }
 
-.nx-chat-close-btn {
+.bt-chat-close-btn {
   background: transparent;
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 8px;
@@ -169,14 +169,14 @@
   transition: all 0.2s ease;
 }
 
-.nx-chat-close-btn:hover {
+.bt-chat-close-btn:hover {
   background: rgba(255, 255, 255, 0.08);
   border-color: rgba(0, 240, 255, 0.4);
   color: #00f0ff;
 }
 
 /* Chat Messages Stream */
-.nx-chat-messages {
+.bt-chat-messages {
   flex: 1;
   overflow-y: auto;
   padding: 1.15rem;
@@ -188,35 +188,35 @@
   scrollbar-color: rgba(0, 240, 255, 0.45) rgba(6, 12, 24, 0.6);
 }
 
-.nx-chat-messages::-webkit-scrollbar {
+.bt-chat-messages::-webkit-scrollbar {
   width: 6px;
 }
 
-.nx-chat-messages::-webkit-scrollbar-track {
+.bt-chat-messages::-webkit-scrollbar-track {
   background: rgba(6, 12, 24, 0.6);
   border-radius: 6px;
 }
 
-.nx-chat-messages::-webkit-scrollbar-thumb {
+.bt-chat-messages::-webkit-scrollbar-thumb {
   background: rgba(0, 240, 255, 0.4);
   border-radius: 6px;
   border: 1px solid rgba(0, 240, 255, 0.2);
   transition: background 0.2s ease;
 }
 
-.nx-chat-messages::-webkit-scrollbar-thumb:hover {
+.bt-chat-messages::-webkit-scrollbar-thumb:hover {
   background: rgba(0, 240, 255, 0.7);
   box-shadow: 0 0 8px rgba(0, 240, 255, 0.5);
 }
 
-.nx-chat-msg {
+.bt-chat-msg {
   display: flex;
   flex-direction: column;
   max-width: 88%;
-  animation: nx-chat-fade-in 0.25s ease forwards;
+  animation: bt-chat-fade-in 0.25s ease forwards;
 }
 
-@keyframes nx-chat-fade-in {
+@keyframes bt-chat-fade-in {
   from {
     opacity: 0;
     transform: translateY(6px);
@@ -228,15 +228,15 @@
   }
 }
 
-.nx-chat-msg--bot {
+.bt-chat-msg--bot {
   align-self: flex-start;
 }
 
-.nx-chat-msg--user {
+.bt-chat-msg--user {
   align-self: flex-end;
 }
 
-.nx-chat-bubble {
+.bt-chat-bubble {
   padding: 0.75rem 0.95rem;
   border-radius: 12px;
   font-family: 'Inter', var(--font-body, sans-serif);
@@ -245,26 +245,26 @@
   word-break: break-word;
 }
 
-.nx-chat-msg--bot .nx-chat-bubble {
+.bt-chat-msg--bot .bt-chat-bubble {
   background: rgba(14, 20, 32, 0.85);
   border: 1px solid rgba(0, 240, 255, 0.22);
   color: #e2e8f0;
   border-top-left-radius: 3px;
 }
 
-.nx-chat-msg--bot .nx-chat-bubble strong {
+.bt-chat-msg--bot .bt-chat-bubble strong {
   color: #00f0ff;
   font-weight: 600;
 }
 
-.nx-chat-msg--user .nx-chat-bubble {
+.bt-chat-msg--user .bt-chat-bubble {
   background: linear-gradient(135deg, rgba(0, 240, 255, 0.25), rgba(99, 102, 241, 0.35));
   border: 1px solid rgba(0, 240, 255, 0.45);
   color: #ffffff;
   border-top-right-radius: 3px;
 }
 
-.nx-chat-time {
+.bt-chat-time {
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.58rem;
   color: #64748b;
@@ -272,7 +272,7 @@
   padding: 0 0.25rem;
 }
 
-.nx-chat-meta {
+.bt-chat-meta {
   display: inline-flex;
   align-items: center;
   flex-wrap: wrap;
@@ -283,7 +283,7 @@
   font-size: 0.6rem;
 }
 
-.nx-meta-badge {
+.bt-meta-badge {
   color: #00f0ff;
   background: rgba(0, 240, 255, 0.12);
   border: 1px solid rgba(0, 240, 255, 0.3);
@@ -293,17 +293,17 @@
   letter-spacing: 0.04em;
 }
 
-.nx-meta-details {
+.bt-meta-details {
   color: #94a3b8;
   font-size: 0.58rem;
 }
 
-.nx-chat-msg--user .nx-chat-time {
+.bt-chat-msg--user .bt-chat-time {
   align-self: flex-end;
 }
 
 /* Suggested Prompts / Chips */
-.nx-chat-suggestions {
+.bt-chat-suggestions {
   padding: 0 1rem 0.6rem 1rem;
   display: flex;
   flex-wrap: wrap;
@@ -314,7 +314,7 @@
   transition: max-height 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease, padding 0.3s ease, margin 0.3s ease;
 }
 
-.nx-chat-suggestions.is-hidden {
+.bt-chat-suggestions.is-hidden {
   max-height: 0;
   opacity: 0;
   padding-top: 0;
@@ -324,7 +324,7 @@
   pointer-events: none;
 }
 
-.nx-chat-chip {
+.bt-chat-chip {
   background: rgba(0, 240, 255, 0.06);
   border: 1px solid rgba(0, 240, 255, 0.22);
   border-radius: 999px;
@@ -337,7 +337,7 @@
   white-space: nowrap;
 }
 
-.nx-chat-chip:hover {
+.bt-chat-chip:hover {
   background: rgba(0, 240, 255, 0.18);
   border-color: rgba(0, 240, 255, 0.55);
   color: #00f0ff;
@@ -345,7 +345,7 @@
 }
 
 /* Typing / Retrieving Indicator */
-.nx-chat-typing {
+.bt-chat-typing {
   display: flex;
   align-items: center;
   gap: 0.4rem;
@@ -357,24 +357,24 @@
   border-top-left-radius: 3px;
 }
 
-.nx-chat-typing-dot {
+.bt-chat-typing-dot {
   width: 6px;
   height: 6px;
   border-radius: 50%;
   background: #00f0ff;
   opacity: 0.4;
-  animation: nx-chat-bounce 1.2s infinite ease-in-out;
+  animation: bt-chat-bounce 1.2s infinite ease-in-out;
 }
 
-.nx-chat-typing-dot:nth-child(2) {
+.bt-chat-typing-dot:nth-child(2) {
   animation-delay: 0.2s;
 }
 
-.nx-chat-typing-dot:nth-child(3) {
+.bt-chat-typing-dot:nth-child(3) {
   animation-delay: 0.4s;
 }
 
-@keyframes nx-chat-bounce {
+@keyframes bt-chat-bounce {
 
   0%,
   100% {
@@ -388,7 +388,7 @@
   }
 }
 
-.nx-chat-typing-txt {
+.bt-chat-typing-txt {
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.62rem;
   color: #94a3b8;
@@ -396,7 +396,7 @@
 }
 
 /* Chat Input Bar */
-.nx-chat-input-bar {
+.bt-chat-input-bar {
   display: flex;
   align-items: center;
   gap: 0.6rem;
@@ -405,7 +405,7 @@
   border-top: 1px solid rgba(0, 240, 255, 0.15);
 }
 
-.nx-chat-input {
+.bt-chat-input {
   flex: 1;
   background: rgba(15, 23, 42, 0.6);
   border: 1px solid rgba(0, 240, 255, 0.2);
@@ -418,17 +418,17 @@
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.nx-chat-input:focus {
+.bt-chat-input:focus {
   border-color: rgba(0, 240, 255, 0.55);
   box-shadow: 0 0 12px rgba(0, 240, 255, 0.2);
 }
 
-.nx-chat-input::placeholder {
+.bt-chat-input::placeholder {
   color: #64748b;
   font-size: 0.76rem;
 }
 
-.nx-chat-send-btn {
+.bt-chat-send-btn {
   background: rgba(0, 240, 255, 0.15);
   border: 1px solid rgba(0, 240, 255, 0.4);
   border-radius: 10px;
@@ -443,30 +443,30 @@
   flex-shrink: 0;
 }
 
-.nx-chat-send-btn:hover {
+.bt-chat-send-btn:hover {
   background: rgba(0, 240, 255, 0.3);
   border-color: #00f0ff;
   transform: scale(1.05);
   box-shadow: 0 0 15px rgba(0, 240, 255, 0.35);
 }
 
-.nx-chat-send-btn:active {
+.bt-chat-send-btn:active {
   transform: scale(0.95);
 }
 
 /* Mobile. The label pill is the only tap affordance here (the 3D speech bubble
    is display:none <=900px), and at the bottom-right it used to sit on top of the
-   .nx-strip status bar. Fixes, in order of importance:
+   .bt-strip status bar. Fixes, in order of importance:
      1. the FAB is lifted clear of the strip, and above the iOS home indicator
-     2. .nx-strip .right (a MOUSE / CURSOR TRK readout) is meaningless on touch
+     2. .bt-strip .right (a MOUSE / CURSOR TRK readout) is meaningless on touch
      3. the label auto-collapses to a circle -- see the .is-collapsed rule below
    The breakpoint is 900px, NOT 600px, and it must stay matched to the rule that
-   hides the speech bubble in nexus.css. At 600px a 601-900px screen (most
+   hides the speech bubble in theme.css. At 600px a 601-900px screen (most
    phones in portrait, and every tablet) got the worst of both: bubble hidden
    AND no collapse. Desktop is deliberately untouched -- it has room, and
    :hover is a better affordance than a timer. */
 @media (max-width: 900px) {
-  .nx-chat-fab {
+  .bt-chat-fab {
     bottom: calc(30px + env(safe-area-inset-bottom));
     right: 16px;
     padding: 0.55rem 0.95rem;
@@ -479,7 +479,7 @@
       border-color 0.25s ease, box-shadow 0.25s ease;
   }
 
-  .nx-chat-window {
+  .bt-chat-window {
     right: 16px;
     bottom: calc(84px + env(safe-area-inset-bottom));
     width: calc(100vw - 32px);
@@ -489,7 +489,7 @@
   /* Collapsed: a 52px circle (dot + icon), comfortably over the 44px minimum
      tap target. The label span collapses to zero width rather than being
      display:none, so the circle keeps both children centred. */
-  .nx-chat-fab.is-collapsed {
+  .bt-chat-fab.is-collapsed {
     width: 52px;
     height: 52px;
     padding: 0;
@@ -498,7 +498,7 @@
     justify-content: center;
   }
 
-  .nx-chat-fab.is-collapsed .nx-chat-fab-label {
+  .bt-chat-fab.is-collapsed .bt-chat-fab-label {
     max-width: 0;
     overflow: hidden;
     white-space: nowrap;
@@ -506,7 +506,7 @@
   }
 
   /* The dot would otherwise push the icon off-centre in the circle. */
-  .nx-chat-fab.is-collapsed .nx-chat-fab-dot {
+  .bt-chat-fab.is-collapsed .bt-chat-fab-dot {
     position: absolute;
     top: 9px;
     right: 9px;
@@ -516,7 +516,7 @@
 /* A mouse/cursor readout is noise on a touch device — there's no cursor to
    track. Pair it with the existing .mid hide at 720px. */
 @media (max-width: 720px) {
-  .nx-strip .right {
+  .bt-strip .right {
     display: none;
   }
 }
@@ -524,13 +524,13 @@
 /* Belt-and-braces with the JS guard in initChat(): if the timer is ever bypassed,
    the collapse must not animate. */
 @media (prefers-reduced-motion: reduce) {
-  .nx-chat-fab {
+  .bt-chat-fab {
     transition: none !important;
   }
 }
 
 /* Scroll-to-bottom button */
-.nx-chat-scroll-btn {
+.bt-chat-scroll-btn {
   position: absolute;
   bottom: 130px;
   right: 18px;
@@ -555,22 +555,22 @@
   pointer-events: auto !important;
 }
 
-.nx-chat-scroll-btn.is-visible {
+.bt-chat-scroll-btn.is-visible {
   opacity: 1;
   visibility: visible;
   transform: translateY(0);
 }
 
-.nx-chat-scroll-btn:hover {
+.bt-chat-scroll-btn:hover {
   background: rgba(0, 240, 255, 0.25);
   border-color: #00f0ff;
   box-shadow: 0 0 12px rgba(0, 240, 255, 0.3);
 }
 
-/* Flat panels for the chat chrome (was the nx-lite tier, now the only look).
+/* Flat panels for the chat chrome (was the bt-lite tier, now the only look).
    See docs/quality-tiers.md. */
-.nx-chat-fab,
-.nx-chat-window {
+.bt-chat-fab,
+.bt-chat-window {
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
   background: rgba(6, 10, 20, 0.96) !important;
@@ -579,12 +579,12 @@
    guard in chat.js) -- sized like a thumbnail so the layout does not jump */
 /* Chat links are coloured here rather than with inline style="color:#00f0ff",
    because the HTML sanitiser strips the style attribute. */
-.nx-chat-bubble a {
+.bt-chat-bubble a {
   color: #00f0ff;
   text-decoration: none;
   border-bottom: 1px solid rgba(0, 240, 255, 0.35);
 }
-.nx-chat-bubble a:hover {
+.bt-chat-bubble a:hover {
   color: #67e8f9;
   border-bottom-color: #67e8f9;
 }
@@ -601,7 +601,7 @@
   text-align: center;
 }
 /* ---- photo response: inline thumbnail + full-size lightbox ---- */
-.nx-chat-photo {
+.bt-chat-photo {
   display: block;
   /* width/height auto + both maxima preserves the aspect ratio: the 9:16 chess
      photo is capped by height (180x320) instead of ballooning to 260x462.
@@ -616,12 +616,12 @@
   cursor: zoom-in;
   transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
 }
-.nx-chat-photo:hover {
+.bt-chat-photo:hover {
   border-color: rgba(0, 240, 255, 0.7);
   box-shadow: 0 0 18px rgba(0, 240, 255, 0.25);
   transform: translateY(-1px);
 }
-.nx-photo-lightbox {
+.bt-photo-lightbox {
   position: fixed;
   inset: 0;
   z-index: 1002;
@@ -631,9 +631,9 @@
   padding: 1.5rem;
   background: rgba(3, 5, 9, 0.92);
   cursor: zoom-out;
-  animation: nxLbFade 0.2s ease;
+  animation: bLbFade 0.2s ease;
 }
-.nx-photo-lightbox img {
+.bt-photo-lightbox img {
   max-width: 100%;
   max-height: 88vh;
   width: auto;
@@ -642,11 +642,11 @@
   border: 1px solid rgba(0, 240, 255, 0.4);
   box-shadow: 0 25px 70px rgba(0, 0, 0, 0.9), 0 0 40px rgba(0, 240, 255, 0.18);
 }
-@keyframes nxLbFade {
+@keyframes bLbFade {
   from { opacity: 0; }
   to { opacity: 1; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .nx-photo-lightbox { animation: none; }
-  .nx-chat-photo { transition: none; }
+  .bt-photo-lightbox { animation: none; }
+  .bt-chat-photo { transition: none; }
 }

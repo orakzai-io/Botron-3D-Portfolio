@@ -4,9 +4,9 @@ export function createTelemetry(mouse) {
   let _fc = 0;
   let _ft = performance.now();
   // Hoisted once — modules run after DOM parse, so the elements exist.
-  const fpsEl = document.getElementById('nx-fps');
-  const mouseEl = document.getElementById('nx-mouse');
-  const netEl = document.getElementById('nx-net');
+  const fpsEl = document.getElementById('bt-fps');
+  const mouseEl = document.getElementById('bt-mouse');
+  const netEl = document.getElementById('bt-net');
 
   // --- Live Network Telemetry ---
   function updateNetwork() {

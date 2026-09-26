@@ -145,7 +145,7 @@ export function createCameraStory({ camera, controls }) {
   });
 
   // Top-nav anchors hijack to Lenis (Lenis disables native smooth scrolling).
-  document.querySelectorAll('.nx-nav-link, .nx-drawer-link').forEach((a) => {
+  document.querySelectorAll('.bt-nav-link, .bt-drawer-link').forEach((a) => {
     a.addEventListener('click', (e) => {
       const href = a.getAttribute('href');
       if (href && href.startsWith('#')) {

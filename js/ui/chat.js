@@ -10,7 +10,7 @@ import swimmingPhoto from '../../assets/swimmingpic.webp';
 import chessPhoto from '../../assets/chesspic.webp';
 
 const PHOTO_TAG = (url, alt, w, h) =>
-  '<img class="nx-chat-photo" src="' + url + '" alt="' + alt + '" width="' + w + '" height="' + h + '" loading="lazy" decoding="async">';
+  '<img class="bt-chat-photo" src="' + url + '" alt="' + alt + '" width="' + w + '" height="' + h + '" loading="lazy" decoding="async">';
 
 const PRO_PHOTO = PHOTO_TAG(professionalPhoto, 'Shahsawar Orakzai in a suit and tie', 577, 576);
 const SWIM_PHOTO = PHOTO_TAG(swimmingPhoto, 'Shahsawar Orakzai at a swimming pool wearing a medal', 635, 634);
@@ -100,21 +100,21 @@ function photoTagsFor(query) {
 function ensurePhotos(query, answerHtml) {
   const tags = photoTagsFor(query);
   if (!tags) return answerHtml;
-  if (/<img[^>]*class="[^"]*nx-chat-photo/.test(answerHtml)) return answerHtml;
+  if (/<img[^>]*class="[^"]*bt-chat-photo/.test(answerHtml)) return answerHtml;
   const label = PHOTO_CHESS.test(query) ? 'Chess.' : PHOTO_SWIM.test(query) ? 'Swimming.' : 'This is Shahsawar.';
   return answerHtml + '<br><strong>' + label + '</strong><br>' + tags + '<br><em>Tap any photo to view full size.</em>';
 }
 
 export function initChat() {
-  const fab = document.getElementById('nx-chat-fab');
-  const win = document.getElementById('nx-chat-window');
-  const closeBtn = document.getElementById('nx-chat-close-btn');
-  const messagesContainer = document.getElementById('nx-chat-messages');
-  const input = document.getElementById('nx-chat-input');
-  const sendBtn = document.getElementById('nx-chat-send-btn');
-  const suggestionsContainer = document.getElementById('nx-chat-suggestions');
+  const fab = document.getElementById('bt-chat-fab');
+  const win = document.getElementById('bt-chat-window');
+  const closeBtn = document.getElementById('bt-chat-close-btn');
+  const messagesContainer = document.getElementById('bt-chat-messages');
+  const input = document.getElementById('bt-chat-input');
+  const sendBtn = document.getElementById('bt-chat-send-btn');
+  const suggestionsContainer = document.getElementById('bt-chat-suggestions');
   const botronBubble = document.getElementById('botron-bubble');
-  const scrollBtn = document.getElementById('nx-chat-scroll-btn');
+  const scrollBtn = document.getElementById('bt-chat-scroll-btn');
 
   if (!win || !input || !messagesContainer) return;
 
@@ -123,12 +123,12 @@ export function initChat() {
   // --- Mobile FAB: show the label, then collapse to a circle. ---
   // The pill is the only affordance that says "tap me" on touch (the 3D speech
   // bubble is display:none <=900px), but a wide label sitting at the bottom
-  // right overlaps the .nx-strip status bar. So: expanded on load, collapsing
+  // right overlaps the .bt-strip status bar. So: expanded on load, collapsing
   // to a circle after a beat, and it is still a single-tap control throughout.
   // Desktop is untouched -- it has room, and :hover is a better affordance
   // than a timer.
   // MUST stay matched to the two CSS breakpoints: the 900px rule that hides the
-  // 3D speech bubble (nexus.css) and the 900px block that draws .is-collapsed
+  // 3D speech bubble (theme.css) and the 900px block that draws .is-collapsed
   // (chat.css). At 600px, a 601-900px screen got no bubble and no collapse.
   const collapseQuery = window.matchMedia('(max-width: 900px)');
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -220,7 +220,7 @@ export function initChat() {
   if (closeBtn) closeBtn.addEventListener('click', closeChat);
 
   // Hide BOTRON chat button when reaching footer so all social icons are clean to scan
-  const footerEl = document.querySelector('.nx-footer');
+  const footerEl = document.querySelector('.bt-footer');
 
   function updateFabFooterVisibility() {
     if (!fab || !footerEl) return;
@@ -274,7 +274,7 @@ export function initChat() {
       'error',
       (e) => {
         const photo = e.target;
-        if (!photo.classList || !photo.classList.contains('nx-chat-photo')) return;
+        if (!photo.classList || !photo.classList.contains('bt-chat-photo')) return;
         const note = document.createElement('span');
         note.className = 'photo-error';
         note.textContent = 'Photo unavailable right now.';
@@ -289,7 +289,7 @@ export function initChat() {
   // photo responses are appended dynamically, not present at init.
   function openPhotoLightbox(src, alt) {
     const box = document.createElement('div');
-    box.className = 'nx-photo-lightbox';
+    box.className = 'bt-photo-lightbox';
     box.setAttribute('role', 'dialog');
     box.setAttribute('aria-modal', 'true');
     box.setAttribute('aria-label', alt || 'Photo');
@@ -313,7 +313,7 @@ export function initChat() {
 
   if (messagesContainer) {
     messagesContainer.addEventListener('click', (e) => {
-      const photo = e.target.closest('.nx-chat-photo');
+      const photo = e.target.closest('.bt-chat-photo');
       if (!photo) return;
       e.preventDefault();
       openPhotoLightbox(photo.src, photo.alt);
@@ -375,8 +375,8 @@ export function initChat() {
   function sanitizeHtml(html) {
     if (!html) return "";
     if (!/<[a-zA-Z]/.test(html)) return html;
-    const doc = new DOMParser().parseFromString('<div id="nx-san-root">' + html + '</div>', 'text/html');
-    const root = doc.getElementById('nx-san-root');
+    const doc = new DOMParser().parseFromString('<div id="bt-san-root">' + html + '</div>', 'text/html');
+    const root = doc.getElementById('bt-san-root');
     if (!root) return escapeHtml(html);
     const stack = [root];
     while (stack.length) {
@@ -447,7 +447,7 @@ export function initChat() {
 
   function appendMessage(text, sender = 'bot', meta = null) {
     const msgEl = document.createElement('div');
-    msgEl.className = `nx-chat-msg nx-chat-msg--${sender}`;
+    msgEl.className = `bt-chat-msg bt-chat-msg--${sender}`;
 
     let metaHtml = '';
     if (meta && meta.sources && meta.sources.length) {
@@ -460,9 +460,9 @@ export function initChat() {
         : '';
       const latency = meta.retrieval_time_ms ? ` • ${meta.retrieval_time_ms}ms` : '';
       metaHtml = `
-        <div class="nx-chat-meta">
-          <span class="nx-meta-badge">⚡ VECTOR RAG</span>
-          <span class="nx-meta-details">${topSources}${sim}${latency}</span>
+        <div class="bt-chat-meta">
+          <span class="bt-meta-badge">⚡ VECTOR RAG</span>
+          <span class="bt-meta-details">${topSources}${sim}${latency}</span>
         </div>
       `;
     }
@@ -472,9 +472,9 @@ export function initChat() {
     const contentHtml = sender === 'user' ? escapeHtml(text) : formatMarkdown(text);
 
     msgEl.innerHTML = `
-      <div class="nx-chat-bubble">${contentHtml}</div>
+      <div class="bt-chat-bubble">${contentHtml}</div>
       ${metaHtml}
-      <span class="nx-chat-time">${getTimeString()}</span>
+      <span class="bt-chat-time">${getTimeString()}</span>
     `;
     messagesContainer.appendChild(msgEl);
     scrollToBottom(true);
@@ -502,20 +502,20 @@ export function initChat() {
 
   function showTypingIndicator() {
     const typingEl = document.createElement('div');
-    typingEl.className = 'nx-chat-typing';
-    typingEl.id = 'nx-chat-typing';
+    typingEl.className = 'bt-chat-typing';
+    typingEl.id = 'bt-chat-typing';
     typingEl.innerHTML = `
-      <span class="nx-chat-typing-dot"></span>
-      <span class="nx-chat-typing-dot"></span>
-      <span class="nx-chat-typing-dot"></span>
-      <span class="nx-chat-typing-txt">RETRIEVING FROM KNOWLEDGE BASE...</span>
+      <span class="bt-chat-typing-dot"></span>
+      <span class="bt-chat-typing-dot"></span>
+      <span class="bt-chat-typing-dot"></span>
+      <span class="bt-chat-typing-txt">RETRIEVING FROM KNOWLEDGE BASE...</span>
     `;
     messagesContainer.appendChild(typingEl);
     scrollToBottom(true);
   }
 
   function removeTypingIndicator() {
-    const typingEl = document.getElementById('nx-chat-typing');
+    const typingEl = document.getElementById('bt-chat-typing');
     if (typingEl) typingEl.remove();
   }
 
@@ -610,7 +610,7 @@ export function initChat() {
   // Handle Quick Chips click
   if (suggestionsContainer) {
     suggestionsContainer.addEventListener('click', (e) => {
-      const chip = e.target.closest('.nx-chat-chip');
+      const chip = e.target.closest('.bt-chat-chip');
       if (chip && chip.dataset.query) {
         handleSendMessage(chip.dataset.query);
       }

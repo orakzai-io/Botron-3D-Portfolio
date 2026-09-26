@@ -38,13 +38,13 @@ export const POSES = [
 // null = that beat uses mouse-tracking gaze instead of a content target.
 export const GAZE_TARGETS = {
   hero: null,
-  about: '.nx-beat-copy',
+  about: '.bt-beat-copy',
   skills: '#skills-globe-container',
-  experience: '.nx-beat-copy',
-  projects: '.nx-beat-copy',
-  education: '.nx-beat-copy',
-  testimonials: '.nx-beat-copy',
-  contact: '.nx-contact-stage',
+  experience: '.bt-beat-copy',
+  projects: '.bt-beat-copy',
+  education: '.bt-beat-copy',
+  testimonials: '.bt-beat-copy',
+  contact: '.bt-contact-stage',
 };
 
 // Extra yaw bias per beat (gaze units). Positive = head turns further
