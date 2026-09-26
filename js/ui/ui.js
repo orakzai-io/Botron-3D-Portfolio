@@ -9,8 +9,10 @@
   if (fine && cursor) {
     const dot = cursor.querySelector('.nx-cursor-dot');
     const ring = cursor.querySelector('.nx-cursor-ring');
-    let mx = innerWidth / 2, my = innerHeight / 2;
-    let rx = mx, ry = my;
+    let mx = innerWidth / 2,
+      my = innerHeight / 2;
+    let rx = mx,
+      ry = my;
 
     let isRolling = false;
 
@@ -19,6 +21,9 @@
       const dy = my - ry;
       rx += dx * 0.28;
       ry += dy * 0.28;
+      // Dot is written here too — one style write per frame instead of one per
+      // mousemove event (high-polling mice fire up to 1000 events/s).
+      if (dot) dot.style.transform = `translate3d(${mx}px,${my}px,0)`;
       if (ring) ring.style.transform = `translate3d(${rx}px,${ry}px,0)`;
 
       // Sleep the loop once reticle ring converges on the pointer
@@ -39,13 +44,18 @@
       }
     };
 
-    addEventListener('mousemove', (e) => {
-      mx = e.clientX;
-      my = e.clientY;
-      // Instant 0ms response for the aiming dot
-      if (dot) dot.style.transform = `translate3d(${mx}px,${my}px,0)`;
-      wakeRoll();
-    }, { passive: true });
+    addEventListener(
+      'mousemove',
+      (e) => {
+        mx = e.clientX;
+        my = e.clientY;
+        // A release that happened outside the window never fires mouseup — catch
+        // it here so the press state can never stick to the reticle.
+        if (e.buttons === 0) cursor.classList.remove('is-down');
+        wakeRoll(); // dot position is written in roll() — per frame, not per event
+      },
+      { passive: true }
+    );
 
     wakeRoll();
     const hoverEls = 'a, button, .nx-chip, .nx-mini, .nx-proj, .nx-filter-pill, .nx-telemetry-hud';
@@ -57,28 +67,61 @@
     });
     document.addEventListener('mousedown', () => cursor.classList.add('is-down'));
     document.addEventListener('mouseup', () => cursor.classList.remove('is-down'));
+    addEventListener('blur', () => cursor.classList.remove('is-down')); // focus lost mid-press
   }
 
-  // scroll progress hairline under the nav
+  // scroll progress hairline under the nav — cached document height +
+  // compositor-only scaleX write, so scrolling never pairs a layout read
+  // (scrollHeight) with a style write (width) on the same tick.
   const hair = document.getElementById('nx-hair');
-  const onScroll = () => {
-    if (hair) {
+  if (hair) {
+    hair.style.width = '100%'; // CSS keeps this too; set defensively
+    let _max = 1;
+    let _lastPct = -1;
+    const measureMax = () => {
+      _max = Math.max(1, document.documentElement.scrollHeight - innerHeight);
+    };
+    const onScroll = () => {
       const sc = window.scrollY || document.documentElement.scrollTop || 0;
-      const max = Math.max(1, document.documentElement.scrollHeight - innerHeight);
-      hair.style.width = (sc / max * 100) + '%';
+      const pct = Math.min(1, sc / _max);
+      if (Math.abs(pct - _lastPct) > 0.0015) {
+        // skip sub-pixel writes
+        _lastPct = pct;
+        hair.style.transform = `scaleX(${pct})`;
+      }
+    };
+    measureMax();
+    addEventListener('scroll', onScroll, { passive: true });
+    addEventListener(
+      'resize',
+      () => {
+        measureMax();
+        onScroll();
+      },
+      { passive: true }
+    );
+    // Late layout shifts (fonts, images, reveals) — re-measure, don't poll.
+    if ('ResizeObserver' in window) {
+      new ResizeObserver(measureMax).observe(document.body);
+    } else if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(measureMax);
     }
-  };
-  addEventListener('scroll', onScroll, { passive: true });
-  onScroll();
+    onScroll();
+  }
 
   // reveal narrative beats as they cross into the viewport
-  const io = new IntersectionObserver((entries) => {
-    entries.forEach((en) => {
-      if (en.isIntersecting) { en.target.classList.add('is-in'); io.unobserve(en.target); }
-    });
-  }, { threshold: 0.22 });
+  const io = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((en) => {
+        if (en.isIntersecting) {
+          en.target.classList.add('is-in');
+          io.unobserve(en.target);
+        }
+      });
+    },
+    { threshold: 0.22 }
+  );
   document.querySelectorAll('.nx-beat, .nx-reveal').forEach((el) => io.observe(el));
-
 
   // ============================================================
   // Testimonials carousel — prev/next + dots, 6s auto-advance
@@ -113,25 +156,44 @@
 
       function go(i) {
         idx = (i + count) % count;
-        track.style.transform = 'translateX(-' + (idx * 100) + '%)';
+        track.style.transform = 'translateX(-' + idx * 100 + '%)';
         dots.forEach((d, j) => d.classList.toggle('active', j === idx));
       }
 
-      function goPrev() { go(idx - 1); }
-      function goNext() { go(idx + 1); }
+      function goPrev() {
+        go(idx - 1);
+      }
+      function goNext() {
+        go(idx + 1);
+      }
       if (prevBtn) prevBtn.addEventListener('click', goPrev);
       if (nextBtn) nextBtn.addEventListener('click', goNext);
 
-      function start() { if (!timer) timer = setInterval(goNext, AUTO_MS); }
-      function stop() { if (timer) { clearInterval(timer); timer = null; } }
-      function restart() { stop(); start(); }
+      function start() {
+        if (!timer) timer = setInterval(goNext, AUTO_MS);
+      }
+      function stop() {
+        if (timer) {
+          clearInterval(timer);
+          timer = null;
+        }
+      }
+      function restart() {
+        stop();
+        start();
+      }
 
       quoteViewport.addEventListener('mouseenter', stop);
       quoteViewport.addEventListener('mouseleave', restart);
 
-      const qIO = new IntersectionObserver((entries) => {
-        entries.forEach((en) => { en.isIntersecting ? start() : stop(); });
-      }, { threshold: 0.35 });
+      const qIO = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((en) => {
+            en.isIntersecting ? start() : stop();
+          });
+        },
+        { threshold: 0.35 }
+      );
       qIO.observe(quoteViewport);
 
       go(0);
@@ -145,6 +207,20 @@
   const contactForm = document.getElementById('contactForm');
   if (contactForm) {
     contactForm.noValidate = true;
+
+    const clearFieldError = (input) => {
+      const field = input ? input.closest('.nx-field') : null;
+      if (!field || !field.classList.contains('has-error')) return;
+      field.classList.remove('has-error');
+      const errEl = field.querySelector('.nx-field-error');
+      if (errEl) errEl.textContent = '';
+    };
+
+    // Clear error immediately when user focuses or types/edits a field
+    contactForm.querySelectorAll('input, textarea').forEach((input) => {
+      input.addEventListener('input', () => clearFieldError(input));
+      input.addEventListener('focus', () => clearFieldError(input));
+    });
 
     contactForm.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -176,7 +252,7 @@
       });
       if (!isValid) return;
 
-        const btn = contactForm.querySelector('button[type="submit"]');
+      const btn = contactForm.querySelector('button[type="submit"]');
       const label = btn.textContent;
       btn.disabled = true;
       btn.textContent = 'TRANSMITTING…';
@@ -184,7 +260,7 @@
         const res = await fetch(contactForm.action, {
           method: 'POST',
           body: new FormData(contactForm),
-          headers: { 'Accept': 'application/json' },
+          headers: { Accept: 'application/json' },
         });
         btn.textContent = res.ok ? 'TRANSMISSION SENT ✓' : 'TRANSMISSION FAILED ✕';
         if (res.ok) contactForm.reset();
@@ -230,9 +306,11 @@
 
     // Close on outside tap
     document.addEventListener('click', (e) => {
-      if (drawer.classList.contains('is-open') &&
-          !drawer.contains(e.target) &&
-          !burger.contains(e.target)) {
+      if (
+        drawer.classList.contains('is-open') &&
+        !drawer.contains(e.target) &&
+        !burger.contains(e.target)
+      ) {
         close();
       }
     });

@@ -1,0 +1,532 @@
+/* ==========================================================================
+   BASE STYLESHEET — moved verbatim out of index.html's inline <style>.
+   Loaded FIRST (before fonts.css / nexus.css / chat.css) so the cascade
+   order that nexus.css relies on ("loads last, overrides the boilerplate")
+   is unchanged.
+   ========================================================================== */
+
+        :root {
+            --primary-cyan: #00f0ff;
+            --text-main: #f8fafc;
+            --font-heading: 'Space Grotesk', sans-serif;
+            --font-body: 'Inter', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            width: 100%;
+            min-height: 100vh;
+            background: #030305;
+            color: var(--text-main);
+            font-family: var(--font-body);
+            overflow-x: hidden;
+        }
+
+        /* Fixed 3D Canvas Stage Background */
+        .stage-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .stage-container canvas {
+            width: 100% !important;
+            height: 100% !important;
+            display: block;
+            pointer-events: none !important;
+            touch-action: pan-y !important;
+        }
+
+        /* UI Overlay Layer */
+        .ui-overlay {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            pointer-events: none;
+        }
+
+        a,
+        button {
+            pointer-events: auto;
+        }
+
+
+        /* === EXPERIENCE CARD WIDTH — critical, inlined so a cached nexus.css can never shrink these === */
+        @media (min-width: 901px) {
+            #experience .nx-beat-grid {
+                grid-template-columns: 1fr !important;
+                width: min(1400px, 94vw) !important;
+                max-width: 1400px !important;
+            }
+
+            #experience .nx-timeline {
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+
+            .nx-timeline-card {
+                width: calc(50% - 60px) !important;
+            }
+        }
+
+        /* === SKILLS SECTION: 3D GLOBE & TELEMETRY HUD (Inlined to prevent cache issues) === */
+        .nx-skills-grid {
+            display: grid !important;
+            grid-template-columns: minmax(0, 520px) 1fr !important;
+            gap: clamp(1.5rem, 5vw, 4.5rem) !important;
+            align-items: center !important;
+            width: min(1280px, 92vw) !important;
+            margin: 0 auto !important;
+        }
+
+        .nx-filter-bar {
+            display: flex !important;
+            flex-wrap: wrap !important;
+            gap: 0.5rem !important;
+            margin-top: 1.4rem !important;
+            margin-bottom: 1.6rem !important;
+            pointer-events: auto !important;
+        }
+
+        .nx-filter-pill {
+            font-family: var(--font-ui, 'Inter', sans-serif) !important;
+            font-size: 0.72rem !important;
+            font-weight: 600 !important;
+            letter-spacing: 0.08em !important;
+            padding: 0.45rem 0.9rem !important;
+            border-radius: 6px !important;
+            border: 1px solid rgba(255, 255, 255, 0.12) !important;
+            background: rgba(10, 15, 26, 0.75) !important;
+            color: #94a3b8 !important;
+            cursor: pointer !important;
+            transition: all 0.25s ease !important;
+            user-select: none !important;
+        }
+
+        .nx-filter-pill:hover {
+            color: #ffffff !important;
+            border-color: rgba(0, 240, 255, 0.5) !important;
+            background: rgba(15, 23, 42, 0.9) !important;
+            transform: translateY(-1px) !important;
+        }
+
+        .nx-filter-pill.active {
+            color: #00f0ff !important;
+            border-color: rgba(0, 240, 255, 0.55) !important;
+            background: rgba(0, 240, 255, 0.10) !important;
+            box-shadow: 0 0 16px rgba(0, 240, 255, 0.22), 0 0 30px rgba(0, 240, 255, 0.10) !important;
+        }
+
+        /* Telemetry HUD Card */
+        .nx-telemetry-hud {
+            padding: 1.3rem 1.5rem !important;
+            border-radius: 12px !important;
+            border: 1px solid rgba(0, 240, 255, 0.25) !important;
+            background: linear-gradient(135deg, rgba(12, 18, 32, 0.85), rgba(6, 10, 20, 0.95)) !important;
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(0, 240, 255, 0.05) !important;
+            pointer-events: auto !important;
+            position: relative !important;
+            overflow: hidden !important;
+        }
+
+        .nx-telemetry-hud::before {
+            content: "" !important;
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 4px !important;
+            height: 100% !important;
+            background: linear-gradient(180deg, #00f0ff, var(--cyan-soft, #67e8f9)) !important;
+            box-shadow: 0 0 12px rgba(0, 240, 255, 0.8), 0 0 20px rgba(0, 240, 255, 0.3) !important;
+        }
+
+        .nx-telemetry-header {
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            margin-bottom: 0.65rem !important;
+        }
+
+        .nx-telemetry-badge {
+            display: flex !important;
+            align-items: center !important;
+            gap: 0.5rem !important;
+        }
+
+        .nx-telemetry-icon {
+            font-size: 1rem !important;
+        }
+
+        .nx-telemetry-cat {
+            font-family: var(--font-ui, 'Inter', sans-serif) !important;
+            font-size: 0.65rem !important;
+            font-weight: 700 !important;
+            letter-spacing: 0.14em !important;
+            padding: 0.2rem 0.55rem !important;
+            border-radius: 4px !important;
+            border: 1px solid rgba(0, 240, 255, 0.3) !important;
+            color: #00f0ff !important;
+            background: rgba(0, 240, 255, 0.08) !important;
+        }
+
+        .nx-telemetry-status {
+            display: flex !important;
+            align-items: center !important;
+            gap: 0.45rem !important;
+        }
+
+        .nx-telemetry-dot {
+            width: 7px !important;
+            height: 7px !important;
+            border-radius: 50% !important;
+            background: #00f0ff !important;
+            box-shadow: 0 0 8px #00f0ff !important;
+        }
+
+        .nx-telemetry-level {
+            font-family: var(--font-ui, 'Inter', sans-serif) !important;
+            font-size: 0.9rem !important;
+            font-weight: 700 !important;
+            color: #f8fafc !important;
+        }
+
+        .nx-telemetry-title {
+            font-family: var(--font-heading) !important;
+            font-size: 1.25rem !important;
+            font-weight: 700 !important;
+            letter-spacing: 0.04em !important;
+            color: #ffffff !important;
+            margin-bottom: 0.4rem !important;
+        }
+
+        .nx-telemetry-desc {
+            font-size: 0.85rem !important;
+            line-height: 1.5 !important;
+            color: #94a3b8 !important;
+            margin-bottom: 1rem !important;
+            min-height: 2.5em !important;
+        }
+
+        .nx-telemetry-meter {
+            width: 100% !important;
+            height: 6px !important;
+            background: rgba(255, 255, 255, 0.08) !important;
+            border-radius: 3px !important;
+            overflow: hidden !important;
+        }
+
+        .nx-telemetry-fill {
+            height: 100% !important;
+            background: linear-gradient(90deg, #00f0ff, var(--cyan-soft, #67e8f9)) !important;
+            border-radius: 3px !important;
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.6) !important;
+            transition: width 0.4s ease, background-color 0.4s ease !important;
+        }
+
+        .nx-telemetry-hint {
+            font-family: var(--font-ui, 'Inter', sans-serif) !important;
+            font-size: 0.6rem !important;
+            letter-spacing: 0.16em !important;
+            color: #64748b !important;
+            margin-top: 0.75rem !important;
+            text-align: right !important;
+        }
+
+        /* 3D Skills Stage */
+        .nx-skills-stage {
+            position: relative !important;
+            width: 100% !important;
+            max-width: 500px !important;
+            aspect-ratio: 1 / 1 !important;
+            justify-self: center !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center !important;
+            pointer-events: auto !important;
+        }
+
+        .nx-skills-stage canvas {
+            width: 100% !important;
+            height: 100% !important;
+            display: block !important;
+            touch-action: none !important;
+        }
+
+        .nx-globe-reticle {
+            position: absolute !important;
+            top: 6px !important;
+            left: 10px !important;
+            right: 10px !important;
+            display: flex !important;
+            justify-content: space-between !important;
+            font-family: var(--font-ui, 'Inter', sans-serif) !important;
+            font-size: 0.6rem !important;
+            letter-spacing: 0.14em !important;
+            color: #64748b !important;
+            pointer-events: none !important;
+            opacity: 0.8 !important;
+        }
+
+        .nx-globe-drag-hint {
+            position: absolute !important;
+            bottom: 8px !important;
+            left: 50% !important;
+            transform: translateX(-50%) !important;
+            font-family: var(--font-ui, 'Inter', sans-serif) !important;
+            font-size: 0.62rem !important;
+            letter-spacing: 0.16em !important;
+            color: #94a3b8 !important;
+            pointer-events: none !important;
+            white-space: nowrap !important;
+            opacity: 0.8 !important;
+            background: rgba(4, 7, 14, 0.75) !important;
+            padding: 0.25rem 0.75rem !important;
+            border-radius: 4px !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        }
+
+        /* === CONTACT SECTION: UNIFIED CONSOLE & ROBOT STAGE (OPTION 1) === */
+        .nx-contact-grid {
+            width: min(1280px, 92vw) !important;
+            margin: 0 auto !important;
+            display: grid !important;
+            grid-template-columns: minmax(0, 560px) 1fr !important;
+            gap: clamp(2rem, 5vw, 5rem) !important;
+            align-items: center !important;
+        }
+
+        .nx-contact-console {
+            max-width: 560px !important;
+            width: 100% !important;
+            pointer-events: auto !important;
+            z-index: 3 !important;
+        }
+
+        .nx-contact-info {
+            display: grid !important;
+            grid-template-columns: repeat(3, 1fr) !important;
+            gap: 0.65rem !important;
+            margin-top: 1.2rem !important;
+            margin-bottom: 1.4rem !important;
+        }
+
+        .nx-contact-info .nx-mini {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 0.35rem !important;
+            padding: 0.85rem 0.95rem !important;
+            border: 1px solid var(--line-2, rgba(255, 255, 255, 0.1)) !important;
+            border-radius: 10px !important;
+            background: rgba(10, 15, 28, 0.75) !important;
+            text-decoration: none !important;
+            color: inherit !important;
+            transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1) !important;
+            cursor: pointer !important;
+        }
+
+        .nx-contact-info .nx-mini:hover {
+            border-color: var(--primary-cyan, #00f0ff) !important;
+            background: rgba(15, 23, 42, 0.95) !important;
+            transform: translateY(-3px) !important;
+            box-shadow: 0 6px 20px rgba(0, 240, 255, 0.18), 0 0 26px rgba(0, 240, 255, 0.08) !important;
+        }
+
+        .nx-contact-info .nx-mini span {
+            font-family: var(--font-ui, 'Inter', sans-serif) !important;
+            font-size: 0.65rem !important;
+            font-weight: 700 !important;
+            letter-spacing: 0.08em !important;
+            color: var(--primary-cyan, #00f0ff) !important;
+            width: fit-content !important;
+            padding: 0.15rem 0.45rem !important;
+            background: rgba(0, 240, 255, 0.08) !important;
+            border: 1px solid rgba(0, 240, 255, 0.25) !important;
+            border-radius: 4px !important;
+        }
+
+        .nx-contact-info .nx-mini b {
+            font-family: var(--font-heading) !important;
+            font-weight: 600 !important;
+            font-size: 0.72rem !important;
+            letter-spacing: 0.1em !important;
+            color: var(--silver-2, #cbd5e1) !important;
+        }
+
+        .nx-contact-info .nx-mini i {
+            font-family: var(--font-body, 'Inter', sans-serif) !important;
+            font-size: 0.78rem !important;
+            font-style: normal !important;
+            color: var(--silver-4, #94a3b8) !important;
+            word-break: break-word !important;
+            line-height: 1.3 !important;
+            transition: color 0.3s ease !important;
+        }
+
+        .nx-contact-info .nx-mini:hover i {
+            color: #ffffff !important;
+        }
+
+        .nx-contact-stage {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center !important;
+            min-height: 520px !important;
+            position: relative !important;
+            pointer-events: none !important;
+        }
+
+        @media (max-width: 900px) {
+
+            .nx-skills-grid,
+            .nx-contact-grid {
+                grid-template-columns: 1fr !important;
+            }
+
+            .nx-skills-stage {
+                max-width: min(90vw, 360px) !important;
+                margin: 1.5rem auto 0 !important;
+            }
+
+            .nx-contact-info {
+                grid-template-columns: 1fr !important;
+            }
+
+            .nx-contact-stage {
+                /* grid is single-column here: the stage sits under the form, so
+                   don't reserve an empty band — the robot's contact head-turn in
+                   robot.js is hardcoded and gaze.js bails on zero-size rects */
+                min-height: 0 !important;
+            }
+
+            /* === CYBER FOOTER === */
+            .nx-footer {
+                position: relative !important;
+                z-index: 10 !important;
+                width: 100% !important;
+                border-top: 1px solid var(--line-2, rgba(255, 255, 255, 0.12)) !important;
+                background: rgba(5, 7, 12, 0.88) !important;
+                padding: 2.2rem 0 calc(2.5rem + 35px) !important;
+                /* bottom padding clears the fixed nx-strip */
+                pointer-events: auto !important;
+            }
+
+            .nx-footer-container {
+                width: min(1280px, 92vw) !important;
+                margin: 0 auto !important;
+                display: flex !important;
+                justify-content: space-between !important;
+                align-items: center !important;
+                gap: 1.5rem !important;
+                flex-wrap: wrap !important;
+            }
+
+            .nx-footer-brand {
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 0.35rem !important;
+            }
+
+            .nx-footer-logo {
+                font-family: var(--font-heading) !important;
+                font-size: 1rem !important;
+                font-weight: 700 !important;
+                letter-spacing: 0.18em !important;
+                color: var(--silver-1, #f8fafc) !important;
+            }
+
+            .nx-footer-logo span {
+                background: linear-gradient(90deg, #00f0ff, var(--cyan-soft, #67e8f9)) !important;
+                -webkit-background-clip: text !important;
+                background-clip: text !important;
+                color: transparent !important;
+                -webkit-text-fill-color: transparent !important;
+            }
+
+            .nx-footer-copy {
+                font-family: var(--font-ui, 'Inter', sans-serif) !important;
+                font-size: 0.72rem !important;
+                letter-spacing: 0.08em !important;
+                color: var(--silver-4, #94a3b8) !important;
+            }
+
+            .nx-footer-socials {
+                display: flex !important;
+                align-items: center !important;
+                gap: 12px !important;
+                flex-wrap: wrap !important;
+            }
+
+            .nx-social-link {
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                width: 40px !important;
+                height: 40px !important;
+                border-radius: 50% !important;
+                border: 2px solid var(--line-2, rgba(255, 255, 255, 0.15)) !important;
+                background: rgba(12, 17, 28, 0.6) !important;
+                color: var(--silver-3, #cbd5e1) !important;
+                font-size: 1.1rem !important;
+                text-decoration: none !important;
+                transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1) !important;
+                cursor: pointer !important;
+                padding: 0 !important;
+            }
+
+            .nx-social-link i {
+                font-size: 1.1rem !important;
+                line-height: 1 !important;
+                transition: transform 0.3s ease !important;
+            }
+
+            .nx-social-link svg {
+                width: 18px !important;
+                height: 18px !important;
+                transition: transform 0.3s ease !important;
+            }
+
+
+            .nx-social-link:hover {
+                color: var(--primary-cyan, #00f0ff) !important;
+                border-color: var(--primary-cyan, #00f0ff) !important;
+                background: rgba(0, 240, 255, 0.12) !important;
+                box-shadow: 0 4px 16px rgba(0, 240, 255, 0.22), 0 0 26px rgba(0, 240, 255, 0.08) !important;
+                transform: translateY(-3px) !important;
+                box-shadow: 0 4px 16px rgba(0, 240, 255, 0.25) !important;
+            }
+
+            .nx-social-link:hover i,
+            .nx-social-link:hover svg {
+                transform: scale(1.15) !important;
+            }
+
+            @media (max-width: 768px) {
+                .nx-footer-container {
+                    flex-direction: column !important;
+                    align-items: center !important;
+                    text-align: center !important;
+                    gap: 1.2rem !important;
+                }
+
+                .nx-footer-socials {
+                    justify-content: center !important;
+                }
+            }
+
+        }
+
+        /* closes the @media (max-width: 900px) opened at line ~746 — browsers
+           implicitly closed it at end-of-stylesheet; Vite/PostCSS requires
+           this to be explicit (no visual behavior change) */

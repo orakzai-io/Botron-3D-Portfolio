@@ -4,52 +4,309 @@
 
 export const SKILLS_DATA = [
   // AI & LLM (9)
-  { id: 'openai', name: 'OpenAI API', category: 'ai', catLabel: 'AI & LLM', level: 99, icon: '⚡', desc: 'GPT-4o/o1 reasoning, tool-calling pipelines & system guardrails' },
-  { id: 'groq', name: 'Groq API', category: 'ai', catLabel: 'AI & LLM', level: 95, icon: '⚡', desc: 'Ultra-low latency LLM inference & high-throughput async processing' },
-  { id: 'agents', name: 'AI Agents', category: 'ai', catLabel: 'AI & LLM', level: 92, icon: '🤖', desc: 'Autonomous multi-agent orchestration, state loops & task delegation' },
-  { id: 'rag', name: 'RAG Systems', category: 'ai', catLabel: 'AI & LLM', level: 92, icon: '🧠', desc: 'Sub-250ms semantic search over 10k+ chunks with hybrid re-ranking' },
-  { id: 'pgvector', name: 'pgvector', category: 'ai', catLabel: 'AI & LLM', level: 95, icon: '📦', desc: 'High-dimensional embeddings, IVFFlat / HNSW vector indexing' },
-  { id: 'langchain', name: 'LangChain', category: 'ai', catLabel: 'AI & LLM', level: 90, icon: '🔗', desc: 'Chains, prompt composition, output parsers & document loaders' },
-  { id: 'prompt', name: 'Prompt Eng.', category: 'ai', catLabel: 'AI & LLM', level: 95, icon: '🎯', desc: 'Few-shot elicitation, structured JSON schemas & hallucination curbs' },
-  { id: 'langsmith', name: 'LangSmith', category: 'ai', catLabel: 'AI & LLM', level: 88, icon: '🔬', desc: 'LLM observability, run tracing, latency metrics & evaluation datasets' },
-  { id: 'n8n-ai', name: 'n8n Automation', category: 'ai', catLabel: 'AI & LLM', level: 88, icon: '🔄', desc: 'Workflow event pipelines, webhook triggers & autonomous ETL flows' },
+  {
+    id: 'openai',
+    name: 'OpenAI API',
+    category: 'ai',
+    catLabel: 'AI & LLM',
+    level: 99,
+    icon: '⚡',
+    desc: 'GPT-4o/o1 reasoning, tool-calling pipelines & system guardrails',
+  },
+  {
+    id: 'groq',
+    name: 'Groq API',
+    category: 'ai',
+    catLabel: 'AI & LLM',
+    level: 95,
+    icon: '⚡',
+    desc: 'Ultra-low latency LLM inference & high-throughput async processing',
+  },
+  {
+    id: 'agents',
+    name: 'AI Agents',
+    category: 'ai',
+    catLabel: 'AI & LLM',
+    level: 92,
+    icon: '🤖',
+    desc: 'Autonomous multi-agent orchestration, state loops & task delegation',
+  },
+  {
+    id: 'rag',
+    name: 'RAG Systems',
+    category: 'ai',
+    catLabel: 'AI & LLM',
+    level: 92,
+    icon: '🧠',
+    desc: 'Sub-250ms semantic search over 10k+ chunks with hybrid re-ranking',
+  },
+  {
+    id: 'pgvector',
+    name: 'pgvector',
+    category: 'ai',
+    catLabel: 'AI & LLM',
+    level: 95,
+    icon: '📦',
+    desc: 'High-dimensional embeddings, IVFFlat / HNSW vector indexing',
+  },
+  {
+    id: 'langchain',
+    name: 'LangChain',
+    category: 'ai',
+    catLabel: 'AI & LLM',
+    level: 90,
+    icon: '🔗',
+    desc: 'Chains, prompt composition, output parsers & document loaders',
+  },
+  {
+    id: 'prompt',
+    name: 'Prompt Eng.',
+    category: 'ai',
+    catLabel: 'AI & LLM',
+    level: 95,
+    icon: '🎯',
+    desc: 'Few-shot elicitation, structured JSON schemas & hallucination curbs',
+  },
+  {
+    id: 'langsmith',
+    name: 'LangSmith',
+    category: 'ai',
+    catLabel: 'AI & LLM',
+    level: 88,
+    icon: '🔬',
+    desc: 'LLM observability, run tracing, latency metrics & evaluation datasets',
+  },
+  {
+    id: 'n8n-ai',
+    name: 'n8n Automation',
+    category: 'ai',
+    catLabel: 'AI & LLM',
+    level: 88,
+    icon: '🔄',
+    desc: 'Workflow event pipelines, webhook triggers & autonomous ETL flows',
+  },
 
   // Backend & Data (7)
-  { id: 'python', name: 'Python', category: 'backend', catLabel: 'Backend & Data', level: 99, icon: '🐍', desc: 'Core language: async architecture, high concurrency & data pipelines' },
-  { id: 'fastapi', name: 'FastAPI', category: 'backend', catLabel: 'Backend & Data', level: 90, icon: '🚀', desc: 'Asynchronous REST APIs, OpenAPI schemas & dependency injection' },
-  { id: 'asyncio', name: 'Asyncio', category: 'backend', catLabel: 'Backend & Data', level: 85, icon: '⚡', desc: 'Non-blocking I/O event loops, concurrent task pools & streams' },
-  { id: 'pydantic', name: 'Pydantic', category: 'backend', catLabel: 'Backend & Data', level: 90, icon: '🛡️', desc: 'Runtime data validation, immutable settings & type coercion' },
-  { id: 'postgres', name: 'SQL / PostgreSQL', category: 'backend', catLabel: 'Backend & Data', level: 82, icon: '🐘', desc: 'Relational schemas, ACID transactions, complex indexing & CTEs' },
-  { id: 'sqlalchemy', name: 'SQLAlchemy', category: 'backend', catLabel: 'Backend & Data', level: 80, icon: '🗄️', desc: 'Async ORM, query optimization, connection pooling & migrations' },
-  { id: 'cpp', name: 'C / C++', category: 'backend', catLabel: 'Backend & Data', level: 75, icon: '⚙️', desc: 'Systems programming, memory management & algorithmic foundations' },
+  {
+    id: 'python',
+    name: 'Python',
+    category: 'backend',
+    catLabel: 'Backend & Data',
+    level: 99,
+    icon: '🐍',
+    desc: 'Core language: async architecture, high concurrency & data pipelines',
+  },
+  {
+    id: 'fastapi',
+    name: 'FastAPI',
+    category: 'backend',
+    catLabel: 'Backend & Data',
+    level: 90,
+    icon: '🚀',
+    desc: 'Asynchronous REST APIs, OpenAPI schemas & dependency injection',
+  },
+  {
+    id: 'asyncio',
+    name: 'Asyncio',
+    category: 'backend',
+    catLabel: 'Backend & Data',
+    level: 85,
+    icon: '⚡',
+    desc: 'Non-blocking I/O event loops, concurrent task pools & streams',
+  },
+  {
+    id: 'pydantic',
+    name: 'Pydantic',
+    category: 'backend',
+    catLabel: 'Backend & Data',
+    level: 90,
+    icon: '🛡️',
+    desc: 'Runtime data validation, immutable settings & type coercion',
+  },
+  {
+    id: 'postgres',
+    name: 'SQL / PostgreSQL',
+    category: 'backend',
+    catLabel: 'Backend & Data',
+    level: 82,
+    icon: '🐘',
+    desc: 'Relational schemas, ACID transactions, complex indexing & CTEs',
+  },
+  {
+    id: 'sqlalchemy',
+    name: 'SQLAlchemy',
+    category: 'backend',
+    catLabel: 'Backend & Data',
+    level: 80,
+    icon: '🗄️',
+    desc: 'Async ORM, query optimization, connection pooling & migrations',
+  },
+  {
+    id: 'cpp',
+    name: 'C / C++',
+    category: 'backend',
+    catLabel: 'Backend & Data',
+    level: 75,
+    icon: '⚙️',
+    desc: 'Systems programming, memory management & algorithmic foundations',
+  },
 
   // DevOps & Cloud (4)
-  { id: 'docker', name: 'Docker', category: 'devops', catLabel: 'DevOps & Cloud', level: 80, icon: '🐳', desc: 'Multi-stage builds, lightweight images & container orchestration' },
-  { id: 'gh-actions', name: 'GitHub Actions', category: 'devops', catLabel: 'DevOps & Cloud', level: 90, icon: '⚙️', desc: 'Automated CI/CD pipelines deploying builds in under 3 minutes' },
-  { id: 'linux', name: 'Linux / Bash', category: 'devops', catLabel: 'DevOps & Cloud', level: 85, icon: '🐧', desc: 'POSIX shell scripting, process monitoring, permissions & SSH' },
-  { id: 'cicd', name: 'CI/CD Pipelines', category: 'devops', catLabel: 'DevOps & Cloud', level: 85, icon: '🔄', desc: 'Automated test suites, artifact packaging & deployment gates' },
+  {
+    id: 'docker',
+    name: 'Docker',
+    category: 'devops',
+    catLabel: 'DevOps & Cloud',
+    level: 80,
+    icon: '🐳',
+    desc: 'Multi-stage builds, lightweight images & container orchestration',
+  },
+  {
+    id: 'gh-actions',
+    name: 'GitHub Actions',
+    category: 'devops',
+    catLabel: 'DevOps & Cloud',
+    level: 90,
+    icon: '⚙️',
+    desc: 'Automated CI/CD pipelines deploying builds in under 3 minutes',
+  },
+  {
+    id: 'linux',
+    name: 'Linux / Bash',
+    category: 'devops',
+    catLabel: 'DevOps & Cloud',
+    level: 85,
+    icon: '🐧',
+    desc: 'POSIX shell scripting, process monitoring, permissions & SSH',
+  },
+  {
+    id: 'cicd',
+    name: 'CI/CD Pipelines',
+    category: 'devops',
+    catLabel: 'DevOps & Cloud',
+    level: 85,
+    icon: '🔄',
+    desc: 'Automated test suites, artifact packaging & deployment gates',
+  },
 
   // Frontend (5)
-  { id: 'typescript', name: 'TypeScript', category: 'frontend', catLabel: 'Frontend', level: 85, icon: '🔷', desc: 'Static typing, interfaces, generics & robust client-side state' },
-  { id: 'javascript', name: 'JavaScript ES6+', category: 'frontend', catLabel: 'Frontend', level: 85, icon: '📜', desc: 'Modern async/await, ES modules, DOM APIs & performance tuning' },
-  { id: 'react', name: 'React', category: 'frontend', catLabel: 'Frontend', level: 75, icon: '⚛️', desc: 'Component architecture, custom hooks & reactive state management' },
-  { id: 'html5', name: 'HTML5 Semantic', category: 'frontend', catLabel: 'Frontend', level: 95, icon: '🌐', desc: 'Clean DOM hierarchies, accessibility standards & SEO optimization' },
-  { id: 'css3', name: 'Modern CSS3', category: 'frontend', catLabel: 'Frontend', level: 95, icon: '🎨', desc: 'Glassmorphism, custom properties, responsive grids & animations' },
+  {
+    id: 'typescript',
+    name: 'TypeScript',
+    category: 'frontend',
+    catLabel: 'Frontend',
+    level: 85,
+    icon: '🔷',
+    desc: 'Static typing, interfaces, generics & robust client-side state',
+  },
+  {
+    id: 'javascript',
+    name: 'JavaScript ES6+',
+    category: 'frontend',
+    catLabel: 'Frontend',
+    level: 85,
+    icon: '📜',
+    desc: 'Modern async/await, ES modules, DOM APIs & performance tuning',
+  },
+  {
+    id: 'react',
+    name: 'React',
+    category: 'frontend',
+    catLabel: 'Frontend',
+    level: 75,
+    icon: '⚛️',
+    desc: 'Component architecture, custom hooks & reactive state management',
+  },
+  {
+    id: 'html5',
+    name: 'HTML5 Semantic',
+    category: 'frontend',
+    catLabel: 'Frontend',
+    level: 95,
+    icon: '🌐',
+    desc: 'Clean DOM hierarchies, accessibility standards & SEO optimization',
+  },
+  {
+    id: 'css3',
+    name: 'Modern CSS3',
+    category: 'frontend',
+    catLabel: 'Frontend',
+    level: 95,
+    icon: '🎨',
+    desc: 'Glassmorphism, custom properties, responsive grids & animations',
+  },
 
   // Tools & Workflow (4)
-  { id: 'git', name: 'Git / GitHub', category: 'tools', catLabel: 'Tools & Workflow', level: 90, icon: '🐙', desc: 'Feature-branch git workflows, interactive rebasing & PR reviews' },
-  { id: 'n8n', name: 'n8n Platform', category: 'tools', catLabel: 'Tools & Workflow', level: 88, icon: '🔌', desc: 'Self-hosted integration engine & API orchestration workflows' },
-  { id: 'vscode', name: 'VS Code', category: 'tools', catLabel: 'Tools & Workflow', level: 92, icon: '💻', desc: 'Productive developer tooling, linting, debugger & SSH workspaces' },
-  { id: 'pgadmin', name: 'pgAdmin', category: 'tools', catLabel: 'Tools & Workflow', level: 80, icon: '📊', desc: 'Database administration, query execution analysis & indexing review' }
+  {
+    id: 'git',
+    name: 'Git / GitHub',
+    category: 'tools',
+    catLabel: 'Tools & Workflow',
+    level: 90,
+    icon: '🐙',
+    desc: 'Feature-branch git workflows, interactive rebasing & PR reviews',
+  },
+  {
+    id: 'n8n',
+    name: 'n8n Platform',
+    category: 'tools',
+    catLabel: 'Tools & Workflow',
+    level: 88,
+    icon: '🔌',
+    desc: 'Self-hosted integration engine & API orchestration workflows',
+  },
+  {
+    id: 'vscode',
+    name: 'VS Code',
+    category: 'tools',
+    catLabel: 'Tools & Workflow',
+    level: 92,
+    icon: '💻',
+    desc: 'Productive developer tooling, linting, debugger & SSH workspaces',
+  },
+  {
+    id: 'pgadmin',
+    name: 'pgAdmin',
+    category: 'tools',
+    catLabel: 'Tools & Workflow',
+    level: 80,
+    icon: '📊',
+    desc: 'Database administration, query execution analysis & indexing review',
+  },
 ];
 
 // Two-color contract: cyan × violet only — categories differ by shade/depth, never hue.
 const CATEGORY_COLORS = {
-  ai: { main: '#00f0ff', glow: 'rgba(0, 240, 255, 0.45)', bg: 'rgba(0, 240, 255, 0.12)', dot: '#00f0ff' },
-  backend: { main: '#67e8f9', glow: 'rgba(103, 232, 249, 0.45)', bg: 'rgba(103, 232, 249, 0.12)', dot: '#67e8f9' },
-  devops: { main: '#a78bfa', glow: 'rgba(167, 139, 250, 0.45)', bg: 'rgba(167, 139, 250, 0.12)', dot: '#a78bfa' },
-  frontend: { main: '#c4b5fd', glow: 'rgba(196, 181, 253, 0.45)', bg: 'rgba(196, 181, 253, 0.12)', dot: '#c4b5fd' },
-  tools: { main: '#8b5cf6', glow: 'rgba(139, 92, 246, 0.45)', bg: 'rgba(139, 92, 246, 0.12)', dot: '#8b5cf6' }
+  ai: {
+    main: '#00f0ff',
+    glow: 'rgba(0, 240, 255, 0.45)',
+    bg: 'rgba(0, 240, 255, 0.12)',
+    dot: '#00f0ff',
+  },
+  backend: {
+    main: '#67e8f9',
+    glow: 'rgba(103, 232, 249, 0.45)',
+    bg: 'rgba(103, 232, 249, 0.12)',
+    dot: '#67e8f9',
+  },
+  devops: {
+    main: '#a78bfa',
+    glow: 'rgba(167, 139, 250, 0.45)',
+    bg: 'rgba(167, 139, 250, 0.12)',
+    dot: '#a78bfa',
+  },
+  frontend: {
+    main: '#c4b5fd',
+    glow: 'rgba(196, 181, 253, 0.45)',
+    bg: 'rgba(196, 181, 253, 0.12)',
+    dot: '#c4b5fd',
+  },
+  tools: {
+    main: '#8b5cf6',
+    glow: 'rgba(139, 92, 246, 0.45)',
+    bg: 'rgba(139, 92, 246, 0.12)',
+    dot: '#8b5cf6',
+  },
 };
 
 export class SkillsGlobe {
@@ -60,11 +317,16 @@ export class SkillsGlobe {
     this.ctx = this.canvas.getContext('2d');
     this.container = this.canvas.parentElement;
 
-    // Low-power mode (phones/tablets): 1x backing store, no canvas shadows,
-    // ~30fps cap. Detected via the primary pointer (coarse = touch device),
-    // NOT viewport width, so a narrow desktop window keeps full quality.
-    this.lowPower = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+    // Single look: always the 1x backing store, no canvas shadows, ~30fps cap.
+    // (These were the low-power tier values; see docs/quality-tiers.md for the
+    // full-tier numbers.)
+    this.isIntersecting = false; // gates per-event getBoundingClientRect reads
     this._lastT = 0;
+    // Per-frame caches (see render / drawNodeBadge / drawCyberCore)
+    this._metrics = new Map(); // font+text → measured width (memoized measureText)
+    this._font = null; // last font string set on ctx
+    this._sorted = []; // scratch array for the per-frame z-sort
+    this._gradCache = new Map(); // rounded radius → cached canvas gradient
     this.activeCategory = 'all';
     this.hoveredSkill = null;
     this.selectedSkill = SKILLS_DATA[0]; // default to OpenAI / primary
@@ -99,7 +361,7 @@ export class SkillsGlobe {
     const N = SKILLS_DATA.length;
     return SKILLS_DATA.map((skill, i) => {
       // Golden spiral distribution on unit sphere
-      const phi = Math.acos(1 - 2 * (i + 0.5) / N);
+      const phi = Math.acos(1 - (2 * (i + 0.5)) / N);
       const theta = Math.PI * (1 + Math.sqrt(5)) * (i + 0.5);
 
       const ux = Math.sin(phi) * Math.cos(theta);
@@ -108,47 +370,79 @@ export class SkillsGlobe {
 
       return {
         ...skill,
-        ux, uy, uz, // unit sphere coords
-        x: 0, y: 0, z: 0, // world 3D coords
-        sx: 0, sy: 0, // screen projected coords
+        ux,
+        uy,
+        uz, // unit sphere coords
+        x: 0,
+        y: 0,
+        z: 0, // world 3D coords
+        sx: 0,
+        sy: 0, // screen projected coords
         scale: 1,
         alpha: 1,
         radius: 0,
         boxW: 0,
-        boxH: 26
+        boxH: 26,
       };
     });
   }
 
   initCanvasSize() {
     const rect = this.container.getBoundingClientRect();
-    const dpr = this.lowPower ? 1 : Math.min(window.devicePixelRatio || 1, 2);
-    this.width = rect.width || 420;
-    this.height = rect.height || 420;
+    const dpr = 1; // 1x backing store - see docs/quality-tiers.md
+    const w = rect.width || 420;
+    const h = rect.height || 420;
+    // Skip the backing-store realloc when nothing changed — mobile browsers
+    // fire resize continuously while the URL bar collapses.
+    if (w === this.width && h === this.height && dpr === this._dpr) return;
+    this._dpr = dpr;
+    this.width = w;
+    this.height = h;
 
     this.canvas.width = this.width * dpr;
     this.canvas.height = this.height * dpr;
     this.canvas.style.width = `${this.width}px`;
     this.canvas.style.height = `${this.height}px`;
     this.ctx.scale(dpr, dpr);
+    this._gradCache.clear(); // gradients are keyed to (cx, cy, r)
 
     // Globe radius dynamically fits container
     this.globeRadius = Math.min(this.width, this.height) * 0.38;
   }
 
   bindEvents() {
-    window.addEventListener('resize', () => {
-      this.initCanvasSize();
-    });
+    let _resizePending = false;
+    window.addEventListener(
+      'resize',
+      () => {
+        if (_resizePending) return; // coalesce the URL-bar resize firehose to 1/frame
+        _resizePending = true;
+        requestAnimationFrame(() => {
+          _resizePending = false;
+          this.initCanvasSize(); // no-ops when width/height/dpr are unchanged
+        });
+      },
+      { passive: true }
+    );
 
     // Pointer events for smooth drag & hover on both touch & desktop
     const onStart = (clientX, clientY) => {
       this.isDragging = true;
+      // A pointer landing on the canvas proves the globe is on screen — never
+      // let a stale (or never-fired) IntersectionObserver flag kill the drag,
+      // and make sure the render loop runs so rotation is actually painted.
+      this.isIntersecting = true;
+      this.start();
       this.lastMouseX = clientX;
       this.lastMouseY = clientY;
     };
 
     const onMove = (clientX, clientY) => {
+      // The globe is usually off-screen: reading the rect here would force a
+      // layout on EVERY mouse/touchmove page-wide (and on mobile, every
+      // touchmove of a native scroll). Gate it on visibility instead — but
+      // never drop an active drag that started on the canvas itself.
+      if (!this.isIntersecting && !this.isDragging) return;
       const rect = this.canvas.getBoundingClientRect();
       this.mouseCanvasX = clientX - rect.left;
       this.mouseCanvasY = clientY - rect.top;
@@ -176,17 +470,25 @@ export class SkillsGlobe {
     window.addEventListener('mousemove', (e) => onMove(e.clientX, e.clientY));
     window.addEventListener('mouseup', onEnd);
 
-    this.canvas.addEventListener('touchstart', (e) => {
-      if (e.touches.length === 1) {
-        onStart(e.touches[0].clientX, e.touches[0].clientY);
-      }
-    }, { passive: true });
+    this.canvas.addEventListener(
+      'touchstart',
+      (e) => {
+        if (e.touches.length === 1) {
+          onStart(e.touches[0].clientX, e.touches[0].clientY);
+        }
+      },
+      { passive: true }
+    );
 
-    window.addEventListener('touchmove', (e) => {
-      if (e.touches.length === 1) {
-        onMove(e.touches[0].clientX, e.touches[0].clientY);
-      }
-    }, { passive: true });
+    window.addEventListener(
+      'touchmove',
+      (e) => {
+        if (e.touches.length === 1) {
+          onMove(e.touches[0].clientX, e.touches[0].clientY);
+        }
+      },
+      { passive: true }
+    );
 
     window.addEventListener('touchend', onEnd);
 
@@ -206,9 +508,9 @@ export class SkillsGlobe {
 
     // Filter Buttons
     const filterButtons = document.querySelectorAll('.nx-filter-pill');
-    filterButtons.forEach(btn => {
+    filterButtons.forEach((btn) => {
       btn.addEventListener('click', (e) => {
-        filterButtons.forEach(b => b.classList.remove('active'));
+        filterButtons.forEach((b) => b.classList.remove('active'));
         btn.classList.add('active');
         this.setCategory(btn.dataset.category || 'all');
       });
@@ -219,7 +521,7 @@ export class SkillsGlobe {
     this.activeCategory = category;
     // Highlight or select the first skill in that category
     if (category !== 'all') {
-      const match = SKILLS_DATA.find(s => s.category === category);
+      const match = SKILLS_DATA.find((s) => s.category === category);
       if (match) {
         this.selectedSkill = match;
         this.updateTelemetryCard(match);
@@ -255,17 +557,14 @@ export class SkillsGlobe {
   }
 
   render(now) {
-    // Low-power: cap at ~30fps (skip every other rAF tick at 60Hz). Physics and
-    // pulse are scaled by `step` so animation speed stays real-time at half rate.
-    const step = this.lowPower ? 2 : 1;
-    if (this.lowPower) {
-      const t = now || performance.now();
-      if (t - this._lastT < 33) {
-        if (this.isRunning) this.rafId = requestAnimationFrame(this.render);
-        return;
-      }
-      this._lastT = t;
+    // FPS cap: ~30fps. step=2 keeps the animation real-time at half rate.
+    const step = 2;
+    const t = now || performance.now();
+    if (t - this._lastT < 33) {
+      if (this.isRunning) this.rafId = requestAnimationFrame(this.render);
+      return;
     }
+    this._lastT = t;
 
     this.pulseTime += 0.02 * step;
 
@@ -293,12 +592,14 @@ export class SkillsGlobe {
     ctx.clearRect(0, 0, this.width, this.height);
 
     // Rotation matrices
-    const cosX = Math.cos(this.rotX), sinX = Math.sin(this.rotX);
-    const cosY = Math.cos(this.rotY), sinY = Math.sin(this.rotY);
+    const cosX = Math.cos(this.rotX),
+      sinX = Math.sin(this.rotX);
+    const cosY = Math.cos(this.rotY),
+      sinY = Math.sin(this.rotY);
 
     // Compute rotated 3D coordinates
     const D = R * 2.8; // Camera distance
-    this.nodes.forEach(node => {
+    this.nodes.forEach((node) => {
       // Rotate around Y
       let x1 = node.ux * cosY + node.uz * sinY;
       let y1 = node.uy;
@@ -336,8 +637,12 @@ export class SkillsGlobe {
     // 1. Draw central Holographic Wireframe Cyber-Core
     this.drawCyberCore(ctx, cx, cy, R * 0.65);
 
-    // 2. Sort nodes by Z (draw furthest/back nodes first)
-    const sortedNodes = [...this.nodes].sort((a, b) => b.z - a.z);
+    // 2. Sort nodes by Z (draw furthest/back nodes first) — reuse a scratch
+    // array instead of allocating a spread copy every frame.
+    const sortedNodes = this._sorted;
+    sortedNodes.length = 0;
+    for (const n of this.nodes) sortedNodes.push(n);
+    sortedNodes.sort((a, b) => b.z - a.z);
 
     // 3. Detect hover
     let currentHover = null;
@@ -370,7 +675,7 @@ export class SkillsGlobe {
     }
 
     // 4. Render all nodes
-    sortedNodes.forEach(node => {
+    sortedNodes.forEach((node) => {
       this.drawNodeBadge(ctx, node, node === this.hoveredSkill, node === this.selectedSkill);
     });
 
@@ -383,28 +688,41 @@ export class SkillsGlobe {
     const pulse = Math.sin(this.pulseTime * 1.5) * 0.12 + 0.95;
     const fastPulse = Math.sin(this.pulseTime * 3) * 0.08 + 1.0;
     const r = radius * pulse;
-    const S = this.lowPower ? 0 : 1; // shadowBlur multiplier: 0 = no software blur on mobile
+    const S = 0; // shadowBlur multiplier: 0 = no software blur (single look)
 
     ctx.save();
 
-    // 1. Radiant Outer Energy Flare & Nebula Glow
-    const outerGrad = ctx.createRadialGradient(cx, cy, 2, cx, cy, r * 1.6);
-    outerGrad.addColorStop(0, 'rgba(0, 240, 255, 0.45)');
-    outerGrad.addColorStop(0.25, 'rgba(167, 139, 250, 0.28)');
-    outerGrad.addColorStop(0.55, 'rgba(103, 232, 249, 0.12)');
-    outerGrad.addColorStop(1, 'rgba(3, 7, 18, 0)');
+    // 1. Radiant Outer Energy Flare & Nebula Glow — cached by rounded radius
+    // (was: a new gradient allocated every frame; gradients are pure functions
+    // of (cx, cy, r), and cx/cy only change on resize, which clears the cache)
+    const gradCache = this._gradCache;
+    const outerR = Math.round(r * 1.6);
+    let outerGrad = gradCache.get('o' + outerR);
+    if (!outerGrad) {
+      outerGrad = ctx.createRadialGradient(cx, cy, 2, cx, cy, outerR);
+      outerGrad.addColorStop(0, 'rgba(0, 240, 255, 0.45)');
+      outerGrad.addColorStop(0.25, 'rgba(167, 139, 250, 0.28)');
+      outerGrad.addColorStop(0.55, 'rgba(103, 232, 249, 0.12)');
+      outerGrad.addColorStop(1, 'rgba(3, 7, 18, 0)');
+      gradCache.set('o' + outerR, outerGrad);
+    }
     ctx.fillStyle = outerGrad;
     ctx.beginPath();
-    ctx.arc(cx, cy, r * 1.6, 0, Math.PI * 2);
+    ctx.arc(cx, cy, outerR, 0, Math.PI * 2);
     ctx.fill();
 
-    // 2. High-Energy Luminous Core (Hot Nucleus)
-    const nucleusR = Math.max(12, r * 0.22 * fastPulse);
-    const nucleusGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, nucleusR);
-    nucleusGrad.addColorStop(0, '#ffffff');
-    nucleusGrad.addColorStop(0.35, '#00f0ff');
-    nucleusGrad.addColorStop(0.7, '#a78bfa');
-    nucleusGrad.addColorStop(1, 'rgba(139, 92, 246, 0)');
+    // 2. High-Energy Luminous Core (Hot Nucleus) — gradient cached by rounded
+    // radius; the pulse quantizes to 1px steps, which is imperceptible on a glow.
+    const nucleusR = Math.max(12, Math.round(r * 0.22 * fastPulse));
+    let nucleusGrad = gradCache.get('n' + nucleusR);
+    if (!nucleusGrad) {
+      nucleusGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, nucleusR);
+      nucleusGrad.addColorStop(0, '#ffffff');
+      nucleusGrad.addColorStop(0.35, '#00f0ff');
+      nucleusGrad.addColorStop(0.7, '#a78bfa');
+      nucleusGrad.addColorStop(1, 'rgba(139, 92, 246, 0)');
+      gradCache.set('n' + nucleusR, nucleusGrad);
+    }
     ctx.fillStyle = nucleusGrad;
     ctx.shadowColor = '#00f0ff';
     ctx.shadowBlur = 24 * S;
@@ -414,10 +732,42 @@ export class SkillsGlobe {
 
     // 3. Multi-Axis 3D Atomic Orbit Rings
     const orbits = [
-      { rx: r * 1.05, ry: r * 0.38, angle: this.rotY * 0.6, color: '#00f0ff', glow: 'rgba(0, 240, 255, 0.7)', dash: [], speed: 1.2 },
-      { rx: r * 0.95, ry: r * 0.35, angle: -this.rotX * 0.8 + 1.05, color: '#c4b5fd', glow: 'rgba(196, 181, 253, 0.7)', dash: [6, 6], speed: 1.6 },
-      { rx: r * 0.90, ry: r * 0.42, angle: this.rotY * 0.5 - 1.05, color: '#67e8f9', glow: 'rgba(103, 232, 249, 0.7)', dash: [], speed: 0.9 },
-      { rx: r * 0.75, ry: r * 0.30, angle: this.pulseTime * 0.4, color: '#8b5cf6', glow: 'rgba(139, 92, 246, 0.65)', dash: [4, 4], speed: 2.1 }
+      {
+        rx: r * 1.05,
+        ry: r * 0.38,
+        angle: this.rotY * 0.6,
+        color: '#00f0ff',
+        glow: 'rgba(0, 240, 255, 0.7)',
+        dash: [],
+        speed: 1.2,
+      },
+      {
+        rx: r * 0.95,
+        ry: r * 0.35,
+        angle: -this.rotX * 0.8 + 1.05,
+        color: '#c4b5fd',
+        glow: 'rgba(196, 181, 253, 0.7)',
+        dash: [6, 6],
+        speed: 1.6,
+      },
+      {
+        rx: r * 0.9,
+        ry: r * 0.42,
+        angle: this.rotY * 0.5 - 1.05,
+        color: '#67e8f9',
+        glow: 'rgba(103, 232, 249, 0.7)',
+        dash: [],
+        speed: 0.9,
+      },
+      {
+        rx: r * 0.75,
+        ry: r * 0.3,
+        angle: this.pulseTime * 0.4,
+        color: '#8b5cf6',
+        glow: 'rgba(139, 92, 246, 0.65)',
+        dash: [4, 4],
+        speed: 2.1,
+      },
     ];
 
     orbits.forEach((orb) => {
@@ -434,8 +784,14 @@ export class SkillsGlobe {
 
       // Orbiting Electron Particle along the ring
       const eAngle = (this.pulseTime * orb.speed) % (Math.PI * 2);
-      const ex = cx + Math.cos(eAngle) * orb.rx * Math.cos(orb.angle) - Math.sin(eAngle) * orb.ry * Math.sin(orb.angle);
-      const ey = cy + Math.cos(eAngle) * orb.rx * Math.sin(orb.angle) + Math.sin(eAngle) * orb.ry * Math.cos(orb.angle);
+      const ex =
+        cx +
+        Math.cos(eAngle) * orb.rx * Math.cos(orb.angle) -
+        Math.sin(eAngle) * orb.ry * Math.sin(orb.angle);
+      const ey =
+        cy +
+        Math.cos(eAngle) * orb.rx * Math.sin(orb.angle) +
+        Math.sin(eAngle) * orb.ry * Math.cos(orb.angle);
 
       ctx.setLineDash([]);
       ctx.fillStyle = '#ffffff';
@@ -462,13 +818,17 @@ export class SkillsGlobe {
     const tickDist = 12;
     ctx.beginPath();
     // North
-    ctx.moveTo(cx, cy - tickDist); ctx.lineTo(cx, cy - tickDist - tickLen);
+    ctx.moveTo(cx, cy - tickDist);
+    ctx.lineTo(cx, cy - tickDist - tickLen);
     // South
-    ctx.moveTo(cx, cy + tickDist); ctx.lineTo(cx, cy + tickDist + tickLen);
+    ctx.moveTo(cx, cy + tickDist);
+    ctx.lineTo(cx, cy + tickDist + tickLen);
     // West
-    ctx.moveTo(cx - tickDist, cy); ctx.lineTo(cx - tickDist - tickLen, cy);
+    ctx.moveTo(cx - tickDist, cy);
+    ctx.lineTo(cx - tickDist - tickLen, cy);
     // East
-    ctx.moveTo(cx + tickDist, cy); ctx.lineTo(cx + tickDist + tickLen, cy);
+    ctx.moveTo(cx + tickDist, cy);
+    ctx.lineTo(cx + tickDist + tickLen, cy);
     ctx.stroke();
 
     ctx.restore();
@@ -476,16 +836,27 @@ export class SkillsGlobe {
 
   drawNodeBadge(ctx, node, isHovered, isSelected) {
     const colors = CATEGORY_COLORS[node.category] || CATEGORY_COLORS.ai;
-    const S = this.lowPower ? 0 : 1; // shadowBlur multiplier: 0 = no software blur on mobile
+    const S = 0; // shadowBlur multiplier: 0 = no software blur (single look)
     const fontSize = Math.round(11 * Math.max(0.72, Math.min(1.2, node.scale)));
-    ctx.font = `600 ${fontSize}px "Inter", -apple-system, sans-serif`;
-
+    // Set the font only when it changes, and memoize measureText: the label set
+    // is fixed (29 skills × ~6 font sizes), so after warmup this is a Map hit
+    // instead of a text-shaping call per node per frame.
+    const fontStr = `600 ${fontSize}px "Inter", -apple-system, sans-serif`;
+    if (fontStr !== this._font) {
+      this._font = fontStr;
+      ctx.font = fontStr;
+    }
     const text = node.name;
-    const metrics = ctx.measureText(text);
+    const mKey = fontStr + '|' + text;
+    let textW = this._metrics.get(mKey);
+    if (textW === undefined) {
+      textW = ctx.measureText(text).width;
+      this._metrics.set(mKey, textW);
+    }
     const paddingX = 10 * node.scale;
     const pillH = 22 * node.scale;
     const dotR = 3.5 * node.scale;
-    const pillW = metrics.width + paddingX * 2 + (dotR * 2 + 6 * node.scale);
+    const pillW = textW + paddingX * 2 + (dotR * 2 + 6 * node.scale);
 
     node.boxW = pillW;
     node.boxH = pillH;
@@ -494,7 +865,7 @@ export class SkillsGlobe {
     const y = node.sy - pillH / 2;
     const r = pillH / 2;
 
-    const alpha = isHovered ? 1.0 : (isSelected ? Math.max(0.85, node.alpha) : node.alpha);
+    const alpha = isHovered ? 1.0 : isSelected ? Math.max(0.85, node.alpha) : node.alpha;
 
     ctx.save();
     ctx.globalAlpha = alpha;
@@ -521,7 +892,9 @@ export class SkillsGlobe {
     ctx.lineWidth = isHovered || isSelected ? 1.5 : 1;
     ctx.strokeStyle = isHovered
       ? colors.main
-      : (isSelected ? colors.glow : `rgba(255, 255, 255, ${0.12 * alpha})`);
+      : isSelected
+        ? colors.glow
+        : `rgba(255, 255, 255, ${0.12 * alpha})`;
     ctx.stroke();
 
     // Category Status Dot
@@ -536,7 +909,11 @@ export class SkillsGlobe {
 
     // Text Label
     ctx.shadowBlur = 0;
-    ctx.fillStyle = isHovered ? '#ffffff' : (isSelected ? colors.main : `rgba(241, 245, 249, ${0.92 * alpha})`);
+    ctx.fillStyle = isHovered
+      ? '#ffffff'
+      : isSelected
+        ? colors.main
+        : `rgba(241, 245, 249, ${0.92 * alpha})`;
     ctx.textBaseline = 'middle';
     ctx.fillText(text, dotX + dotR + 6 * node.scale, node.sy + 0.5);
 
@@ -585,20 +962,25 @@ export class SkillsGlobe {
     }
 
     if ('IntersectionObserver' in window) {
-      this.observer = new IntersectionObserver((entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            this.start();
-          } else {
-            this.stop();
-          }
-        });
-      }, {
-        rootMargin: '140px 0px', // start rendering 140px before entering viewport for instant seamless experience
-        threshold: 0
-      });
+      this.observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            this.isIntersecting = entry.isIntersecting;
+            if (entry.isIntersecting) {
+              this.start();
+            } else {
+              this.stop();
+            }
+          });
+        },
+        {
+          rootMargin: '140px 0px', // start rendering 140px before entering viewport for instant seamless experience
+          threshold: 0,
+        }
+      );
       this.observer.observe(target);
     } else {
+      this.isIntersecting = true;
       this.start();
     }
   }

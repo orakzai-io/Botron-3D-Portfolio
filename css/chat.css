@@ -1,5 +1,5 @@
 /* ==========================================================================
-   BOTRON RAG CHAT COPILOT — STYLES
+   BOTRON RAG CHAT — STYLES
    ========================================================================== */
 
 /* Floating Launch Trigger Button (FAB) */
@@ -12,11 +12,8 @@
   align-items: center;
   gap: 0.65rem;
   padding: 0.65rem 1.15rem;
-  background: rgba(8, 12, 20, 0.88);
   border: 1px solid rgba(0, 240, 255, 0.4);
   border-radius: 999px;
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
   color: #fff;
   font-family: 'Space Grotesk', var(--font-body, sans-serif);
   font-size: 0.75rem;
@@ -89,11 +86,8 @@
   z-index: 1001;
   display: flex;
   flex-direction: column;
-  background: rgba(6, 9, 15, 0.94);
   border: 1px solid rgba(0, 240, 255, 0.35);
   border-radius: 18px;
-  backdrop-filter: blur(28px);
-  -webkit-backdrop-filter: blur(28px);
   box-shadow: 0 25px 70px rgba(0, 0, 0, 0.9), 0 0 40px rgba(0, 240, 255, 0.16);
   overflow: hidden;
   opacity: 0;
@@ -460,19 +454,78 @@
   transform: scale(0.95);
 }
 
-@media (max-width: 600px) {
+/* Mobile. The label pill is the only tap affordance here (the 3D speech bubble
+   is display:none <=900px), and at the bottom-right it used to sit on top of the
+   .nx-strip status bar. Fixes, in order of importance:
+     1. the FAB is lifted clear of the strip, and above the iOS home indicator
+     2. .nx-strip .right (a MOUSE / CURSOR TRK readout) is meaningless on touch
+     3. the label auto-collapses to a circle -- see the .is-collapsed rule below
+   The breakpoint is 900px, NOT 600px, and it must stay matched to the rule that
+   hides the speech bubble in nexus.css. At 600px a 601-900px screen (most
+   phones in portrait, and every tablet) got the worst of both: bubble hidden
+   AND no collapse. Desktop is deliberately untouched -- it has room, and
+   :hover is a better affordance than a timer. */
+@media (max-width: 900px) {
   .nx-chat-fab {
-    bottom: 24px;
-    right: 18px;
+    bottom: calc(30px + env(safe-area-inset-bottom));
+    right: 16px;
     padding: 0.55rem 0.95rem;
     font-size: 0.7rem;
+    /* Override the base `transition: all`, which would also animate the
+       width/height change AND every unrelated property. Naming them keeps the
+       collapse to the four properties that actually change. */
+    transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+      height 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+      border-color 0.25s ease, box-shadow 0.25s ease;
   }
 
   .nx-chat-window {
     right: 16px;
-    bottom: 80px;
+    bottom: calc(84px + env(safe-area-inset-bottom));
     width: calc(100vw - 32px);
     height: 72vh;
+  }
+
+  /* Collapsed: a 52px circle (dot + icon), comfortably over the 44px minimum
+     tap target. The label span collapses to zero width rather than being
+     display:none, so the circle keeps both children centred. */
+  .nx-chat-fab.is-collapsed {
+    width: 52px;
+    height: 52px;
+    padding: 0;
+    gap: 0;
+    border-radius: 50%;
+    justify-content: center;
+  }
+
+  .nx-chat-fab.is-collapsed .nx-chat-fab-label {
+    max-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    opacity: 0;
+  }
+
+  /* The dot would otherwise push the icon off-centre in the circle. */
+  .nx-chat-fab.is-collapsed .nx-chat-fab-dot {
+    position: absolute;
+    top: 9px;
+    right: 9px;
+  }
+}
+
+/* A mouse/cursor readout is noise on a touch device — there's no cursor to
+   track. Pair it with the existing .mid hide at 720px. */
+@media (max-width: 720px) {
+  .nx-strip .right {
+    display: none;
+  }
+}
+
+/* Belt-and-braces with the JS guard in initChat(): if the timer is ever bypassed,
+   the collapse must not animate. */
+@media (prefers-reduced-motion: reduce) {
+  .nx-chat-fab {
+    transition: none !important;
   }
 }
 
@@ -514,12 +567,86 @@
   box-shadow: 0 0 12px rgba(0, 240, 255, 0.3);
 }
 
-/* Mobile Low-GPU optimization for chat copilot */
-@media (hover: none) and (pointer: coarse) {
-  .nx-chat-fab,
-  .nx-chat-window {
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    background: rgba(6, 10, 20, 0.96) !important;
-  }
+/* Flat panels for the chat chrome (was the nx-lite tier, now the only look).
+   See docs/quality-tiers.md. */
+.nx-chat-fab,
+.nx-chat-window {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background: rgba(6, 10, 20, 0.96) !important;
+}
+/* shown in place of the photo when the file is missing (see the photo-error
+   guard in chat.js) -- sized like a thumbnail so the layout does not jump */
+/* Chat links are coloured here rather than with inline style="color:#00f0ff",
+   because the HTML sanitiser strips the style attribute. */
+.nx-chat-bubble a {
+  color: #00f0ff;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(0, 240, 255, 0.35);
+}
+.nx-chat-bubble a:hover {
+  color: #67e8f9;
+  border-bottom-color: #67e8f9;
+}
+.photo-error {
+  display: block;
+  width: 100%;
+  max-width: 260px;
+  margin: 0.6rem 0;
+  padding: 1.1rem 0.9rem;
+  border: 1px dashed rgba(148, 163, 184, 0.35);
+  border-radius: 10px;
+  color: var(--silver-4, #8b95a5);
+  font-size: 0.78rem;
+  text-align: center;
+}
+/* ---- photo response: inline thumbnail + full-size lightbox ---- */
+.nx-chat-photo {
+  display: block;
+  /* width/height auto + both maxima preserves the aspect ratio: the 9:16 chess
+     photo is capped by height (180x320) instead of ballooning to 260x462.
+     min() keeps it inside a narrow mobile chat bubble too. */
+  width: auto;
+  height: auto;
+  max-width: min(260px, 100%);
+  max-height: 320px;
+  margin: 0.6rem 0;
+  border: 1px solid rgba(0, 240, 255, 0.35);
+  border-radius: 10px;
+  cursor: zoom-in;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
+}
+.nx-chat-photo:hover {
+  border-color: rgba(0, 240, 255, 0.7);
+  box-shadow: 0 0 18px rgba(0, 240, 255, 0.25);
+  transform: translateY(-1px);
+}
+.nx-photo-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 1002;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  background: rgba(3, 5, 9, 0.92);
+  cursor: zoom-out;
+  animation: nxLbFade 0.2s ease;
+}
+.nx-photo-lightbox img {
+  max-width: 100%;
+  max-height: 88vh;
+  width: auto;
+  height: auto;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 240, 255, 0.4);
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.9), 0 0 40px rgba(0, 240, 255, 0.18);
+}
+@keyframes nxLbFade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .nx-photo-lightbox { animation: none; }
+  .nx-chat-photo { transition: none; }
 }

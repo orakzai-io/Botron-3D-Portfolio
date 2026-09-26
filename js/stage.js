@@ -1,37 +1,38 @@
-// js/stage.js — NEXBOT engine (imported by js/main.js).
+// js/stage.js — BOTRON engine (imported by js/main.js).
 // Glues the WebGL scene, scroll-driven camera story, robot, gaze, and UI
 // telemetry together, then drives the (FPS-throttled) render loop.
-import * as THREE from "three";
-import { setupScene } from "./webgl/scene.js";
-import { createCameraStory } from "./webgl/camera-story.js";
-import { createGaze } from "./webgl/gaze.js";
-import { createRobot } from "./webgl/robot.js";
-import { createTelemetry } from "./webgl/telemetry.js";
-import { createDebugOverlay } from "./webgl/debug-camera.js"; // <--- NEW
-import nexbotModelUrl from "./data/nexbot.glb?url";
-import { TARGET_FPS, IS_LOW_POWER } from "./webgl/config.js";
+import * as THREE from 'three';
+import { setupScene } from './webgl/scene.js';
+import { createCameraStory } from './webgl/camera-story.js';
+import { createGaze } from './webgl/gaze.js';
+import { createRobot } from './webgl/robot.js';
+import { createTelemetry } from './webgl/telemetry.js';
+import botronModelUrl from './data/botron.glb?url';
+import { signalBoot } from './boot-gate.js';
 
-const container = document.getElementById("stage-container");
-const { renderer, scene, camera, controls, glowRing, particles } = setupScene({ container });
+const container = document.getElementById('stage-container');
+const { renderer, scene, camera, controls, glowRing, particles, keyLight, ground } = setupScene({
+  container,
+});
 
 // Shared, smoothed mouse state (currentX/Y are the lerped normalized values).
 const mouse = { targetX: 0, targetY: 0, currentX: 0, currentY: 0 };
-window.addEventListener("mousemove", (e) => {
-  mouse.targetX = (e.clientX / window.innerWidth) * 2 - 1;
-  mouse.targetY = -(e.clientY / window.innerHeight) * 2 + 1;
-}, { passive: true });
+window.addEventListener(
+  'mousemove',
+  (e) => {
+    mouse.targetX = (e.clientX / window.innerWidth) * 2 - 1;
+    mouse.targetY = -(e.clientY / window.innerHeight) * 2 + 1;
+  },
+  { passive: true }
+);
 
 // Camera story owns the intro + the Lenis/GSAP scrub loop.
 const story = createCameraStory({ camera, controls });
-
-// Dev-only: camera/draw-call overlay (press "D"). Vite replaces import.meta.env.DEV
-// with false in prod builds, tree-shaking debug-camera.js out of the bundle.
-if (import.meta.env.DEV) createDebugOverlay({ camera, controls, renderer });
 // gaze reads the robot model via a getter so it can be created before the robot.
 const gaze = createGaze({
   camera,
   beats: story.beats,
-  getRobot: () => (robot && robot.model),
+  getRobot: () => robot && robot.model,
   getGazeBeatIndex: () => story.state.gazeBeatIndex,
   getBotVisible: () => story.state.botVisible,
 });
@@ -39,7 +40,7 @@ const gaze = createGaze({
 const robot = createRobot({
   scene,
   renderer,
-  modelUrl: nexbotModelUrl,
+  modelUrl: botronModelUrl,
   mouse,
   gazeState: gaze.state,
   storyState: story.state,
@@ -53,7 +54,8 @@ const telemetry = createTelemetry(mouse);
 const _headPos = new THREE.Vector3();
 const botronBubble = document.getElementById('botron-bubble');
 const botronBubbleText = botronBubble ? botronBubble.querySelector('p') : null;
-let _bubbleW = 0, _bubbleH = 0;
+let _bubbleW = 0,
+  _bubbleH = 0;
 let _currentBeatId = null;
 
 if (botronBubble && botronBubbleText) {
@@ -65,9 +67,9 @@ if (botronBubble && botronBubbleText) {
     // If win does NOT have 'is-open', chat just closed -> show option to reopen
     const isOpen = win && win.classList.contains('is-open');
     if (isOpen) {
-      botronBubbleText.innerHTML = `// <span style="color:#00f0ff">RAG COPILOT ONLINE • [CLICK TO CLOSE]</span>`;
+      botronBubbleText.innerHTML = `// <span style="color:#00f0ff">RAG ONLINE • [CLICK TO CLOSE]</span>`;
     } else {
-      botronBubbleText.innerHTML = `// <span style="color:#00f0ff">COPILOT MINIMIZED • [CLICK TO REOPEN]</span>`;
+      botronBubbleText.innerHTML = `// <span style="color:#00f0ff">BOTRON IDLE • [CLICK TO REOPEN]</span>`;
     }
     _feedbackTimer = setTimeout(() => {
       const msg = BOTRON_BEAT_MESSAGES[_currentBeatId] || BOTRON_BEAT_MESSAGES.hero;
@@ -77,28 +79,10 @@ if (botronBubble && botronBubbleText) {
 }
 
 const BOTRON_BEAT_MESSAGES = {
-  hero: `// I'M BOTRON • ASK ME ABOUT SHASO <span style="color:#00f0ff">[CLICK TO CHAT]</span>`,
-  about: `// CHECK ABOUT MY CREATOR SHASO &darr;`,
-  contact: `// TRANSMISSION READY &mdash; SHASO RESPONDS FAST &darr;`,
+  hero: `// I'M BOTRON • ASK ME ANYTHING <span style="color:#00f0ff">[CLICK TO CHAT]</span>`,
+  about: `// CHECK OUT MY CREATOR &darr;`,
+  contact: `// TRANSMISSION READY &mdash; HE RESPONDS FAST &darr;`,
 };
-
-function getCurrentSectionId() {
-  const sectionIds = ['hero', 'about', 'skills', 'experience', 'projects', 'education', 'testimonials', 'contact'];
-  const midY = window.innerHeight * 0.5;
-
-  for (const id of sectionIds) {
-    const el = document.getElementById(id);
-    if (el) {
-      const rect = el.getBoundingClientRect();
-      if (rect.top <= midY && rect.bottom >= midY) {
-        return id;
-      }
-    }
-  }
-  // If at very top of the page
-  if ((window.scrollY || 0) < 200) return 'hero';
-  return null;
-}
 
 // Exponential decay damping: 100% framerate-independent, never overshoots
 function damp(current, target, lambda, dt) {
@@ -137,7 +121,13 @@ function updateBotronBubble() {
   _headPos.project(camera);
 
   // If behind the camera or out of viewport bounds, hide.
-  if (_headPos.z > 1 || _headPos.x < -1.2 || _headPos.x > 1.2 || _headPos.y < -1.2 || _headPos.y > 1.2) {
+  if (
+    _headPos.z > 1 ||
+    _headPos.x < -1.2 ||
+    _headPos.x > 1.2 ||
+    _headPos.y < -1.2 ||
+    _headPos.y > 1.2
+  ) {
     hideBubble();
     return;
   }
@@ -168,24 +158,40 @@ function updateBotronBubble() {
     _bubbleH = botronBubble.offsetHeight;
   }
 
-  // Position bubble: default to LEFT of head with tail pointing right -> bot
   // Bubble gap (px) from the projected head CENTER; contact needs more to clear the shoulder and arm.
   const GAP_BY_SECTION = { contact: 50 };
   const gap = GAP_BY_SECTION[currentSection] ?? 16;
-  let x = screenX - _bubbleW - gap;
-  let isTailRight = true;
 
-  // If bubble would clip off the left edge, flip to RIGHT of head
-  if (x < 16) {
-    x = screenX + gap;
-    isTailRight = false;
+  // Space-aware placement (replaces the old hard rule that forced the bubble to
+  // the right from beat 1 on — in the contact beat the head sits near the right
+  // edge, so the naive clamp used to drag the bubble over the bot's face):
+  //   - hero: keep the classic left-of-bot look (tail pointing right at the bot)
+  //   - later beats: prefer the right, but fall back to the left whenever the
+  //     bubble would overflow the viewport; if neither side truly fits, pick the
+  //     side with more room. The bubble is never clamped on top of the head.
+  const pad = 12; // min distance from viewport edges
+  const fitsRight = screenX + gap + _bubbleW + pad <= sw;
+  const fitsLeft = screenX - gap - _bubbleW - pad >= 0;
+  const preferRight =
+    currentSection === 'about' || (story && story.state && story.state.beatIndex >= 1);
+
+  let placeOnRight;
+  if (!fitsRight && !fitsLeft) {
+    // Bubble wider than the free space on both sides — take the roomier side.
+    placeOnRight = sw - screenX >= screenX;
+  } else if (preferRight) {
+    placeOnRight = fitsRight || !fitsLeft;
+  } else {
+    placeOnRight = !fitsLeft && fitsRight;
   }
 
-  // Clamp within viewport
-  x = Math.max(12, Math.min(sw - _bubbleW - 12, x));
+  let x = placeOnRight ? screenX + gap : screenX - _bubbleW - gap;
+
+  // Clamp within viewport (side selection above guarantees this never covers the head)
+  x = Math.max(pad, Math.min(sw - _bubbleW - pad, x));
   const y = Math.max(70, Math.min(sh - _bubbleH - 20, screenY - _bubbleH * 0.5));
 
-  const isTailLeft = !isTailRight;
+  const isTailLeft = placeOnRight;
   if (_lastTailLeft !== isTailLeft) {
     if (isTailLeft) {
       botronBubble.classList.add('tail-left');
@@ -209,24 +215,38 @@ function updateBotronBubble() {
   }
 }
 
-// --- Resize ---
-window.addEventListener("resize", () => {
-  _bubbleW = 0;
-  _bubbleH = 0;
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.0));
-  story.onResize?.(); // camera-story re-collects beats + refreshes ScrollTrigger
-});
+// --- Resize (rAF-coalesced) ---
+// Mobile browsers fire resize continuously while the URL bar collapses —
+// per-event canvas reallocs + ScrollTrigger.refresh() jank the compositor
+// exactly while the user is scrolling.
+let _lastAppliedW = window.innerWidth;
+let _resizePending = false;
+window.addEventListener(
+  'resize',
+  () => {
+    if (_resizePending) return;
+    _resizePending = true;
+    requestAnimationFrame(() => {
+      _resizePending = false;
+      const widthChanged = window.innerWidth !== _lastAppliedW;
+      _bubbleW = 0;
+      _bubbleH = 0;
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.0));
+      story.onResize?.({ widthChanged }); // camera-story refreshes ScrollTrigger only on width change
+      _lastAppliedW = window.innerWidth;
+    });
+  },
+  { passive: true }
+);
 
 // --- Render loop (Adaptive GPU sleeping, FPS-throttled, paused when tab is hidden) ---
 const clock = new THREE.Clock();
 let lastRenderTime = 0;
-const isMobile = IS_LOW_POWER;
-const activeFPS = isMobile ? 24 : TARGET_FPS;
-const frameInterval = 1000 / activeFPS;
-
+let firstFrameSignalled = false; // boot gate: fires once, after the first render
+let _perfLogged = false; // DEV: one-shot "bot on screen" report
 // User scroll & interaction activity tracker
 let _isScrolling = true;
 let _settleFrames = 30; // initial frames on page load so scene initializes cleanly
@@ -241,10 +261,12 @@ function wakeRender(frames = 20) {
   }, 140);
 }
 
-window.addEventListener("scroll", () => wakeRender(20), { passive: true });
-window.addEventListener("wheel", () => wakeRender(20), { passive: true });
-window.addEventListener("touchmove", () => wakeRender(20), { passive: true });
-window.addEventListener("resize", () => wakeRender(30), { passive: true });
+window.addEventListener('scroll', () => wakeRender(20), { passive: true });
+window.addEventListener('wheel', () => wakeRender(20), { passive: true });
+window.addEventListener('touchmove', () => wakeRender(20), { passive: true });
+window.addEventListener('mousemove', () => wakeRender(15), { passive: true });
+window.addEventListener('resize', () => wakeRender(30), { passive: true });
+
 
 function animate(currentTime) {
   requestAnimationFrame(animate);
@@ -252,14 +274,23 @@ function animate(currentTime) {
   // Pause rendering completely when the tab is backgrounded to save CPU/GPU
   if (document.hidden) return;
 
+
+  // Dynamic Adaptive Refresh Rate:
+  // - Active scroll / touch / cursor tracking: full 60 FPS for buttery smooth motion (zero judder).
+  // - Stationary reading (bot visible): throttled to 20-24 FPS for low-power idle breathing.
+  // - Stationary reading (bot hidden): deep sleep at 0 FPS (zero draw calls).
+  const isInteracting = _isScrolling || _settleFrames > 0;
+  const currentFPS = isInteracting ? 60 : 20;
+  const currentInterval = 1000 / currentFPS;
+
   const delta = currentTime - lastRenderTime;
-  if (delta < frameInterval) return;
-  lastRenderTime = currentTime - (delta % frameInterval);
+  if (delta < currentInterval) return;
+  lastRenderTime = currentTime - (delta % currentInterval);
 
   // When robot is hidden (Skills, Experience, Projects, etc.) and page is stationary,
   // sleep the renderer after settling. Saves 70-80% idle GPU during content reading!
   const botIsVisible = story.state.botVisible !== false;
-  if (!botIsVisible && !_isScrolling) {
+  if (!botIsVisible && !_isScrolling && firstFrameSignalled) {
     if (_settleFrames > 0) {
       _settleFrames--;
     } else {
@@ -282,6 +313,24 @@ function animate(currentTime) {
   }
   robot.update(elapsedTime, dt);
 
+  // DEV instrumentation: the moment the bot is actually on screen, report how
+  // long it took and whether the GLB was served from cache. The model pipeline
+  // is identical on every device (robot.js never reads a tier flag).
+  if (import.meta.env.DEV && !_perfLogged && robot.model) {
+    _perfLogged = true;
+    const glb = performance.getEntriesByType('resource').find((e) => /botron.*\.glb/.test(e.name));
+    console.info(
+      '[nx] perf — bot on screen at ' + Math.round(performance.now()) + 'ms',
+      glb
+        ? {
+            glbMs: Math.round(glb.duration),
+            glbKB: Math.round(glb.encodedBodySize / 1024),
+            fromCache: glb.transferSize === 0,
+          }
+        : { glb: 'no resource entry (preload removed or not started)' }
+    );
+  }
+
   // Stamp botVisible on body ONLY when changed to prevent DOM mutation churn
   const nextBotVisible = botIsVisible ? '1' : '0';
   if (document.body.dataset.botVisible !== nextBotVisible) {
@@ -293,6 +342,12 @@ function animate(currentTime) {
   telemetry.update();
 
   renderer.render(scene, camera);
+
+  // Boot gate: first real frame — the canvas is painted with the hero pose.
+  if (!firstFrameSignalled) {
+    firstFrameSignalled = true;
+    signalBoot('firstFrame');
+  }
 }
 
 // Start the loop via rAF so the first frame receives a valid timestamp.

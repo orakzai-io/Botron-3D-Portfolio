@@ -1,6 +1,6 @@
 # backend/main.py
 """
-FastAPI RAG Microservice for BOTRON Copilot.
+FastAPI RAG Microservice for BOTRON.
 Integrates Vector Retrieval (FastEmbed) with Groq Cloud (Llama 3.3).
 """
 
@@ -10,13 +10,16 @@ import logging
 from typing import List, Optional
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from dotenv import load_dotenv
 
-from rag import retriever
-
-# Load environment variables
+# Load environment variables BEFORE importing rag. Importing rag executes its
+# module body, which reads MIN_SIMILARITY from the environment -- so this has
+# to happen first or the .env value is silently ignored and the hardcoded
+# default is used instead.
 load_dotenv()
+
+from rag import retriever  # noqa: E402  (import order is load-bearing here)
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("botron-api")
@@ -56,8 +59,10 @@ else:
 
 
 class ChatRequest(BaseModel):
-    query: str
-    top_k: Optional[int] = 3
+    query: str = Field(..., min_length=1, max_length=2000)
+    # Bounded: an unbounded top_k lets a caller request every chunk in the
+    # knowledge base into the prompt, which is a direct, unmetered cost.
+    top_k: int = Field(default=3, ge=1, le=10)
 
 class SourceChunk(BaseModel):
     id: str
@@ -73,8 +78,8 @@ class ChatResponse(BaseModel):
     model: str
 
 
-SYSTEM_PROMPT_TEMPLATE = """You are BOTRON, an advanced autonomous AI copilot embedded in Shahsawar Orakzai's (Shaso's) 3D interactive portfolio (orakzai.io).
-Your task is to answer visitor questions concisely, accurately, and authoritatively about Shaso's technical work, projects, background, and athletic career.
+SYSTEM_PROMPT_TEMPLATE = """You are BOTRON, an advanced autonomous AI assistant embedded in Shahsawar Orakzai's 3D interactive portfolio (orakzai.io).
+Your task is to answer visitor questions concisely, accurately, and authoritatively about Shahsawar's technical work, projects, background, and athletic career.
 
 === GROUND TRUTH RETRIEVED CONTEXT ===
 {context}
@@ -83,7 +88,7 @@ Your task is to answer visitor questions concisely, accurately, and authoritativ
 GUIDELINES:
 1. Ground your answers strictly in the retrieved facts provided above. Do NOT hallucinate skills, metrics, or experiences not mentioned.
 2. Tone: Sharp, intelligent, disciplined, technical, and warmly professional. You may subtly use cyber-telemetry flourishes (e.g. 'AFFIRMATIVE //', 'SYS // RECORDED') where natural, but keep the core answer direct and easy to read.
-3. If the retrieved context does not contain enough information to answer, state what you have indexed and offer relevant suggestions (e.g. REDNOTE, Async Web Scraper, VaultGuard, Swimming career, or contact details).
+3. If the retrieved context does not contain the answer, say plainly that you do not have that information, then name the areas you do cover (REDNOTE, Async Web Scraper, VaultGuard, academics, experience, swimming, chess, contact). Never guess, never extrapolate, and never present a plausible-sounding inference as fact. It is far better to say "I don't have that indexed" than to state something untrue about a real person.
 4. Keep answers concise (2 to 4 punchy sentences or clear bullet points), ideal for a fast-reading chat interface.
 """
 
@@ -113,7 +118,24 @@ def chat(payload: ChatRequest):
         raise HTTPException(status_code=400, detail="Query cannot be empty.")
 
     # 1. RAG Vector Retrieval Step
-    top_chunks, retrieval_ms = retriever.retrieve(query, top_k=payload.top_k or 3)
+    top_chunks, retrieval_ms = retriever.retrieve(query, top_k=payload.top_k)
+
+    # Nothing cleared MIN_SIMILARITY -> do not call the LLM. It would only
+    # invent an answer from nothing, and that is the failure mode that matters
+    # most on a portfolio.
+    if not top_chunks:
+        return ChatResponse(
+            answer=(
+                "I don't have anything indexed on that. My knowledge base covers Shahsawar's "
+                "engineering work (REDNOTE, Async Web Scraper, VaultGuard), his academics and "
+                "Harvard credentials, his work experience, and his swimming and chess background. "
+                "Try one of those, or ask how to contact him."
+            ),
+            sources=[],
+            retrieval_time_ms=round(retrieval_ms, 2),
+            generation_time_ms=0.0,
+            model="none",
+        )
 
     # Format context for prompt
     context_str = "\n\n".join([
@@ -164,7 +186,7 @@ def chat(payload: ChatRequest):
                     {"role": "user", "content": query}
                 ],
                 model=model_name,
-                temperature=0.2,
+                temperature=0.5,
                 max_tokens=600,
             )
 

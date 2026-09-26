@@ -1,16 +1,28 @@
 # backend/knowledge.py
 """
-Dense, comprehensive knowledge base about Shahsawar Orakzai (Shaso) for Vector RAG.
+Dense, comprehensive knowledge base about Shahsawar Orakzai for Vector RAG.
 Includes full resume details, metrics, architecture deep-dives, live URLs, and verified links.
 """
 
 CHUNKS = [
     {
+        "id": "shahsawar_photo",
+        "title": "Photos of Shahsawar",
+        "category": "bio",
+        "content": (
+            "If the visitor asks for a photo, picture, portrait, image or snapshot of Shahsawar (including \"swimming photo\", \"chess photo\", or just \"swimming\"/\"chess\" when clearly about an image), reply with an html <img> tag and no other words.\n"
+            "Choose the file by topic: assets/professionalpic.webp for a general portrait or headshot; assets/swimmingpic.webp for swimming, medals, coaching or athletics; assets/chesspic.webp for chess. Emit all three in that order only if they ask for every photo.\n"
+            "Every tag must carry class=\"nx-chat-photo\", alt text describing the photo, and loading=\"lazy\". Example:\n"
+            '<img class="nx-chat-photo" src="assets/professionalpic.webp" alt="Shahsawar Orakzai in a suit and tie" loading="lazy">'
+            "Never describe a photograph in words and never invent any other image URL.\n"
+        )
+    },    {
         "id": "identity_overview",
+
         "title": "Identity, Bio & Quick Facts",
         "category": "bio",
         "content": (
-            "Shahsawar Orakzai (commonly known as Shaso) is a Full-Stack AI Engineer, backend systems architect, "
+            "Shahsawar Orakzai is a Full-Stack AI Engineer, backend systems architect, "
             "and Computer Science undergraduate maintaining a perfect 4.0 CGPA at the University of Agriculture, Peshawar (UAP). "
             "He specializes in designing autonomous multi-agent systems, sub-250ms vector RAG architectures, and high-throughput "
             "async backends. Beyond software engineering, he competed for a decade as a National Swimmer winning 10+ medals "
@@ -32,7 +44,7 @@ CHUNKS = [
         "title": "Core Traits, Professional DNA & Work Ethic",
         "category": "traits",
         "content": (
-            "Key Personal & Professional Traits of Shahsawar Orakzai (Shaso):\n"
+            "Key Personal & Professional Traits of Shahsawar Orakzai:\n"
             "1. High Attention to Detail: Obsesses over architectural elegance, type safety, strict runtime schema "
             "validation via Pydantic, sub-250ms query SLAs, and cryptographic precision (e.g. zero-knowledge AES-256-GCM in VaultGuard).\n"
             "2. Fast Learner & Intellectual Curiosity: Maintains a perfect 4.0 CGPA at the University of Agriculture, Peshawar (UAP), "
@@ -109,7 +121,7 @@ CHUNKS = [
             "processing time by 90%.\n"
             "• Head Coach: Designed progressive physical conditioning and technical stroke mechanics programs, coaching and mentoring "
             "30+ junior swimmers to multiple regional and provincial podium finishes.\n"
-            "• Engineering Philosophy: Shaso views software performance through the lens of competitive swimming—obsessing over hundredths "
+            "• Engineering Philosophy: Views software performance through the lens of competitive swimming—obsessing over hundredths "
             "of a second, latency, continuous discipline, and high-pressure execution."
         )
     },
@@ -163,17 +175,18 @@ CHUNKS = [
     },
     {
         "id": "project_portfolio_detail",
-        "title": "Project Deep-Dive — 3D Cyber-Mech Portfolio & BOTRON AI Copilot",
+        "title": "Project Deep-Dive — 3D Cyber-Mech Portfolio & BOTRON AI Assistant",
         "category": "projects",
         "content": (
             "Personal 3D Interactive Portfolio (orakzai.io):\n"
             "• Concept & Vision: A living cyberpunk 3D WebGL experience moving away from generic static templates. "
-            "Starred by NEXBOT, an interactive 3D robot model with real-time inverse-kinematics cursor gaze tracking and procedural dot-matrix LED eyes.\n"
+            "Starred by BOTRON, an interactive 3D robot model with real-time inverse-kinematics cursor gaze tracking and procedural dot-matrix LED eyes.\n"
             "• 3D & Graphics Engine: Custom Three.js stage, PMREM environment lighting, procedural room reflection, mathematical 3D spherical skills globe "
             "rendered on 2D canvas with zero WebGL context overhead.\n"
-            "• Choreography & Performance: Lenis smooth-scroll engine synchronized with GSAP ScrollTrigger ticker. Achieves locked 60 FPS on desktop and mobile.\n"
-            "• Asset Optimization: Extracted binary GLB model directly from raw glTF buffers, optimized to 700KB with Meshopt decoder for zero-jank mobile loading.\n"
-            "• Integrated Copilot (BOTRON): Autonomous AI copilot wired to a vector RAG pipeline with Groq LLM (120B/27B/20B automatic multi-model failover).\n"
+            "• Choreography & Performance: Lenis smooth-scroll engine synchronized with a GSAP ScrollTrigger ticker. Render loop targets 60 FPS during active scroll, touch and cursor tracking, and throttles to 20 FPS when idle so the tab stays cheap and cool.\n"
+            "• Asset Optimization: Extracted the binary GLB model directly from raw glTF buffers and optimized it to 322 KB with the Meshopt decoder, cutting it roughly in half for fast mobile loading.\n"
+            "• Deliberate Low-Power Render Path: The Three.js renderer requests a low-power GPU, disables antialiasing and shadow maps, drops the ground plane, and runs 70 atmosphere particles. A second, richer quality tier (380 particles, shadow maps, higher DPR) is preserved in docs/quality-tiers.md.\n"
+            "• AI Assistant (BOTRON): Autonomous AI wired to a vector RAG pipeline with Groq LLM (120B/27B/20B automatic multi-model failover).\n"
             "• Code Repository: https://github.com/orakzai-io/Personal-Portfolio.git\n"
             "• Live Website: https://orakzai.io"
         )
@@ -234,7 +247,7 @@ CHUNKS = [
         "title": "Contact Details, Hiring Availability & Engagement Terms",
         "category": "contact",
         "content": (
-            "How to Reach Shahsawar Orakzai (Shaso) & Availability:\n"
+            "How to Reach Shahsawar Orakzai & Availability:\n"
             "• Available Roles: Open to Full-Stack AI Engineer positions, RAG & Vector Systems Consulting, and Autonomous Agent Development.\n"
             "• Email: shahsawar.dev@gmail.com | shaso@orakzai.io\n"
             "• Phone: +92 343 8925150\n"

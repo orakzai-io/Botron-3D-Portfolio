@@ -1,154 +1,180 @@
 // js/ui/chat.js
-// Interactive BOTRON RAG Copilot Chat Interface
+// Interactive BOTRON RAG Chat Interface
 // Built with a plug-and-play FastAPI/RAG backend hook + built-in local knowledge retriever.
 
-// =========================================================================
-// RAG BACKEND INTEGRATION HOOK
-// When your FastAPI / Python RAG server is live, simply set this URL:
-// e.g. const RAG_API_URL = "https://your-api-endpoint.hf.space/chat";
-// =========================================================================
-const RAG_API_URL = "http://localhost:8000/chat"; // Local Python FastAPI RAG endpoint
+// The three photos are IMPORTED, not written as bare "assets/..." strings.
+// Vite only emits assets it can see statically, so a plain string would
+// 404 in dist/ even though it works fine in dev.
+import professionalPhoto from '../../assets/professionalpic.webp';
+import swimmingPhoto from '../../assets/swimmingpic.webp';
+import chessPhoto from '../../assets/chesspic.webp';
 
-// Built-in Knowledge Base for local answers & offline fallback (Dense dataset + URLs)
-const KNOWLEDGE_BASE = [
-  {
-    id: "greetings",
-    keywords: ["hi", "hello", "hey", "greetings", "good morning", "good evening", "howdy", "sup", "who are you", "what are you", "botron", "help", "what can you do", "introduce yourself", "assistant", "start"],
-    response: "Greetings! I am <strong>BOTRON</strong>, Shahsawar's autonomous cyber-mech AI copilot. I've indexed his entire engineering portfolio, verified Harvard credentials, 5+ production AI/RAG systems, 4.0 CGPA academics, and athletic background into my knowledge base.<br><br>Feel free to ask me anything — for example: <em>'Tell me about REDNOTE'</em>, <em>'What is his tech stack?'</em>, <em>'What was his role at MINDGIGS?'</em>, or <em>'How do I contact Shaso?'</em>"
-  },
-  {
-    id: "who_is_shaso",
-    keywords: ["who is", "who is shaso", "about shaso", "about shahsawar", "bio", "biography", "background", "summary", "overview", "intro", "introduction", "tell me about him", "tell me about shaso", "who is he", "profile", "creator", "identity"],
-    response: "<strong>Shahsawar Orakzai (Shaso)</strong> is a Full-Stack AI Engineer, backend systems architect, and Computer Science undergraduate maintaining a <strong>perfect 4.0 CGPA</strong> at the University of Agriculture, Peshawar (UAP).<br>• <strong>Specialization:</strong> Autonomous multi-agent systems, sub-250ms vector RAG architectures, and high-throughput async Python/FastAPI backends.<br>• <strong>Industry Track Record:</strong> Independent Freelancer delivering 5+ production AI applications and former Python Developer Intern at <strong>MINDGIGS</strong>.<br>• <strong>Athletic Discipline:</strong> 10 years as a National Swimmer winning 10+ provincial/national medals, Head Coach & IT Manager for KP Swimming Association, and competitive chess player."
-  },
-  {
-    id: "traits_strengths",
-    keywords: [
-      "trait", "traits", "strength", "strengths", "attention to detail", "fast learner", "disciplined", "discipline",
-      "work ethic", "mindset", "personality", "qualities", "characteristics", "speed", "problem solving", "habit", "habits", "attitude"
-    ],
-    response: "<strong>Core Traits & Professional DNA of Shahsawar (Shaso):</strong><br>• <strong>High Attention to Detail:</strong> Obsesses over architectural elegance, type safety, strict runtime schema validation via Pydantic, zero-knowledge cryptographic guarantees (VaultGuard), and sub-250ms query SLAs.<br>• <strong>Fast Learner & Adaptable:</strong> Maintains a <strong>perfect 4.0 CGPA</strong> in Computer Science at UAP, completed dual <strong>Harvard CS50x & CS50P</strong> certifications, and rapidly self-masters bleeding-edge AI tooling (Qdrant, pgvector, FastEmbed, Groq SLMs, n8n).<br>• <strong>Athletic Discipline & Speed:</strong> Cultivated over a decade as a <strong>National Swimmer (10+ Medals, Gold Medalist)</strong>. Brings an athlete's stamina, composure under pressure, and relentless work ethic to intense engineering deadlines.<br>• <strong>Strategic Problem-Solving:</strong> Competitive chess player who designs modular architectures with tactical foresight, planning several moves ahead for edge cases, scale, and clean abstractions."
-  },
-  {
-    id: "projects_all",
-    keywords: ["project", "projects", "work", "built", "builds", "showcase", "apps", "applications", "creations", "what did he make", "portfolio projects", "software", "systems"],
-    response: "<strong>Shahsawar's Flagship Engineering Projects:</strong><br>1. <strong>REDNOTE:</strong> Enterprise RAG document search assistant with sub-250ms vector queries over 10,000+ chunks (<a href='https://orakzai-io-rednote.hf.space' target='_blank' style='color:#00f0ff;'>Live Demo ↗</a> | <a href='https://github.com/orakzai-io/Rednote.git' target='_blank' style='color:#00f0ff;'>Code ↗</a>).<br>2. <strong>Async Web Scraper:</strong> Distributed intelligence pipeline handling 50k+ raw web pages daily with Groq LLM normalization & n8n (<a href='https://orakzai-io-async-web-scraper.hf.space' target='_blank' style='color:#00f0ff;'>Live Demo ↗</a> | <a href='https://github.com/orakzai-io/Async-Web-Scraper.git' target='_blank' style='color:#00f0ff;'>Code ↗</a>).<br>3. <strong>VaultGuard:</strong> Zero-knowledge credential vault with client-side AES-256-GCM + PBKDF2 (<a href='https://github.com/orakzai-io/Vault-Guard.git' target='_blank' style='color:#00f0ff;'>Code ↗</a> | <a href='https://youtu.be/-OcbtZTuibo?si=o0BBKnni7OCR09bJ' target='_blank' style='color:#00f0ff;'>Video ↗</a>).<br>4. <strong>3D Cyber-Mech Portfolio:</strong> Three.js WebGL canvas stage with inverse-kinematics gaze tracking & BOTRON copilot (<a href='https://orakzai.io' target='_blank' style='color:#00f0ff;'>Live ↗</a>)."
-  },
-  {
-    id: "rednote",
-    keywords: ["rednote", "rag", "vector", "pgvector", "retrieval", "chunk", "chunks", "document", "pdf", "qdrant", "fastembed", "embedding", "embeddings", "semantic"],
-    response: "<strong>REDNOTE</strong> is Shaso's flagship RAG document assistant:<br>• <strong>Performance:</strong> Sub-250ms semantic search queries over 10,000+ indexed chunks using PostgreSQL + <strong>pgvector</strong>.<br>• <strong>Pipeline:</strong> Automated PDF upload, recursive chunking, dense embeddings, JWT auth, and autonomous AI agents.<br>• <strong>DevOps:</strong> Dockerized with GitHub Actions CI/CD deploying in &lt;3 minutes.<br>• <a href='https://orakzai-io-rednote.hf.space' target='_blank' style='color:#00f0ff;'>Live Demo ↗</a> | <a href='https://github.com/orakzai-io/Rednote.git' target='_blank' style='color:#00f0ff;'>Source Code ↗</a>"
-  },
-  {
-    id: "scraper",
-    keywords: ["scraper", "async", "scraping", "groq", "n8n", "pipeline", "50k", "crawl", "crawler", "extraction", "distributed"],
-    response: "<strong>Async Web Scraper & Intelligence Pipeline:</strong><br>• Distributed pipeline processing <strong>50k+ raw web pages daily</strong> into PostgreSQL at a <strong>99.2% extraction success rate</strong>.<br>• Rate-limited and normalized via <strong>Groq LLM</strong> inference + <strong>n8n</strong> workflow automation.<br>• Real-time TypeScript monitoring dashboard with 3-second interval polling, cutting manual verification by 90%.<br>• <a href='https://orakzai-io-async-web-scraper.hf.space' target='_blank' style='color:#00f0ff;'>Live Demo ↗</a> | <a href='https://github.com/orakzai-io/Async-Web-Scraper.git' target='_blank' style='color:#00f0ff;'>Source Code ↗</a>"
-  },
-  {
-    id: "vaultguard",
-    keywords: ["vault", "vaultguard", "security", "encryption", "password", "crypto", "aes", "pbkdf2", "credentials", "zero-knowledge"],
-    response: "<strong>VaultGuard (Zero-Knowledge Credential Vault):</strong><br>• Client-side authenticated <strong>AES-256-GCM</strong> encryption with <strong>PBKDF2</strong> master-key derivation (100k+ iterations).<br>• <strong>Sub-50ms</strong> cryptographic latency; server and PostgreSQL host never possess plaintext secrets or master keys.<br>• Built with Python, JavaScript, PostgreSQL, Docker.<br>• <a href='https://github.com/orakzai-io/Vault-Guard.git' target='_blank' style='color:#00f0ff;'>Source Code ↗</a> | <a href='https://youtu.be/-OcbtZTuibo?si=o0BBKnni7OCR09bJ' target='_blank' style='color:#00f0ff;'>Video Demo ↗</a>"
-  },
-  {
-    id: "portfolio_3d",
-    keywords: ["portfolio", "3d", "three", "webgl", "nexbot", "botron", "canvas", "animation", "shaders", "lenis", "gsap", "stage"],
-    response: "<strong>3D Cyber-Mech Portfolio (orakzai.io):</strong><br>• Custom Three.js WebGL canvas stage starring NEXBOT with real-time inverse-kinematics cursor gaze tracking.<br>• Lenis smooth-scrolling synchronized with GSAP ScrollTrigger ticker at locked 60 FPS.<br>• Mathematical 3D holographic skills globe and integrated BOTRON vector RAG copilot.<br>• <a href='https://orakzai.io' target='_blank' style='color:#00f0ff;'>Live Site ↗</a> | <a href='https://github.com/orakzai-io/Personal-Portfolio.git' target='_blank' style='color:#00f0ff;'>Source Code ↗</a>"
-  },
-  {
-    id: "experience",
-    keywords: ["experience", "work", "job", "career", "mindgigs", "freelance", "intern", "internship", "employment", "history", "roles", "companies"],
-    response: "<strong>Professional Work Experience:</strong><br>1. <strong>Independent Freelancer (Present · Remote):</strong> Delivered 5+ full-stack AI applications (LLMs, pgvector/Qdrant, TypeScript, Docker) with 100% on-time completion and sub-200ms FastAPI backends.<br>2. <strong>MINDGIGS (Dec 2025 – Feb 2026 · Peshawar):</strong> Python Developer Intern. Lifted REST API throughput by ~40% with FastAPI/asyncio, integrated Intel Small LLMs (SLMs), and built Docker scraping pipelines handling 20k+ daily records.<br>3. <strong>KP Swimming Association (Present · Seasonal):</strong> IT Manager & Coach. Digitized database records for 200+ athletes (cutting admin time 90%) and coached 30+ swimmers to podium finishes."
-  },
-  {
-    id: "education",
-    keywords: ["education", "degree", "university", "cgpa", "gpa", "cs50", "harvard", "certificate", "certificates", "school", "uap", "academic", "courses", "study"],
-    response: "<strong>Academic Background & Harvard Credentials:</strong><br>• <strong>BS Computer Science (BSCS):</strong> University of Agriculture, Peshawar (Oct 2024 – Oct 2028 Expected) with a <strong>perfect 4.0 CGPA</strong>.<br>• <strong>Harvard CS50x (Feb 2026):</strong> Intro to Computer Science (<a href='https://certificates.cs50.io/46d6924e-c5e2-49f5-8639-90d52ebb90d1.pdf' target='_blank' style='color:#00f0ff;'>Verify Certificate ↗</a>).<br>• <strong>Harvard CS50P (Oct 2025):</strong> Programming with Python (<a href='https://certificates.cs50.io/9847b334-9e42-4281-a696-a6e5cc35b008.pdf' target='_blank' style='color:#00f0ff;'>Verify Certificate ↗</a>)."
-  },
-  {
-    id: "swimming",
-    keywords: ["swim", "swimming", "athlete", "medal", "medals", "sports", "coach", "chess", "championship", "kp", "gold"],
-    response: "<strong>Athletic Discipline & Leadership:</strong><br>• Spent <strong>10 years as a National Swimmer</strong> representing KP province across Pakistan, earning <strong>10+ provincial and national medals</strong> including <strong>Gold at National Junior Swimming Championships</strong>.<br>• Serves as <strong>Head Coach & IT Manager</strong> for KP Swimming Association, mentoring 30+ swimmers and digitizing records for 200+ athletes.<br>• Off the terminal, trains tactical foresight and pattern recognition in competitive chess."
-  },
-  {
-    id: "testimonials",
-    keywords: ["testimonial", "testimonials", "review", "reviews", "feedback", "clients", "client", "upwork", "rating", "recommendation", "recommendations"],
-    response: "<strong>Verified Client & Peer Recommendations:</strong><br>• <strong>Vivek Pippala (AI Engineer · Upwork 5★):</strong> <em>'Shahsawar optimized our RAG search pipeline using pgvector and FastAPI, delivering sub-second response times across indexed document chunks.'</em><br>• <strong>Awais Khan (Software Engineer · 5★):</strong> <em>'His technical mastery of async Python, REST APIs, and Docker containerization significantly boosted our backend throughput.'</em><br>• <strong>Muhammad Husnain (Web Developer · 5★):</strong> <em>'One of the most talented full-stack devs I've worked with — integrated modern LLM endpoints and TypeScript cleanly.'</em>"
-  },
-  {
-    id: "tech_stack",
-    keywords: ["stack", "skills", "tech", "technologies", "languages", "tools", "python", "fastapi", "react", "typescript", "backend", "frontend", "devops", "docker", "postgres", "sql"],
-    response: "<strong>Technical Stack Matrix (25 Core Competencies):</strong><br>• <strong>AI & LLMs:</strong> RAG Architectures, pgvector, Qdrant, ChromaDB, FastEmbed, Groq API, OpenAI API, LangChain, LangSmith, Autonomous Agents, Prompt Engineering.<br>• <strong>Backend & Data:</strong> Python, FastAPI, Asyncio, Pydantic, PostgreSQL, SQLAlchemy, C/C++.<br>• <strong>DevOps & Cloud:</strong> Docker, GitHub Actions CI/CD (&lt;3 min builds), Linux/Bash, Hugging Face, Vercel.<br>• <strong>Frontend:</strong> TypeScript, JavaScript ES6+, React, Modern CSS3, HTML5.<br>• <strong>Tools:</strong> n8n automation, Git/GitHub, VS Code, pgAdmin."
-  },
-  {
-    id: "contact",
-    keywords: ["contact", "hire", "email", "phone", "reach", "github", "linkedin", "social", "resume", "cv", "touch", "call", "message"],
-    response: "<strong>Contact & Professional Coordinates:</strong><br>• <strong>Email:</strong> <a href='mailto:shahsawar.dev@gmail.com' style='color:#00f0ff;'>shahsawar.dev@gmail.com</a> | <a href='mailto:shaso@orakzai.io' style='color:#00f0ff;'>shaso@orakzai.io</a><br>• <strong>Phone:</strong> +92 343 8925150<br>• <strong>Resume:</strong> <a href='assets/Shahsawar.dev.pdf' download style='color:#00f0ff;'>Download PDF ↗</a><br>• <strong>GitHub:</strong> <a href='https://github.com/orakzai-io' target='_blank' style='color:#00f0ff;'>github.com/orakzai-io ↗</a><br>• <strong>LinkedIn:</strong> <a href='https://linkedin.com/in/orakzai-io' target='_blank' style='color:#00f0ff;'>linkedin.com/in/orakzai-io ↗</a><br>• <strong>Hugging Face:</strong> <a href='https://huggingface.co/orakzai-io' target='_blank' style='color:#00f0ff;'>huggingface.co/orakzai-io ↗</a><br>• <strong>Twitter/X:</strong> <a href='https://x.com/orakzai_io' target='_blank' style='color:#00f0ff;'>@orakzai_io ↗</a>"
+const PHOTO_TAG = (url, alt, w, h) =>
+  '<img class="nx-chat-photo" src="' + url + '" alt="' + alt + '" width="' + w + '" height="' + h + '" loading="lazy" decoding="async">';
+
+const PRO_PHOTO = PHOTO_TAG(professionalPhoto, 'Shahsawar Orakzai in a suit and tie', 577, 576);
+const SWIM_PHOTO = PHOTO_TAG(swimmingPhoto, 'Shahsawar Orakzai at a swimming pool wearing a medal', 635, 634);
+const CHESS_PHOTO = PHOTO_TAG(chessPhoto, 'Shahsawar Orakzai playing chess', 720, 1196);
+
+// ---------------------------------------------------------------------------
+// RAG BACKEND
+// ---------------------------------------------------------------------------
+// Configured at build time via VITE_RAG_API_URL (see .env.example), so the
+// deployment URL is not hardcoded and contributors can run the site without
+// editing source. Left empty, BOTRON answers locally and makes no network
+// call, which is the default for a fresh clone.
+const RAG_API_URL = import.meta.env.VITE_RAG_API_URL || '';
+const RAG_HEALTH_URL = RAG_API_URL ? RAG_API_URL.replace(/\/chat\/?$/, '/health') : '';
+
+// A sleeping free-tier host takes 20-45s to wake. We ping /health as soon as
+// the page is idle so that cost is paid before the visitor types, not after.
+const RAG_WAKE_TIMEOUT_MS = 45000;
+
+// 'unknown' -> we have not asked yet; 'waking' -> ping in flight;
+// 'ready' -> answered; 'down' -> unreachable, do not keep trying.
+let ragState = RAG_HEALTH_URL ? 'waking' : 'down';
+let ragWakePromise = null;
+
+function wakeRagBackend() {
+  if (!RAG_HEALTH_URL) return Promise.resolve(false);
+  if (ragState === 'ready') return Promise.resolve(true);
+  if (ragWakePromise) return ragWakePromise;
+  const ctrl = new AbortController();
+  const t = setTimeout(() => ctrl.abort(), RAG_WAKE_TIMEOUT_MS);
+  ragState = 'waking';
+  ragWakePromise = fetch(RAG_HEALTH_URL, { signal: ctrl.signal })
+    .then((r) => {
+      clearTimeout(t);
+      ragState = r.ok ? 'ready' : 'down';
+      return r.ok;
+    })
+    .catch(() => {
+      clearTimeout(t);
+      ragState = 'down';
+      return false;
+    });
+  return ragWakePromise;
+}
+
+// Fire the warm-up without competing with the WebGL boot for bandwidth.
+// requestIdleCallback is not in Safari, hence the timeout fallback.
+function scheduleRagWarmup() {
+  if (!RAG_HEALTH_URL) return;
+  const go = () => wakeRagBackend();
+  if ('requestIdleCallback' in window) requestIdleCallback(go, { timeout: 4000 });
+  else setTimeout(go, 2500);
+}
+
+// ---------------------------------------------------------------------------
+// DETERMINISTIC PHOTOS
+// ---------------------------------------------------------------------------
+// The photos used to be guaranteed because the local knowledge base literally
+// contained the <img> tag. With the RAG answering, the model would have to
+// choose to emit it, and when it instead describes the photo in words the
+// images silently vanish. So photo intent is detected here and the tag is
+// injected regardless of what the model said. The prose still comes from the
+// RAG; only the image is ours.
+const PHOTO_INTENT = /\b(photo|photos|pic|pics|picture|pictures|image|images|portrait|portraits|snapshot|face|headshot|selfie|photograph|photographs|look\s+like|see\s+(him|his)|show\s+(me|him|his)|send\s+(me|his)|view)\b/i;
+const PHOTO_ALL = /\b(all|every|each|both)\b/i;
+const PHOTO_CHESS = /\b(chess|board|game|games|strategy|strategic|tactics)\b/i;
+const PHOTO_SWIM = /\b(swim|swimming|swimmer|medal|medals|medalist|pool|athlet|athletic|coach|coaching|competition)\b/i;
+
+function photoTagsFor(query) {
+  const q = String(query || '');
+  if (!PHOTO_INTENT.test(q)) return '';
+  let tags = '';
+  if (PHOTO_ALL.test(q)) {
+    tags = PRO_PHOTO + '<br>' + SWIM_PHOTO + '<br>' + CHESS_PHOTO;
+  } else if (PHOTO_CHESS.test(q)) {
+    tags = CHESS_PHOTO;
+  } else if (PHOTO_SWIM.test(q)) {
+    tags = SWIM_PHOTO;
+  } else {
+    tags = PRO_PHOTO;
   }
-];
+  return tags;
+}
 
-function findLocalAnswer(query) {
-  const clean = query.toLowerCase().replace(/[?!.,;:'"()]/g, " ").trim();
-  if (!clean) return "";
-
-  const words = clean.split(/\s+/).filter(Boolean);
-
-  // 1. Direct match scoring across all knowledge base entries
-  let bestItem = null;
-  let bestScore = 0;
-
-  for (const item of KNOWLEDGE_BASE) {
-    let score = 0;
-    for (const kw of item.keywords) {
-      if (clean === kw) {
-        score += 25; // exact match
-      } else if (clean.includes(kw)) {
-        // Multi-word phrase or compound keyword match
-        score += kw.includes(" ") ? 16 : (kw.length > 4 ? 9 : 4);
-      } else if (words.includes(kw)) {
-        score += 8;
-      }
-    }
-    if (score > bestScore) {
-      bestScore = score;
-      bestItem = item;
-    }
-  }
-
-  if (bestItem && bestScore >= 4) {
-    return bestItem.response;
-  }
-
-  // 2. Intelligent, context-rich fallback instead of a repetitive error message
-  return `I have indexed Shahsawar's full engineering dossier. Here is a quick snapshot:
-<br>• <strong>AI & Systems:</strong> High-throughput FastAPI backends, vector RAG (<a href="https://github.com/orakzai-io/Rednote.git" target="_blank" style="color:#00f0ff;">REDNOTE</a>), and autonomous agent workflows.
-<br>• <strong>Academics:</strong> 4.0 CGPA Computer Science major at UAP with dual <strong>Harvard CS50x & CS50P</strong> credentials.
-<br>• <strong>Core Traits:</strong> High attention to detail, rapid learner, athletic discipline, and strategic problem-solving.
-<br><br>Would you like details on his <strong>projects</strong>, <strong>technical stack</strong>, <strong>work experience</strong>, or <strong>contact info</strong>?`;
+// If the reply already carries one of our photos (the model complied), leave
+// it alone. Otherwise append ours so a photo request always shows a photo.
+function ensurePhotos(query, answerHtml) {
+  const tags = photoTagsFor(query);
+  if (!tags) return answerHtml;
+  if (/<img[^>]*class="[^"]*nx-chat-photo/.test(answerHtml)) return answerHtml;
+  const label = PHOTO_CHESS.test(query) ? 'Chess.' : PHOTO_SWIM.test(query) ? 'Swimming.' : 'This is Shahsawar.';
+  return answerHtml + '<br><strong>' + label + '</strong><br>' + tags + '<br><em>Tap any photo to view full size.</em>';
 }
 
 export function initChat() {
-  const fab = document.getElementById("nx-chat-fab");
-  const win = document.getElementById("nx-chat-window");
-  const closeBtn = document.getElementById("nx-chat-close-btn");
-  const messagesContainer = document.getElementById("nx-chat-messages");
-  const input = document.getElementById("nx-chat-input");
-  const sendBtn = document.getElementById("nx-chat-send-btn");
-  const suggestionsContainer = document.getElementById("nx-chat-suggestions");
-  const botronBubble = document.getElementById("botron-bubble");
-  const scrollBtn = document.getElementById("nx-chat-scroll-btn");
+  const fab = document.getElementById('nx-chat-fab');
+  const win = document.getElementById('nx-chat-window');
+  const closeBtn = document.getElementById('nx-chat-close-btn');
+  const messagesContainer = document.getElementById('nx-chat-messages');
+  const input = document.getElementById('nx-chat-input');
+  const sendBtn = document.getElementById('nx-chat-send-btn');
+  const suggestionsContainer = document.getElementById('nx-chat-suggestions');
+  const botronBubble = document.getElementById('botron-bubble');
+  const scrollBtn = document.getElementById('nx-chat-scroll-btn');
 
   if (!win || !input || !messagesContainer) return;
 
   let isOpen = false;
 
+  // --- Mobile FAB: show the label, then collapse to a circle. ---
+  // The pill is the only affordance that says "tap me" on touch (the 3D speech
+  // bubble is display:none <=900px), but a wide label sitting at the bottom
+  // right overlaps the .nx-strip status bar. So: expanded on load, collapsing
+  // to a circle after a beat, and it is still a single-tap control throughout.
+  // Desktop is untouched -- it has room, and :hover is a better affordance
+  // than a timer.
+  // MUST stay matched to the two CSS breakpoints: the 900px rule that hides the
+  // 3D speech bubble (nexus.css) and the 900px block that draws .is-collapsed
+  // (chat.css). At 600px, a 601-900px screen got no bubble and no collapse.
+  const collapseQuery = window.matchMedia('(max-width: 900px)');
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  let fabCollapseTimer = null;
+
+  function setFabCollapsed(collapsed) {
+    if (!fab) return;
+    fab.classList.toggle('is-collapsed', collapsed);
+  }
+
+  function scheduleFabCollapse() {
+    if (!fab) return;
+    clearTimeout(fabCollapseTimer);
+    // No auto-collapse for reduced-motion users: a control that changes shape
+    // on a timer is disorienting when motion sensitivity is declared.
+    if (reducedMotion.matches || !collapseQuery.matches) return;
+    fabCollapseTimer = setTimeout(() => {
+      // Never collapse out from under an open window.
+      if (!isOpen) setFabCollapsed(true);
+    }, 3500);
+  }
+
+  if (fab) {
+    // ONE tap always opens the chat, whether the FAB is a pill or a circle.
+    // (An earlier version peeked the label on the first tap when collapsed, which
+    // made the control a 3-step flow: circle -> label -> chat. The circle already
+    // carries the same pulsing dot and chat icon, and the aria-label is
+    // "Open BOTRON", so it is not ambiguous enough to justify that cost.)
+    scheduleFabCollapse();
+    // Re-evaluate when crossing the breakpoint so a desktop->mobile resize
+    // doesn't leave a stale collapsed pill behind.
+    collapseQuery.addEventListener('change', () => {
+      clearTimeout(fabCollapseTimer);
+      if (!collapseQuery.matches) setFabCollapsed(false);
+      else scheduleFabCollapse();
+    });
+  }
+
   function syncBubbleState(open) {
     if (!botronBubble) return;
-    const textEl = botronBubble.querySelector("p");
+    const textEl = botronBubble.querySelector('p');
     if (!textEl) return;
     if (open) {
-      textEl.innerHTML = `// <span style="color:#00f0ff">RAG COPILOT ONLINE • [CLICK TO CLOSE]</span>`;
+      textEl.innerHTML = `// <span style="color:#00f0ff">RAG ONLINE • [CLICK TO CLOSE]</span>`;
     } else {
-      textEl.innerHTML = `// <span style="color:#00f0ff">COPILOT MINIMIZED • [CLICK TO REOPEN]</span>`;
+      textEl.innerHTML = `// <span style="color:#00f0ff">BOTRON IDLE • [CLICK TO REOPEN]</span>`;
     }
   }
 
@@ -156,13 +182,13 @@ export function initChat() {
     requestAnimationFrame(() => {
       messagesContainer.scrollTo({
         top: messagesContainer.scrollHeight,
-        behavior: smooth ? "smooth" : "auto"
+        behavior: smooth ? 'smooth' : 'auto',
       });
       // Second tick ensures layout updates (typing dots, markdown render) are accounted for
       setTimeout(() => {
         messagesContainer.scrollTo({
           top: messagesContainer.scrollHeight,
-          behavior: smooth ? "smooth" : "auto"
+          behavior: smooth ? 'smooth' : 'auto',
         });
         updateScrollBtn();
       }, 50);
@@ -171,8 +197,8 @@ export function initChat() {
 
   function openChat() {
     isOpen = true;
-    win.classList.add("is-open");
-    win.setAttribute("aria-hidden", "false");
+    win.classList.add('is-open');
+    win.setAttribute('aria-hidden', 'false');
     syncBubbleState(true);
     input.focus();
     scrollToBottom(false);
@@ -180,8 +206,8 @@ export function initChat() {
 
   function closeChat() {
     isOpen = false;
-    win.classList.remove("is-open");
-    win.setAttribute("aria-hidden", "true");
+    win.classList.remove('is-open');
+    win.setAttribute('aria-hidden', 'true');
     syncBubbleState(false);
   }
 
@@ -190,103 +216,249 @@ export function initChat() {
     else openChat();
   }
 
-  if (fab) fab.addEventListener("click", toggleChat);
-  if (closeBtn) closeBtn.addEventListener("click", closeChat);
+  if (fab) fab.addEventListener('click', toggleChat);
+  if (closeBtn) closeBtn.addEventListener('click', closeChat);
 
   // Hide BOTRON chat button when reaching footer so all social icons are clean to scan
-  const footerEl = document.querySelector(".nx-footer");
+  const footerEl = document.querySelector('.nx-footer');
 
   function updateFabFooterVisibility() {
     if (!fab || !footerEl) return;
     const footerRect = footerEl.getBoundingClientRect();
     // When the footer enters the bottom of the viewport
-    const isAtFooter = footerRect.top <= (window.innerHeight - 10);
+    const isAtFooter = footerRect.top <= window.innerHeight - 10;
     if (isAtFooter) {
-      fab.classList.add("is-footer-hidden");
+      fab.classList.add('is-footer-hidden');
     } else {
-      fab.classList.remove("is-footer-hidden");
+      fab.classList.remove('is-footer-hidden');
     }
   }
 
   if (footerEl && fab) {
-    if ("IntersectionObserver" in window) {
+    if ('IntersectionObserver' in window) {
       const footerObs = new IntersectionObserver(
         (entries) => {
           entries.forEach((entry) => {
             if (entry.isIntersecting) {
-              fab.classList.add("is-footer-hidden");
+              fab.classList.add('is-footer-hidden');
             } else {
               updateFabFooterVisibility();
             }
           });
         },
-        { rootMargin: "0px 0px -10px 0px", threshold: 0 }
+        { rootMargin: '0px 0px -10px 0px', threshold: 0 }
       );
       footerObs.observe(footerEl);
+    } else {
+      // No IntersectionObserver (ancient browser): fall back to a scroll poll.
+      window.addEventListener('scroll', updateFabFooterVisibility, { passive: true });
     }
 
-    window.addEventListener("scroll", updateFabFooterVisibility, { passive: true });
-    window.addEventListener("resize", updateFabFooterVisibility, { passive: true });
+    window.addEventListener('resize', updateFabFooterVisibility, { passive: true });
     updateFabFooterVisibility();
   }
 
   // Hook into the 3D robot speech bubble — click to toggle open/close
   if (botronBubble) {
-    botronBubble.addEventListener("click", () => {
+    botronBubble.addEventListener('click', () => {
       toggleChat();
     });
   }
 
+  // --- Missing-photo fallback ---
+  // The three photos in assets/ are real files on disk. If one is ever moved, renamed
+  // or not yet added, swap the broken-image icon for a sentence rather than
+  // showing a torn-image glyph. 'error' does not bubble, hence capture=true.
+  if (messagesContainer) {
+    messagesContainer.addEventListener(
+      'error',
+      (e) => {
+        const photo = e.target;
+        if (!photo.classList || !photo.classList.contains('nx-chat-photo')) return;
+        const note = document.createElement('span');
+        note.className = 'photo-error';
+        note.textContent = 'Photo unavailable right now.';
+        photo.replaceWith(note);
+      },
+      true
+    );
+  }
+  // --- Photo lightbox ---
+  // The inline thumbnail is too small to actually see a face, so tapping it
+  // opens a full-size overlay. Delegated on the messages container because
+  // photo responses are appended dynamically, not present at init.
+  function openPhotoLightbox(src, alt) {
+    const box = document.createElement('div');
+    box.className = 'nx-photo-lightbox';
+    box.setAttribute('role', 'dialog');
+    box.setAttribute('aria-modal', 'true');
+    box.setAttribute('aria-label', alt || 'Photo');
+    const img = document.createElement('img');
+    img.src = src;
+    img.alt = alt || '';
+    box.appendChild(img);
+    const close = () => box.remove();
+    box.addEventListener('click', close);
+    document.addEventListener(
+      'keydown',
+      function onKey(e) {
+        if (e.key !== 'Escape') return;
+        close();
+        document.removeEventListener('keydown', onKey);
+      },
+      true
+    );
+    document.body.appendChild(box);
+  }
+
+  if (messagesContainer) {
+    messagesContainer.addEventListener('click', (e) => {
+      const photo = e.target.closest('.nx-chat-photo');
+      if (!photo) return;
+      e.preventDefault();
+      openPhotoLightbox(photo.src, photo.alt);
+    });
+  }
   // Close on Escape key
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && isOpen) {
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && isOpen) {
       closeChat();
     }
   });
 
   // Hide the quick suggestion chips after the user asks their first question
   function hideSuggestions() {
-    if (suggestionsContainer && !suggestionsContainer.classList.contains("is-hidden")) {
-      suggestionsContainer.classList.add("is-hidden");
+    if (suggestionsContainer && !suggestionsContainer.classList.contains('is-hidden')) {
+      suggestionsContainer.classList.add('is-hidden');
     }
   }
 
   function getTimeString() {
     const now = new Date();
-    return now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    return now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  }
+
+  // --- HTML sanitiser ---
+  // Bot replies are LLM output, and the LLM is fed raw visitor text, so the
+  // response is untrusted. Previously any reply containing a known tag was
+  // passed through to innerHTML untouched, which let a crafted question make
+  // the model emit markup that then executed in the page. Everything is now
+  // parsed and rebuilt from an allowlist: unknown elements are unwrapped, and
+  // any attribute not explicitly permitted is dropped.
+  const SANITIZE_TAGS = new Set([
+    'A', 'B', 'BR', 'CODE', 'DIV', 'EM', 'I', 'IMG',
+    'LI', 'OL', 'P', 'PRE', 'SPAN', 'STRONG', 'UL',
+  ]);
+  // Removed outright along with their text content.
+  const SANITIZE_DROP = new Set(['SCRIPT', 'STYLE', 'IFRAME', 'OBJECT', 'EMBED', 'LINK', 'META', 'FORM', 'SVG']);
+  const SANITIZE_ATTRS = {
+    A: ['href', 'target', 'rel', 'title', 'download'],
+    IMG: ['src', 'alt', 'width', 'height', 'loading', 'decoding', 'class'],
+    SPAN: ['class'],
+    DIV: ['class'],
+  };
+  // Allows your own relative assets, absolute paths, real links and mailto:.
+  // Blocks javascript:, data:, vbscript: and every other scheme.
+  // NOTE: "assets/..." is allowed because the resume PDF is linked that way
+  // (assets/Shahsawar.dev.pdf). Without it the sanitiser stripped the href.
+  const SANITIZE_URL = /^(https?:\/\/|mailto:|\/|\.\/|\.\.\/|assets\/|#)/i;
+
+  function escapeHtml(str) {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function sanitizeHtml(html) {
+    if (!html) return "";
+    if (!/<[a-zA-Z]/.test(html)) return html;
+    const doc = new DOMParser().parseFromString('<div id="nx-san-root">' + html + '</div>', 'text/html');
+    const root = doc.getElementById('nx-san-root');
+    if (!root) return escapeHtml(html);
+    const stack = [root];
+    while (stack.length) {
+      const node = stack.pop();
+      for (const el of Array.from(node.children)) {
+        const tag = el.tagName.toUpperCase();
+        if (SANITIZE_DROP.has(tag)) { el.remove(); continue; }
+        if (!SANITIZE_TAGS.has(tag)) {
+          // unwrap: keep the words, lose the element
+          const parent = el.parentNode;
+          while (el.firstChild) parent.insertBefore(el.firstChild, el);
+          el.remove();
+          stack.push(parent);
+          continue;
+        }
+        const allowed = SANITIZE_ATTRS[tag] || [];
+        for (const a of Array.from(el.attributes)) {
+          const n = a.name.toLowerCase();
+          if (allowed.indexOf(n) === -1) { el.removeAttribute(a.name); continue; }
+          if ((n === "href" || n === "src") && !SANITIZE_URL.test(a.value.trim())) {
+            el.removeAttribute(a.name);
+          }
+        }
+        if (tag === 'A') {
+          el.setAttribute('target', '_blank');
+          el.setAttribute('rel', 'noopener noreferrer nofollow');
+        }
+        stack.push(el);
+      }
+    }
+    return root.innerHTML;
+  }
+  // The backend can only be told the *source* path (assets/professionalpic.webp);
+  // Vite rewrites the real files to content-hashed names, so anything coming back
+  // from the LLM is remapped to the imported URL here. Without this the backend
+  // photo path always rendered a broken image.
+  const PHOTO_SRC_MAP = new Map([
+    ['assets/professionalpic.webp', professionalPhoto],
+    ['assets/swimmingpic.webp', swimmingPhoto],
+    ['assets/chesspic.webp', chessPhoto],
+  ]);
+  function remapPhotoSrc(html) {
+    return html.replace(/(<img[^>]*?src=")([^"]+)(")/g, (full, pre, src, post) => {
+      const mapped = PHOTO_SRC_MAP.get(src.trim());
+      return mapped ? pre + mapped + post : full;
+    });
   }
 
   function formatMarkdown(text) {
-    if (!text) return "";
-    // If already contains HTML markup from knowledge base, preserve it
-    if (/<(strong|em|a|code|br|span|ul|li)[\s>]/i.test(text)) {
-      return text;
+    if (!text) return '';
+    // The knowledge base and the LLM both emit real markup, so most replies
+    // match this. It must be sanitised, not returned raw -- an earlier version
+    // returned early here, which meant sanitizeHtml() below never executed.
+    if (/<(strong|em|a|code|br|span|ul|li|img)[\s>]/i.test(text)) {
+      return sanitizeHtml(remapPhotoSrc(text));
     }
-    let html = text
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;");
-    return html
-      .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-      .replace(/\*(.*?)\*/g, "<em>$1</em>")
-      .replace(/`([^`]+)`/g, "<code>$1</code>")
-      .replace(/^[-•*]\s+(.*)$/gm, "• $1")
-      .replace(/\n\n/g, "<br><br>")
-      .replace(/\n/g, "<br>");
+    let html = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    return sanitizeHtml(
+      html
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.*?)\*/g, '<em>$1</em>')
+      .replace(/`([^`]+)`/g, '<code>$1</code>')
+      .replace(/^[-•*]\s+(.*)$/gm, '• $1')
+      .replace(/\n\n/g, '<br><br>')
+      .replace(/\n/g, '<br>')
+    );
   }
 
-  function appendMessage(text, sender = "bot", meta = null) {
-    const msgEl = document.createElement("div");
+  function appendMessage(text, sender = 'bot', meta = null) {
+    const msgEl = document.createElement('div');
     msgEl.className = `nx-chat-msg nx-chat-msg--${sender}`;
 
-    let metaHtml = "";
+    let metaHtml = '';
     if (meta && meta.sources && meta.sources.length) {
       const topSources = meta.sources
         .slice(0, 2)
-        .map((s) => `${s.title.split("—")[0].trim()}`)
-        .join(", ");
-      const sim = meta.sources[0]?.similarity ? ` • ${(meta.sources[0].similarity * 100).toFixed(0)}% MATCH` : "";
-      const latency = meta.retrieval_time_ms ? ` • ${meta.retrieval_time_ms}ms` : "";
+        .map((s) => escapeHtml(String(s.title || '').split('—')[0].trim()))
+        .join(', ');
+      const sim = meta.sources[0]?.similarity
+        ? ` • ${(meta.sources[0].similarity * 100).toFixed(0)}% MATCH`
+        : '';
+      const latency = meta.retrieval_time_ms ? ` • ${meta.retrieval_time_ms}ms` : '';
       metaHtml = `
         <div class="nx-chat-meta">
           <span class="nx-meta-badge">⚡ VECTOR RAG</span>
@@ -295,7 +467,9 @@ export function initChat() {
       `;
     }
 
-    const contentHtml = sender === "user" ? text : formatMarkdown(text);
+    // User text is escaped outright: it is never markup. Bot text goes
+    // through formatMarkdown, which sanitises before it reaches innerHTML.
+    const contentHtml = sender === 'user' ? escapeHtml(text) : formatMarkdown(text);
 
     msgEl.innerHTML = `
       <div class="nx-chat-bubble">${contentHtml}</div>
@@ -309,26 +483,27 @@ export function initChat() {
   // --- Scroll-to-bottom button ---
   function updateScrollBtn() {
     if (!scrollBtn) return;
-    const distFromBottom = messagesContainer.scrollHeight - messagesContainer.scrollTop - messagesContainer.clientHeight;
+    const distFromBottom =
+      messagesContainer.scrollHeight - messagesContainer.scrollTop - messagesContainer.clientHeight;
     if (distFromBottom > 80) {
-      scrollBtn.classList.add("is-visible");
+      scrollBtn.classList.add('is-visible');
     } else {
-      scrollBtn.classList.remove("is-visible");
+      scrollBtn.classList.remove('is-visible');
     }
   }
 
-  messagesContainer.addEventListener("scroll", updateScrollBtn, { passive: true });
+  messagesContainer.addEventListener('scroll', updateScrollBtn, { passive: true });
 
   if (scrollBtn) {
-    scrollBtn.addEventListener("click", () => {
+    scrollBtn.addEventListener('click', () => {
       scrollToBottom(true);
     });
   }
 
   function showTypingIndicator() {
-    const typingEl = document.createElement("div");
-    typingEl.className = "nx-chat-typing";
-    typingEl.id = "nx-chat-typing";
+    const typingEl = document.createElement('div');
+    typingEl.className = 'nx-chat-typing';
+    typingEl.id = 'nx-chat-typing';
     typingEl.innerHTML = `
       <span class="nx-chat-typing-dot"></span>
       <span class="nx-chat-typing-dot"></span>
@@ -340,7 +515,7 @@ export function initChat() {
   }
 
   function removeTypingIndicator() {
-    const typingEl = document.getElementById("nx-chat-typing");
+    const typingEl = document.getElementById('nx-chat-typing');
     if (typingEl) typingEl.remove();
   }
 
@@ -348,51 +523,85 @@ export function initChat() {
     const query = text || input.value.trim();
     if (!query) return;
 
-    // Disappear suggested options after the first user question
     hideSuggestions();
-
-    appendMessage(query, "user");
-    input.value = "";
+    appendMessage(query, 'user');
+    input.value = '';
     showTypingIndicator();
 
-    // 1. If FastAPI backend URL is set and accessible, query it via HTTP POST
-    if (RAG_API_URL) {
-      try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 3500); // 3.5s timeout for local server
-        const response = await fetch(RAG_API_URL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ query }),
-          signal: controller.signal
-        });
-        clearTimeout(timeoutId);
-
-        if (response.ok) {
-          const data = await response.json();
-          removeTypingIndicator();
-          appendMessage(data.answer || data.response || "No response generated.", "bot", data);
-          return;
-        }
-      } catch (err) {
-        console.warn("[RAG] API fetch failed or offline, falling back to smart local retriever:", err);
-      }
+    // No backend configured (or it is known down): stay local and instant.
+    // Photos still work, because ensurePhotos() is independent of the backend.
+    if (!RAG_API_URL || ragState === 'down') {
+      removeTypingIndicator();
+      appendMessage(ensurePhotos(query, offlineAnswer(query)), 'bot');
+      return;
     }
 
-    // 2. High-precision local semantic retriever fallback
-    setTimeout(() => {
+    let timeoutId = null;
+    try {
+      // While the host is still waking, allow the full wake window. Falling
+      // back after 3.5s here is what made a slow cold start look broken.
+      const budget = ragState === 'ready' ? 12000 : RAG_WAKE_TIMEOUT_MS;
+      const controller = new AbortController();
+      timeoutId = setTimeout(() => controller.abort(), budget);
+
+      const response = await fetch(RAG_API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query }),
+        signal: controller.signal,
+      });
+      clearTimeout(timeoutId);
+
+      if (!response.ok) throw new Error('HTTP ' + response.status);
+      const data = await response.json();
+      ragState = 'ready';
       removeTypingIndicator();
-      const answer = findLocalAnswer(query);
-      appendMessage(answer, "bot");
-    }, 400);
+      const answer = data.answer || data.response || 'No response generated.';
+      appendMessage(ensurePhotos(query, formatMarkdown(answer)), 'bot', data);
+    } catch (err) {
+      if (timeoutId) clearTimeout(timeoutId);
+      // A timeout while we were still warming is NOT a failure of the backend,
+      // so we do not mark it down -- we just report it honestly.
+      const wasWaking = ragState === 'waking';
+      if (err && err.name === 'AbortError' && wasWaking) {
+        removeTypingIndicator();
+        appendMessage(
+          '<em>// RAG BACKEND IS STILL WAKING UP — sleeping hosts take 20-45s to start. ' +
+            'It may be back shortly; meanwhile BOTRON can still show you his work.</em><br>' +
+            ensurePhotos(query, offlineAnswer(query)),
+          'bot'
+        );
+        return;
+      }
+      if (err && err.name === 'AbortError') ragState = 'down';
+      else ragState = 'down';
+      removeTypingIndicator();
+      appendMessage(ensurePhotos(query, offlineAnswer(query)), 'bot');
+    }
   }
+
+  function offlineAnswer(query) {
+    return (
+      "<em>// RAG BACKEND OFFLINE — answering from the local index.</em><br>" +
+      "Shahsawar Orakzai is a Full-Stack AI Engineer and Computer Science undergraduate at UAP " +
+      "with a 4.0 CGPA and dual Harvard CS50x/CS50P credentials. He has delivered 5+ production " +
+      "AI applications, including <strong>REDNOTE</strong> (sub-250ms vector RAG over 10,000+ chunks), " +
+      "an async scraping intelligence pipeline, and <strong>VaultGuard</strong>, a zero-knowledge " +
+      "credential vault. He is also a former MINDGIGS Python intern, a 10-year National Swimmer, " +
+      "and a competitive chess player.<br><br>Once the backend is reachable I can answer in detail — " +
+      "try again in a moment."
+    );
+  }
+
+  // Warm the host before anyone types, without blocking the 3D boot.
+  scheduleRagWarmup();
 
   if (sendBtn) {
-    sendBtn.addEventListener("click", () => handleSendMessage());
+    sendBtn.addEventListener('click', () => handleSendMessage());
   }
 
-  input.addEventListener("keydown", (e) => {
-    if (e.key === "Enter" && !e.shiftKey) {
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage();
     }
@@ -400,8 +609,8 @@ export function initChat() {
 
   // Handle Quick Chips click
   if (suggestionsContainer) {
-    suggestionsContainer.addEventListener("click", (e) => {
-      const chip = e.target.closest(".nx-chat-chip");
+    suggestionsContainer.addEventListener('click', (e) => {
+      const chip = e.target.closest('.nx-chat-chip');
       if (chip && chip.dataset.query) {
         handleSendMessage(chip.dataset.query);
       }
@@ -410,8 +619,8 @@ export function initChat() {
 }
 
 // Auto-boot chat once DOM is ready
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", initChat);
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initChat);
 } else {
   initChat();
 }

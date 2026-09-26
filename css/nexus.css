@@ -1,5 +1,5 @@
 /* ============================================================
-   NEXBOT — POLISHED MECH · black & silver, scarce cyan
+   BOTRON — POLISHED MECH · black & silver, scarce cyan
    Loaded last so it cleanly overrides the boilerplate UI.
    ============================================================ */
 
@@ -24,14 +24,21 @@
   --font-ui: 'JetBrains Mono', monospace;
   --font-body: 'Inter', -apple-system, sans-serif;
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
-  --danger: #00f0ff; /* two-color contract: validation reuses the cyan atom */
+  /* Error state color: label + input border + message paint from this token.
+     Deliberately NOT the cyan accent — an invalid field must read as feedback,
+     distinct from branding. */
+  --danger: #ff5555;
+  --danger-glow: rgba(255, 85, 85, 0.14); /* red focus ring behind an errored field */
   /* accent atoms — cyan is the single UI accent (violet lives only in the bot scene & skills globe).
      Every cyan in the UI derives from these two shades; no one-off cyan hexes anywhere else. */
   --cyan-soft: #67e8f9;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
+/* Mobile: kill the system tap-highlight overlay (a translucent slab painted
+   over the whole tapped box — very visible around the globe canvas, pills and
+   HUD on the near-black theme). The burger opts out locally; this is global. */
+html { scroll-behavior: smooth; -webkit-tap-highlight-color: transparent; }
 
 body {
   background: radial-gradient(1200px 800px at 72% -10%, var(--bg1), var(--bg) 60%);
@@ -51,14 +58,8 @@ body {
 .stage-container { position: fixed; inset: 0; z-index: 1; }
 .stage-container canvas { width: 100% !important; height: 100% !important; display: block; }
 
-/* film overlay — scanlines + vignette */
+/* film overlay -- vignette (the scanline layer was removed; see docs/quality-tiers.md) */
 .nx-fx { position: fixed; inset: 0; z-index: 5; pointer-events: none; }
-.nx-fx::before {
-  content: ""; position: absolute; inset: 0;
-  background: repeating-linear-gradient(0deg,
-    rgba(255, 255, 255, 0.025) 0 1px, rgba(255, 255, 255, 0) 1px 3px);
-  mix-blend-mode: overlay;
-}
 .nx-fx::after {
   content: ""; position: absolute; inset: 0;
   background:
@@ -76,9 +77,10 @@ body {
   transition: opacity 0.35s var(--ease) 0.25s, visibility 0s 0.8s;
 }
 .nx-boot p { margin: 0; opacity: 0; animation: bootLine 0.4s var(--ease) forwards; }
-.nx-boot p:nth-child(2) { animation-delay: 0.45s; }
-.nx-boot p:nth-child(3) { animation-delay: 0.9s; }
-.nx-boot p:nth-child(4) { animation-delay: 1.35s; }
+/* tightened so all four lines read inside the boot gate's min display */
+.nx-boot p:nth-child(2) { animation-delay: 0.12s; }
+.nx-boot p:nth-child(3) { animation-delay: 0.24s; }
+.nx-boot p:nth-child(4) { animation-delay: 0.36s; }
 body.intro-complete .nx-boot { opacity: 0; visibility: hidden; }
 @keyframes bootLine { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 .nx-boot-caret { color: var(--cyan); animation: blink 1s steps(1) infinite; }
@@ -93,7 +95,7 @@ body.intro-complete .nx-boot { opacity: 0; visibility: hidden; }
   position: fixed; width: 28px; height: 28px; margin: -14px 0 0 -14px;
   border: 1px solid rgba(232, 237, 244, 0.5); border-radius: 50%;
   transition: width 0.15s var(--ease), height 0.15s var(--ease),
-              margin 0.15s var(--ease), border-color 0.15s, box-shadow 0.15s, scale 0.15s ease;
+              margin 0.15s var(--ease), border-color 0.15s, box-shadow 0.15s;
   display: grid; place-items: center;
 }
 .nx-cursor-ring i { position: absolute; background: rgba(232, 237, 244, 0.55); }
@@ -105,7 +107,13 @@ body.intro-complete .nx-boot { opacity: 0; visibility: hidden; }
   width: 44px; height: 44px; margin: -22px 0 0 -22px;
   border-color: var(--cyan-dim); box-shadow: 0 0 16px var(--cyan-dim);
 }
-.nx-cursor.is-down .nx-cursor-ring { scale: 0.8; }
+/* Press state — shrink via width/height/margin (never `scale`: that property
+   composes OUTSIDE `transform`, so it multiplied the JS-written translate3d
+   and dragged the ring toward the viewport origin on every mousedown).
+   Margins and size interpolate with identical timing, keeping the ring
+   pinned to the dot — same technique as the .is-hover rule above. */
+.nx-cursor.is-down .nx-cursor-ring { width: 22.4px; height: 22.4px; margin: -11.2px 0 0 -11.2px; }
+.nx-cursor.is-hover.is-down .nx-cursor-ring { width: 35.2px; height: 35.2px; margin: -17.6px 0 0 -17.6px; }
 
 @keyframes nxAppear { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
 @keyframes nxRise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
@@ -115,8 +123,6 @@ body.intro-complete .nx-boot { opacity: 0; visibility: hidden; }
   position: fixed; top: 0; left: 0; width: 100%; z-index: 20;
   display: flex; align-items: center; gap: 2.5rem;
   padding: 1.05rem clamp(1.25rem, 4vw, 3rem);
-  background: rgba(6, 8, 12, 0.62);
-  backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
   border-bottom: 1px solid var(--line);
   opacity: 0; transform: translateY(-100%);
   transition: opacity 0.8s var(--ease) 0.15s, transform 0.8s var(--ease) 0.15s;
@@ -199,7 +205,6 @@ body.intro-complete .nx-nav { opacity: 1; transform: none; }
   display: none;
   position: absolute; top: 100%; left: 0; width: 100%;
   background: rgba(6, 9, 16, 0.97);
-  backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
   border-bottom: 1px solid var(--line);
   overflow: hidden;
   max-height: 0;
@@ -265,19 +270,24 @@ body.intro-complete .nx-nav { opacity: 1; transform: none; }
 }
 
 .nx-hair {
-  position: absolute; left: 0; bottom: -1px; height: 1px; width: 0%;
+  position: absolute; left: 0; bottom: -1px; height: 1px; width: 100%;
+  /* progress driven by transform: scaleX() from ui.js — compositor-only,
+     no layout write on the scroll path */
+  transform: scaleX(0); transform-origin: 0 50%;
   background: linear-gradient(90deg, transparent, #cfd8e4 22%, var(--silver) 45%, var(--cyan) 75%, transparent);
   box-shadow: 0 0 10px rgba(0, 240, 255, 0.35); pointer-events: none;
 }
 
-/* live status strip pinned to the bottom of the viewport */
+/* live status strip pinned to the bottom of the viewport.
+   padding-bottom carries env(safe-area-inset-bottom) so the text clears the
+   iOS home indicator / Android gesture bar. */
 .nx-strip {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 20;
   display: flex; justify-content: space-between; gap: 1rem;
   padding: 0.55rem clamp(1.25rem, 4vw, 3rem);
+  padding-bottom: calc(0.55rem + env(safe-area-inset-bottom));
   font-family: var(--font-ui); font-size: 0.62rem; letter-spacing: 0.16em;
   color: var(--silver-4); border-top: 1px solid var(--line);
-  background: rgba(6, 8, 12, 0.5); backdrop-filter: blur(12px);
   pointer-events: none; user-select: none;
 }
 .nx-strip b { color: var(--silver-2); font-weight: 500; }
@@ -292,7 +302,11 @@ body.intro-complete .nx-nav { opacity: 1; transform: none; }
   align-items: center; padding: 7.5rem 0 3rem;
 }
 .nx-copy { position: relative; z-index: 3; pointer-events: none; }
-.nx-copy .nx-in { opacity: 0; animation: nxAppear 0.9s var(--ease) forwards; }
+.nx-copy .nx-in {
+  opacity: 0; animation: nxAppear 0.9s var(--ease) forwards;
+  /* paused until the boot gate lifts the overlay — the hero then animates in */
+  animation-play-state: paused;
+}
 .nx-copy .nx-in:nth-child(1) { animation-delay: 0.35s; }
 .nx-copy .nx-in:nth-child(2) { animation-delay: 0.5s; }
 .nx-copy .nx-in:nth-child(3) { animation-delay: 0.62s; }
@@ -300,6 +314,8 @@ body.intro-complete .nx-nav { opacity: 1; transform: none; }
 .nx-copy .nx-in:nth-child(5) { animation-delay: 0.82s; }
 .nx-copy .nx-in:nth-child(6) { animation-delay: 0.92s; }
 body.intro-complete .nx-copy .nx-in { animation-play-state: running; }
+/* no JS → the gate never runs → don't leave the hero invisible */
+@media (scripting: none) { .nx-copy .nx-in { animation-play-state: running; } }
 
 .nx-eyebrow {
   font-family: var(--font-ui); font-size: 0.72rem; letter-spacing: 0.24em;
@@ -347,8 +363,6 @@ body.intro-complete .nx-copy .nx-in { animation-play-state: running; }
   color: var(--silver); text-decoration: none;
   padding: 0.85rem 1.5rem; border-radius: 12px; cursor: pointer;
   border: 1px solid var(--line-2);
-  background: linear-gradient(180deg, rgba(255,255,255,0.07), rgba(255,255,255,0.015));
-  backdrop-filter: blur(10px);
   transition: border-color 0.3s, box-shadow 0.3s, transform 0.3s var(--ease), background 0.3s;
 }
 .nx-btn::before { content: "▸ "; color: var(--cyan); opacity: 0.85; }
@@ -372,8 +386,7 @@ body.intro-complete .nx-copy .nx-in { animation-play-state: running; }
   font-family: var(--font-ui); font-size: 0.66rem; letter-spacing: 0.1em;
   color: var(--silver-2); line-height: 1.6;
   max-width: 285px; padding: 0.75rem 1rem; border: 1px solid rgba(0, 240, 255, 0.28);
-  border-radius: 12px; background: rgba(8, 10, 14, 0.92);
-  backdrop-filter: blur(14px); position: relative;
+  border-radius: 12px; position: relative;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), 0 0 20px rgba(0, 240, 255, 0.15);
   opacity: 1 !important;
   pointer-events: auto;
@@ -485,7 +498,6 @@ body[data-bot-visible="0"] .nx-bubble--hero {
   border-radius: 999px; background: rgba(255, 255, 255, 0.025);
 }
 
-.nx-bubble-station { display: flex; flex-direction: column; align-items: center; gap: 1.2rem; }
 .nx-monitor { font-family: var(--font-ui); font-size: 0.6rem; letter-spacing: 0.22em; color: var(--silver-4); }
 
 /* reveal on scroll */
@@ -519,8 +531,6 @@ body[data-bot-visible="0"] .nx-bubble--hero {
   padding: 0.42rem 0.85rem;
   border-radius: 6px;
   border: 1px solid var(--line);
-  background: rgba(10, 15, 26, 0.65);
-  backdrop-filter: blur(8px);
   color: var(--silver-3);
   cursor: pointer;
   transition: all 0.25s ease;
@@ -544,8 +554,6 @@ body[data-bot-visible="0"] .nx-bubble--hero {
   padding: 1.25rem 1.4rem;
   border-radius: 12px;
   border: 1px solid var(--line-2);
-  background: linear-gradient(135deg, rgba(12, 18, 30, 0.75), rgba(6, 10, 18, 0.85));
-  backdrop-filter: blur(12px);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), inset 0 0 20px rgba(0, 240, 255, 0.04);
   pointer-events: auto;
   position: relative;
@@ -663,6 +671,16 @@ body[data-bot-visible="0"] .nx-bubble--hero {
   display: block;
   touch-action: none;
 }
+/* Touch flash hardening: no long-press text-selection / magnifier flash on the
+   globe stage or the telemetry HUD card (mirrors .nx-filter-pill's treatment).
+   Canvas box is the biggest tap target on mobile, so opt it out explicitly. */
+.nx-skills-stage,
+.nx-skills-stage canvas,
+.nx-telemetry-hud {
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+}
 .nx-globe-reticle {
   position: absolute;
   top: 6px;
@@ -701,25 +719,36 @@ body[data-bot-visible="0"] .nx-bubble--hero {
 @media (max-width: 900px) {
   .nx-hero-grid, .nx-beat-grid, .nx-skills-grid { grid-template-columns: 1fr; text-align: left; }
   .nx-stage { min-height: 44vh; order: 2; }
-  .nx-bubble--hero {
-    position: absolute;
-    left: 50%;
-    right: auto;
-    top: 10%;
-    transform: translateX(-50%) !important;
-    opacity: 1 !important;
+  /* 100vh is the TALL viewport on mobile (it ignores the collapsing URL bar),
+     so every beat overhung the visible screen and stacked up as empty space
+     below the copy. svh is the small/stable viewport and does not jump when
+     the bar hides. Padding is trimmed for the same reason. */
+  .nx-hero { min-height: 100svh; }
+  .nx-beat {
+    min-height: 100svh;
+    padding: 4.5rem 0 2.5rem;
+    /* see the note on the desktop rule above */
+    content-visibility: visible;
+    contain-intrinsic-size: none;
   }
-  .nx-bubble--hero::after {
-    left: 50%;
-    right: auto;
-    top: auto;
-    bottom: -6px;
-    border: none;
-    border-right: 1px solid rgba(0, 240, 255, 0.35);
-    border-bottom: 1px solid rgba(0, 240, 255, 0.35);
-    transform: translateX(-50%) rotate(45deg);
+  /* Botron bubble is hidden on mobile — the chat FAB (#nx-chat-fab) is the
+     entry point there. The old override (absolute / top:10% / opacity:1)
+     pinned the bubble 10% down the whole .ui-overlay document-height and
+     forced it visible over the hero copy; JS placement also can't help at
+     these widths (the pill alone is ~74% of the screen). */
+  .nx-bubble--hero {
+    display: none !important;
   }
   .nx-skills-stage { max-width: min(90vw, 360px); margin: 1.2rem auto 0; }
+}
+
+/* Fallback for browsers without svh support (older iOS): 100vh is better than
+   leaving the declaration invalid. */
+@supports not (height: 100svh) {
+  @media (max-width: 900px) {
+    .nx-hero { min-height: 100vh; }
+    .nx-beat { min-height: 100vh; }
+  }
 }
 
 /* custom cursor — active only on precise pointers; native cursor hidden */
@@ -829,14 +858,15 @@ html.lenis body { height: auto; }
   right: calc(50% + 30px);
 }
 .nx-timeline-card {
+  /* Flat panel is intentionally unclipped: the timeline top bar is a background layer,
+     so border-radius follows the corner curve without overflow:hidden or paint
+     containment. This also keeps the flat-panel treatment consistent. */
   width: calc(50% - 70px);
   margin-right: auto;
   margin-left: 0;
   padding: 16px 22px;
-  background: linear-gradient(135deg, rgba(16, 20, 27, 0.6) 0%, rgba(8, 10, 14, 0.6) 100%);
   border: 1px solid var(--line);
   border-radius: 12px;
-  backdrop-filter: blur(14px);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
   transition: border-color 0.3s, box-shadow 0.3s, transform 0.3s var(--ease);
 }
@@ -844,11 +874,10 @@ html.lenis body { height: auto; }
   margin-right: 0;
   margin-left: auto;
 }
-.nx-timeline-card:hover {
-  border-color: var(--cyan-dim);
-  box-shadow: 0 0 24px rgba(0, 240, 255, 0.10);
-  transform: translateY(-3px);
-}
+/* No hover state here on purpose: the shared card rule further down
+   (".nx-proj:hover, .nx-timeline-card:hover, .nx-quote:hover") outranks anything
+   declared at this point, so the cyan treatment lives in the ENHANCEMENT LAYER
+   next to the mission-deck accents. */
 .nx-timeline-card .nx-card-status {
   display: inline-flex;
   gap: 0.45rem;
@@ -890,7 +919,6 @@ html.lenis body { height: auto; }
   height: 100%;
   display: flex;
   flex-direction: column;
-  background: rgba(8, 10, 14, 0.45);
   border: 1px solid var(--line);
   border-radius: 12px;
   overflow: hidden;
@@ -1190,8 +1218,6 @@ html.lenis body { height: auto; }
   padding: 1.6rem;
   border: 1px solid var(--line);
   border-radius: 12px;
-  background: linear-gradient(180deg, rgba(8, 10, 14, 0.5) 0%, rgba(4, 5, 10, 0.5) 100%);
-  backdrop-filter: blur(10px);
   transition: border-color 0.3s, background 0.3s, transform 0.3s var(--ease), box-shadow 0.3s;
   display: flex;
   flex-direction: column;
@@ -1343,8 +1369,6 @@ html.lenis body { height: auto; }
   padding: 0.85rem 0.95rem;
   border: 1px solid var(--line-2);
   border-radius: 10px;
-  background: rgba(10, 15, 28, 0.75);
-  backdrop-filter: blur(12px);
   text-decoration: none;
   color: inherit;
   transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
@@ -1396,14 +1420,6 @@ html.lenis body { height: auto; }
   min-height: 520px;
   position: relative;
   pointer-events: none;
-}
-.nx-contact-stage .nx-bubble-station {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1.2rem;
-  position: absolute;
-  top: 20%;
 }
 .nx-contact-form {
   display: flex;
@@ -1463,7 +1479,7 @@ html.lenis body { height: auto; }
 .nx-field.has-error input,
 .nx-field.has-error textarea {
   border-color: var(--danger);
-  box-shadow: 0 0 0 3px rgba(0, 240, 255, 0.10);
+  box-shadow: 0 0 0 3px var(--danger-glow);
 }
 .nx-field.has-error .nx-field-error {
   opacity: 1;
@@ -1479,8 +1495,6 @@ html.lenis body { height: auto; }
   z-index: 10;
   width: 100%;
   border-top: 1px solid var(--line-2);
-  background: rgba(5, 7, 12, 0.88);
-  backdrop-filter: blur(16px);
   padding: 20px 0 calc(20px + 35px);
   pointer-events: auto;
 }
@@ -1610,7 +1624,7 @@ html.lenis body { height: auto; }
    Appended last so it wins over everything above.
    ============================================================ */
 
-/* --- ambient aurora atmosphere (drifts behind the 3D stage) --- */
+/* --- ambient aurora atmosphere (static gradients behind the 3D stage) --- */
 body::before, body::after {
   content: "";
   position: fixed;
@@ -1619,21 +1633,15 @@ body::before, body::after {
   height: 62vw;
   border-radius: 50%;
   pointer-events: none;
-  filter: blur(90px);
 }
 body::before {
   top: -24vw; right: -16vw;
   background: radial-gradient(circle, rgba(0, 240, 255, 0.13), transparent 65%);
-  animation: auroraDrift1 26s ease-in-out infinite alternate;
 }
 body::after {
   bottom: -28vw; left: -20vw;
   background: radial-gradient(circle, rgba(0, 240, 255, 0.08), transparent 65%);
-  animation: auroraDrift2 34s ease-in-out infinite alternate;
 }
-@keyframes auroraDrift1 { to { transform: translate3d(-6vw, 5vw, 0) scale(1.12); opacity: 0.4; } }
-@keyframes auroraDrift2 { to { transform: translate3d(5vw, -4vw, 0) scale(1.1); opacity: 0.42; } }
-
 /* --- selection, scrollbar, focus rings --- */
 ::selection { background: rgba(0, 240, 255, 0.2); color: #fff; }
 ::-webkit-scrollbar-thumb {
@@ -1711,7 +1719,6 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
 /* --- cards: quiet education-style treatment (subtle silver hairline, soft shadow) --- */
 .nx-proj, .nx-timeline-card, .nx-quote, .nx-telemetry-hud {
   border: 1px solid var(--line);
-  background: linear-gradient(135deg, rgba(13, 17, 26, 0.55), rgba(7, 9, 15, 0.72));
   box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
 }
 .nx-proj:hover, .nx-timeline-card:hover, .nx-quote:hover {
@@ -1719,6 +1726,119 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
   background: linear-gradient(135deg, rgba(17, 22, 33, 0.62), rgba(9, 12, 19, 0.78));
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
   transform: translateY(-4px);
+}
+
+/* --- projects: mission-deck accents -----------------------------------
+   The cards keep the quiet neutral base above, but get the section's cyan
+   treatment back (same polish level as the timeline spine / HUD bar / pill
+   halo): cyan hover, a gradient hairline, a sheen sweep over the screenshot
+   and a live status readout. All transform/opacity/shadow — no layout cost.
+   The always-on pieces also read on touch, where :hover never fires. */
+.nx-proj { position: relative; }
+.nx-proj::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--cyan), var(--cyan-soft));
+  opacity: 0.32;
+  z-index: 3;
+  pointer-events: none;
+  transition: opacity 0.3s var(--ease);
+}
+.nx-proj:hover::before { opacity: 1; }
+.nx-proj:hover {
+  border-color: rgba(0, 240, 255, 0.45);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45), 0 0 28px rgba(0, 240, 255, 0.14);
+}
+.nx-proj-thumb img { filter: brightness(0.85) saturate(0.95); }
+.nx-proj:hover .nx-proj-thumb img { filter: brightness(1) saturate(1.05); }
+.nx-proj-thumb::after {
+  content: "";
+  position: absolute;
+  top: 0; left: -70%;
+  width: 45%; height: 100%;
+  background: linear-gradient(105deg, transparent, rgba(0, 240, 255, 0.14), transparent);
+  transform: skewX(-22deg);
+  transition: left 0.65s var(--ease);
+  pointer-events: none;
+  z-index: 1; /* above the scanlines (::before), below the mission overlay (2) */
+}
+.nx-proj:hover .nx-proj-thumb::after { left: 135%; }
+.nx-proj-idx {
+  opacity: 1;
+  background: linear-gradient(135deg, var(--cyan), var(--cyan-soft));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+.nx-proj-status { display: inline-flex; align-items: center; gap: 0.42em; }
+.nx-proj-status::before {
+  content: "";
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--cyan);
+  box-shadow: 0 0 8px rgba(0, 240, 255, 0.85);
+  animation: nxStatusPulse 1.9s ease-in-out infinite;
+}
+@keyframes nxStatusPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+/* Same cyan hover treatment as the projects block, exposed only to precise pointers.
+   The timeline top bar is a background layer on hover, so border-radius clips it
+   to the corner curve without clipping the card or affecting its glass/blur state. */
+/* live status readout in the card header — this span was previously unstyled,
+   so it collapsed to a 0x0 (invisible) inline box; same 6px lamp as
+   .nx-proj-status::before. */
+.nx-pulse-light {
+  align-self: center;
+  flex: none;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--cyan);
+  box-shadow: 0 0 8px rgba(0, 240, 255, 0.85);
+  animation: nxStatusPulse 1.9s ease-in-out infinite;
+}
+/* standby: a lamp that is deliberately NOT live. The pulse is what reads as
+   "active", so the dim variant stays static -- but it is still a lit lens with a
+   soft halo, otherwise it reads as a dead pixel instead of a status. */
+.nx-pulse-light--dim {
+  background: var(--silver-2);
+  box-shadow: 0 0 8px rgba(205, 215, 228, 0.30);
+  animation: none;
+  opacity: 1;
+}
+
+/* hover-only polish: never fires under a finger, so touch keeps the static look */
+@media (hover: hover) and (pointer: fine) {
+  .nx-timeline-card:hover {
+    border-color: rgba(0, 240, 255, 0.45);
+    /* layer 1 is the cyan top bar. As a background layer it is clipped by the
+       12px border-radius exactly like the border is: it tapers into the corner
+       curve with no step, needs no overflow:hidden, and fuses with the cyan border
+       above it into one lit top edge instead of two parallel lines. */
+    background: linear-gradient(90deg, rgba(0, 240, 255, 0.45), rgba(103, 232, 249, 0.45)) no-repeat top left / 100% 2px,
+      linear-gradient(135deg, rgba(19, 26, 38, 0.66), rgba(10, 14, 22, 0.8));
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45), 0 0 28px rgba(0, 240, 255, 0.14);
+    transform: translateY(-4px);
+  }
+  /* the standby lamp acknowledges the row without pretending to be live: the
+     pulse stays off, only the lens brightens */
+  .nx-timeline-card:hover .nx-pulse-light--dim {
+    background: var(--silver);
+    box-shadow: 0 0 8px rgba(205, 215, 228, 0.5);
+  }
+  /* the row's tags warm up with the card; a single tag's own hover stays the
+     louder state (lift + glow), which is why the non-hovered ones are targeted */
+  .nx-timeline-card:hover .nx-tag:not(:hover) {
+    color: var(--silver);
+    border-color: rgba(0, 240, 255, 0.30);
+    background: rgba(0, 240, 255, 0.05);
+  }
 }
 
 /* --- section titles: subtle accent gradient text --- */
@@ -1746,6 +1866,21 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
   background: rgba(0, 240, 255, 0.07);
 }
 
+/* The dot answers the row it belongs to (translateX keeps it centred on the
+   spine, incl. the <=900px left rail). This MUST stay below the nth-child(even)
+   dot rule above: both selectors are 0,3,0, so the later one wins, and from up in
+   the card's hover block the even row's default glow was silently overriding this
+   bloom -- its dot scaled but never lit up. */
+@media (hover: hover) and (pointer: fine) {
+  .nx-timeline-dot {
+    transition: transform 0.35s var(--ease), box-shadow 0.35s var(--ease);
+  }
+  .nx-timeline-item:hover .nx-timeline-dot {
+    transform: translateX(-50%) scale(1.18);
+    box-shadow: 0 0 0 5px rgba(0, 240, 255, 0.16), 0 0 22px rgba(0, 240, 255, 0.9);
+  }
+}
+
 /* --- telemetry HUD accent bar --- */
 .nx-telemetry-hud::before { background: linear-gradient(180deg, var(--cyan), var(--cyan-soft)); }
 
@@ -1769,9 +1904,6 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
 /* --- footer: gradient hairline + social glow --- */
 .nx-footer {
   border-top: 1px solid transparent;
-  background:
-    linear-gradient(rgba(5, 7, 12, 0.88), rgba(5, 7, 12, 0.88)) padding-box,
-    linear-gradient(90deg, transparent, rgba(0, 240, 255, 0.50), transparent) border-box;
 }
 .nx-social-link:hover {
   box-shadow: 0 4px 16px rgba(0, 240, 255, 0.2), 0 0 26px rgba(0, 240, 255, 0.08);
@@ -1779,65 +1911,124 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
 
 /* --- reduced motion: disable ambient drift + sheen --- */
 @media (prefers-reduced-motion: reduce) {
-  body::before, body::after { animation: none; }
   .nx-btn::after { display: none; }
+  .nx-proj-thumb::after { display: none; }
+  .nx-proj-status::before { animation: none; }
+  .nx-pulse-light { animation: none; }
+  /* keep the timeline dot's hover glow, drop the scale pop */
+  .nx-timeline-item:hover .nx-timeline-dot { transform: translateX(-50%); }
 }
 
 /* ==========================================================================
    LOW-GPU & MOBILE ULTRA-FAST PERFORMANCE OPTIMIZATIONS
+   Single look now -- the old glass/quality-tier system was removed on purpose;
+   every visitor gets the flat-panel look. See docs/quality-tiers.md for the
+   removed glass design and how to bring it back.
    ========================================================================== */
 
-/* 1. Off-screen narrative beats layout skipping */
+/* Off-screen narrative beats layout skipping.
+   NOTE: this optimization is desktop-only. contain-intrinsic-size substitutes a
+   fixed-height box whenever a beat is off-screen, and on phones the beats are
+   TALLER than the 750px guess (100svh + padding), so scrolling swapped real
+   sections for 750px ghosts and produced large empty bands plus a jumpy scroll
+   length. The 900px override below turns it off for touch layouts. */
 .nx-beat {
   content-visibility: auto;
   contain-intrinsic-size: 1px 750px;
 }
 
-/* 2. Mobile glassmorphism blur optimization (saves GPU raster passes on mobile) */
+/* The flat panels are the only look on every device. The explicit `none`
+   resets are kept as a guard if an older cached stylesheet reintroduces glass. */
+.nx-nav,
+.nx-bubble,
+.nx-btn,
+.nx-filter-pill,
+.nx-telemetry-hud,
+.nx-timeline-card,
+.nx-quote,
+.nx-proj,
+.nx-mini {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background: rgba(8, 12, 22, 0.94);
+}
+
+/* These declarations exist with !important in the earlier base.css stylesheet,
+   so they need matching priority here. Their own hover/active selectors are
+   equally/more specific and remain later in this file. */
+.nx-filter-pill,
+.nx-telemetry-hud,
+.nx-contact-info .nx-mini {
+  background: rgba(8, 12, 22, 0.94) !important;
+}
+
+.nx-strip {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background: rgba(6, 8, 12, 0.94) !important;
+}
+
+.nx-nav-drawer {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background: rgba(6, 9, 16, 0.97) !important;
+}
+
+.nx-footer {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background: rgba(5, 7, 12, 0.94) !important;
+}
+
+.nx-timeline-card,
+.nx-proj,
+.nx-quote {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+}
+
+body::before,
+body::after {
+  filter: none !important;
+  animation: none !important;
+}
+
+/* Touch devices never rely on hover for essential state. Reset decorative
+   hover effects so a tap cannot leave a lifted card, bright image, sheen, or
+   glowing control stuck on screen; focus-visible remains available for keyboards. */
 @media (hover: none) and (pointer: coarse) {
-  .nx-nav,
-  .nx-bubble,
-  .nx-btn,
-  .nx-filter-pill,
-  .nx-telemetry-hud,
-  .nx-timeline-card,
-  .nx-quote,
-  .nx-proj,
-  .nx-mini {
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    background: rgba(8, 12, 22, 0.94) !important;
+  .nx-nav-link:hover,
+  .nx-proj:hover,
+  .nx-timeline-card:hover,
+  .nx-quote:hover,
+  .nx-edu:hover,
+  .nx-btn:hover,
+  .nx-tag:hover,
+  .nx-filter-pill:hover,
+  .nx-quotes-arrow:hover,
+  .nx-social-link:hover,
+  .nx-chat-fab:hover,
+  .nx-chat-chip:hover,
+  .nx-chat-send-btn:hover,
+  .nx-chat-scroll-btn:hover,
+  .nx-contact-info .nx-mini:hover {
+    transform: none !important;
   }
 
-  .nx-strip {
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    background: rgba(6, 8, 12, 0.94) !important;
-  }
-
-  .nx-drawer {
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    background: rgba(6, 9, 16, 0.97) !important;
-  }
-
-  .nx-footer {
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    background: rgba(5, 7, 12, 0.94) !important;
-  }
-
-  .nx-timeline-card,
-  .nx-proj,
-  .nx-quote {
+  .nx-proj:hover {
+    border-color: var(--line) !important;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6) !important;
   }
+  .nx-proj:hover::before { opacity: 0.32; }
+  .nx-proj:hover .nx-proj-thumb img { filter: brightness(0.85) saturate(0.95); }
+  .nx-proj:hover .nx-proj-thumb::after,
+  .nx-btn:hover::after { display: none; }
+  .nx-edu:hover::before,
+  .nx-edu:hover::after { width: 0; height: 0; border-color: transparent; }
+  .nx-social-link:hover { box-shadow: none !important; }
+  .nx-filter-pill:hover { box-shadow: none !important; }
+  .nx-nav-link:hover::after { transform: scaleX(0); }
+}
 
-  /* 3. Ambient aurora: keep the gradient, drop the 90px blur + infinite
-     animation (two 62vw fixed layers re-rastering under the WebGL canvas) */
-  body::before,
-  body::after {
-    filter: none !important;
-    animation: none !important;
-  }
+.nx-fx::before {
+  display: none !important;
 }

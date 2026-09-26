@@ -1,25 +1,25 @@
 // js/webgl/scene.js
 // Owns three.js renderer / scene / camera / controls + the
 // non-robot scene dressing (ground, grid, glow pad/ring, floating dust).
-import * as THREE from "three";
-import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
-import { IS_LOW_POWER } from "./config.js";
+import * as THREE from 'three';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
 export function setupScene({ container }) {
-  const isMobile = IS_LOW_POWER;
 
-  // --- Renderer (low-power + medium precision for zero fan noise) ---
+  // --- Renderer ---
+  // Must use highp: mobile GPUs (Mali/Adreno) implement mediump as 16-bit half-floats (max 65504).
+  // In PBR shaders (MeshStandardMaterial), Cook-Torrance GGX specular highlights exceed 65504,
+  // causing fp16 overflow (NaN / Inf) which renders as black speckles and blotches on shiny surfaces.
   const renderer = new THREE.WebGLRenderer({
     antialias: false,
-    powerPreference: "low-power",
-    precision: "mediump",
+    powerPreference: 'low-power',
+    precision: 'highp',
   });
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.0));
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.0;
-  renderer.shadowMap.enabled = !isMobile;
+  renderer.shadowMap.enabled = false; // low-power 3D path - see docs/quality-tiers.md
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   renderer.shadowMap.autoUpdate = false; // update only when the scene updates
   container.appendChild(renderer.domElement);
@@ -34,15 +34,28 @@ export function setupScene({ container }) {
   scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
 
   // --- Camera + controls (camera-story owns the actual framing/intro) ---
-  const camera = new THREE.PerspectiveCamera(
-    35,
-    window.innerWidth / window.innerHeight,
-    0.1,
-    5000
-  );
-  const controls = new OrbitControls(camera, renderer.domElement);
-  controls.enabled = false;
-  controls.update();
+  const camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 0.1, 5000);
+  // Controls shim — OrbitControls (~25 KB) was bundled but ALWAYS disabled:
+  // the camera story writes target and calls update() directly; nothing else
+  // of the class is ever used. (A temporary dev-only debug-camera.js used to
+  // lazily attach the real class for free-orbit pose tuning; it has been
+  // removed, so the real OrbitControls is now dead weight we never ship.)
+  //
+  // ⚠ update() MUST keep camera.lookAt(target): OrbitControls.update() ends
+  // with it (three r0.169, OrbitControls.js ~line 392) and it is the ONLY
+  // camera-orientation source in the app — camera-story.js sets position +
+  // target and relies on this call to aim the camera at each story beat.
+  // The other OrbitControls.update() work (spherical/pan/damping/limits) is
+  // a no-op here: enabled=false kills all input, damping is off, limits are
+  // unbounded. Removing the lookAt breaks every camera angle.
+  const controls = {
+    target: new THREE.Vector3(),
+    enabled: false,
+    domElement: renderer.domElement,
+    update() {
+      camera.lookAt(this.target);
+    },
+  };
 
   // --- Lighting: silver studio key, cool rim, faint cyan UI accent ---
   const key = new THREE.DirectionalLight(0xf2f5fa, 3.0);
@@ -67,19 +80,10 @@ export function setupScene({ container }) {
   const fill = new THREE.AmbientLight(0x3c4658, 0.35);
   scene.add(fill);
 
-  // --- Contact-shadow ground plane (only where shadows actually render) ---
-  // With shadowMap disabled, ShadowMaterial draws nothing visible but still
-  // costs a transparent full-screen-ish pass every frame — so don't create it.
-  if (!isMobile) {
-    const ground = new THREE.Mesh(
-      new THREE.PlaneGeometry(2400, 2400),
-      new THREE.ShadowMaterial({ opacity: 0.32 })
-    );
-    ground.rotation.x = -Math.PI / 2;
-    ground.position.y = -0.5;
-    ground.receiveShadow = true;
-    scene.add(ground);
-  }
+  // Ground plane / contact shadow: intentionally NOT created. With shadowMap
+  // disabled a ShadowMaterial plane draws nothing but still costs a pass.
+  // The full tier created it here - see docs/quality-tiers.md.
+  const ground = null;
 
   // --- Infinite silver grid (dissolves into the fog) ---
   const grid = new THREE.GridHelper(2600, 64, 0x3a4552, 0x1c222b);
@@ -91,7 +95,12 @@ export function setupScene({ container }) {
   // --- Theme glow: faint cyan pad + pulsing outer ring ---
   const glowDisc = new THREE.Mesh(
     new THREE.CircleGeometry(26, 64),
-    new THREE.MeshBasicMaterial({ color: 0x00f0ff, transparent: true, opacity: 0.045, depthWrite: false })
+    new THREE.MeshBasicMaterial({
+      color: 0x00f0ff,
+      transparent: true,
+      opacity: 0.045,
+      depthWrite: false,
+    })
   );
   glowDisc.rotation.x = -Math.PI / 2;
   glowDisc.position.y = -0.4;
@@ -99,7 +108,13 @@ export function setupScene({ container }) {
 
   const glowRing = new THREE.Mesh(
     new THREE.RingGeometry(26, 30, 72),
-    new THREE.MeshBasicMaterial({ color: 0xa78bfa, transparent: true, opacity: 0.06, depthWrite: false, side: THREE.DoubleSide })
+    new THREE.MeshBasicMaterial({
+      color: 0xa78bfa,
+      transparent: true,
+      opacity: 0.06,
+      depthWrite: false,
+      side: THREE.DoubleSide,
+    })
   );
   glowRing.rotation.x = -Math.PI / 2;
   glowRing.position.y = -0.38;
@@ -107,19 +122,28 @@ export function setupScene({ container }) {
 
   // --- Floating silver dust ---
   const pGeo = new THREE.BufferGeometry();
-  const pCount = isMobile ? 70 : 380;
+  const pCount = 70; // low-power dust count (full tier used 380)
   const pPos = new Float32Array(pCount * 3);
   for (let i = 0; i < pCount; i++) {
     pPos[i * 3 + 0] = (Math.random() - 0.5) * 1400;
     pPos[i * 3 + 1] = Math.random() * 320 - 40;
     pPos[i * 3 + 2] = (Math.random() - 0.5) * 900;
   }
-  pGeo.setAttribute("position", new THREE.BufferAttribute(pPos, 3));
+  pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
   const particles = new THREE.Points(
     pGeo,
-    new THREE.PointsMaterial({ color: 0xbcc6d4, size: 1.6, transparent: true, opacity: 0.5, depthWrite: false, sizeAttenuation: true })
+    new THREE.PointsMaterial({
+      color: 0xbcc6d4,
+      size: 1.6,
+      transparent: true,
+      opacity: 0.5,
+      depthWrite: false,
+      sizeAttenuation: true,
+    })
   );
   scene.add(particles);
 
-  return { renderer, scene, camera, controls, glowRing, particles };
+  // keyLight/ground stay in the returned object for callers, but nothing
+// downgrades at runtime any more - see docs/quality-tiers.md.
+  return { renderer, scene, camera, controls, glowRing, particles, keyLight: key, ground };
 }

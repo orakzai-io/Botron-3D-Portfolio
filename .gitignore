@@ -9,10 +9,11 @@ dist/
 .DS_Store
 .env
 .env.*
+# ...but the templates are documentation and MUST be committed.
+!.env.example
+!.env.*.example
 __pycache__/
 *.pyc
 venv/
 .venv/
 
-# HF deploy temp worktree (created by scripts/deploy-hf.ps1)
-.hf-deploy/

@@ -2,8 +2,8 @@
 // Content-tracking gaze.
 // Projects the robot's world position to NDC, then steers a smoothed yaw/pitch
 // toward the active section's card. robot.js reads state.yaw / state.pitch.
-import * as THREE from "three";
-import { GAZE_TARGETS, GAZE_YAW_BIAS } from "./config.js";
+import * as THREE from 'three';
+import { GAZE_TARGETS, GAZE_YAW_BIAS } from './config.js';
 
 // Exponential decay damping: 100% framerate-independent, never overshoots
 function damp(current, target, lambda, dt) {
@@ -63,17 +63,23 @@ export function createGaze({ camera, beats, getRobot, getGazeBeatIndex, getBotVi
         robotModel.getWorldPosition(_WB).project(camera);
         _cachedBotNX = _WB.x;
         _cachedBotNY = _WB.y;
-      } catch (_) { return; }
+      } catch (_) {
+        return;
+      }
     }
 
     if (!_cachedRect) return;
 
     // The card center, in the same NDC space.
-    const cx = (_cachedRect.left + _cachedRect.width * 0.5) / window.innerWidth * 2 - 1;
-    const cy = -(_cachedRect.top + _cachedRect.height * 0.5) / window.innerHeight * 2 + 1;
+    const cx = ((_cachedRect.left + _cachedRect.width * 0.5) / window.innerWidth) * 2 - 1;
+    const cy = (-(_cachedRect.top + _cachedRect.height * 0.5) / window.innerHeight) * 2 + 1;
 
     // The bot turns toward the card by their on-screen offset.
-    const yawT = THREE.MathUtils.clamp((cx - _cachedBotNX) * 1.3 + (GAZE_YAW_BIAS[beat.el.id] ?? 0), -1.25, 1.25);
+    const yawT = THREE.MathUtils.clamp(
+      (cx - _cachedBotNX) * 1.3 + (GAZE_YAW_BIAS[beat.el.id] ?? 0),
+      -1.25,
+      1.25
+    );
     state.yaw = damp(state.yaw, yawT, 6.0, dt);
 
     const pitchT = THREE.MathUtils.clamp((cy - _cachedBotNY) * 0.8, -0.5, 0.5);
