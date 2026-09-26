@@ -1,4 +1,4 @@
-# backend/rag.py
+# rag/rag.py
 """
 Vector RAG Engine for BOTRON.
 Uses Qdrant in-memory vector database with FastEmbed (BAAI/bge-small-en-v1.5)

@@ -1,4 +1,4 @@
-# backend/main.py
+# rag/main.py
 """
 FastAPI RAG Microservice for BOTRON.
 Integrates Vector Retrieval (FastEmbed) with Groq Cloud (Llama 3.3).

@@ -147,11 +147,11 @@ subscription for CPU Basic Docker Spaces**; use it only if you already have one.
 
 ```bash
 docker build -t botron-rag ./backend
-docker run -p 8000:8000 --env-file backend/.env botron-rag
+docker run -p 8000:8000 --env-file rag/.env botron-rag
 ```
 
 `.dockerignore` is essential here: the Dockerfile does `COPY . .`, so without it a
-local build copies `backend/.env` — and the real Groq key — into an image layer.
+local build copies `rag/.env` — and the real Groq key — into an image layer.
 
 ### Cold starts
 

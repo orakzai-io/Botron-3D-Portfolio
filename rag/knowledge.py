@@ -1,4 +1,4 @@
-# backend/knowledge.py
+# rag/knowledge.py
 """
 Dense, comprehensive knowledge base about Shahsawar Orakzai for Vector RAG.
 Includes full resume details, metrics, architecture deep-dives, live URLs, and verified links.
