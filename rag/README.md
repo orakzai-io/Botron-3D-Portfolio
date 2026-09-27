@@ -12,7 +12,7 @@ times** — this is the single most important thing to understand about this ser
 ### Phase A — once, at startup
 
 ```
-rag.py:203   retriever = VectorRetriever()      # module-level, runs on import
+retriever.py:203   retriever = VectorRetriever()      # module-level, runs on import
   ├── _init_qdrant()                           # loads BAAI/bge-small-en-v1.5
   └── _index_chunks()                          # embeds ALL chunks in one batch
         ├── embeddings = model.embed(texts)    # 16 texts -> 16 x 384-dim vectors
@@ -47,7 +47,7 @@ messages.
 
 ## Two retrieval backends
 
-`rag.py` attempts the dense path and silently falls back if the imports fail.
+`retriever.py` attempts the dense path and silently falls back if the imports fail.
 
 | | Dense (default in production) | Lexical fallback |
 | :--- | :--- | :--- |
@@ -193,7 +193,7 @@ distinguishing "nothing relevant" from "the model failed".
 | File | Role |
 | :--- | :--- |
 | `main.py` | FastAPI app, `/chat`, `/health`, Pydantic models, system prompt |
-| `rag.py` | Retrieval: dense + lexical backends, TF-IDF, relevance floor |
+| `retriever.py` | Retrieval: dense + lexical backends, TF-IDF, relevance floor |
 | `knowledge.py` | The indexed chunks — the single source of truth for what BOTRON can say |
 
 ## Adding knowledge

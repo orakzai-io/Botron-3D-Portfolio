@@ -19,7 +19,7 @@ from dotenv import load_dotenv
 # default is used instead.
 load_dotenv()
 
-from rag import retriever  # noqa: E402  (import order is load-bearing here)
+from retriever import retriever  # noqa: E402  (import order is load-bearing here)
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("botron-api")
