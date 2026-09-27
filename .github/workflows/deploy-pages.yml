@@ -25,10 +25,12 @@ permissions:
   pages: write
   id-token: write
 
-# Never run two deploys at once; queue instead of cancelling mid-publish.
+# Cancel stale runs rather than queueing them. For a static site the newest push
+# is always the one that should win, and queueing leaves old runs sitting in the
+# UI looking active.
 concurrency:
   group: pages
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   build:
@@ -57,6 +59,11 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           path: dist
+          # Expire quickly. Re-running a workflow reuses the same run ID, so
+          # without this a re-run stacks a second "github-pages" artifact and
+          # deploy-pages fails with:
+          #   Multiple artifacts named "github-pages" were unexpectedly found
+          retention-days: 1
 
   deploy:
     needs: build
