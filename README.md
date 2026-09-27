@@ -118,9 +118,9 @@ VITE_RAG_API_URL=http://localhost:8000/chat
 ├── assets/               # project screenshots, photos, fonts (Vite-imported)
 ├── public/                # files served verbatim, NOT processed by Vite
 │   └── assets/Shahsawar.dev.pdf
-├── backend/              # FastAPI RAG service  (see backend/README.md)
+├── rag/              # FastAPI RAG service  (see rag/README.md)
 │   ├── main.py           # /chat, /health, request model
-│   ├── rag.py            # retrieval: dense + TF-IDF, relevance floor
+│   ├── retriever.py      # retrieval: dense + TF-IDF, relevance floor
 │   └── knowledge.py      # the indexed knowledge chunks
 ```
 
@@ -136,7 +136,7 @@ VITE_RAG_API_URL=http://localhost:8000/chat
 > resume PDF lives in `public/assets/` because it is linked with a plain
 > `<a href>`, which the bundler cannot see or process.
 
-**More:** [backend/README.md](backend/README.md) — the RAG service in depth.
+**More:** [rag/README.md](rag/README.md) — the RAG service in depth.
 
 ## How it works
 
@@ -187,13 +187,13 @@ uses `base: "./"`, so it works on a root domain or a sub-path unchanged.
 **Backend** — FastAPI Cloud or any container host. Root directory `backend`,
 start command `uvicorn main:app --host 0.0.0.0 --port $PORT`, with `GROQ_API_KEY` and
 `MIN_SIMILARITY` set as environment variables. Full instructions in
-[backend/README.md](backend/README.md).
+[rag/README.md](rag/README.md).
 
 The frontend must be told where the backend lives via `VITE_RAG_API_URL` at build time.
 
 ## Security notes
 
-- `backend/.env` is gitignored and a `.dockerignore` keeps it out of container images
+- `rag/.env` is gitignored and a `.dockerignore` keeps it out of container images
 - `RAG_API_URL` is a build-time env var, so no deployment URL is committed
 - The Groq key is only ever used server-side; the browser never sees it
 - Bot replies pass through an allowlist HTML sanitiser before reaching `innerHTML`
