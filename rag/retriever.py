@@ -282,7 +282,17 @@ class VectorRetriever:
                 with_payload=True,
             )
 
-            return self._finalise(results, top_k, query, t0)
+        results = [
+            {
+                "id":         hit.payload["id"],
+                "title":      hit.payload["title"],
+                "category":   hit.payload["category"],
+                "content":    hit.payload["content"],
+                "similarity": round(float(hit.score), 4),
+            }
+            for hit in hits
+        ]
+        return self._finalise(results, top_k, query, t0)
 
     def _retrieve_lexical(self, query: str, top_k: int, t0: float):
         self._ensure_tfidf()
