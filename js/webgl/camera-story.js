@@ -16,7 +16,7 @@ const _VC = new THREE.Vector3();
 const _VT = new THREE.Vector3();
 const _VB = new THREE.Vector3();
 
-export function createCameraStory({ camera, controls }) {
+export function createCameraStory({ camera, controls, onScroll }) {
   const beats = [];
 
   const recollectBeats = () => {
@@ -129,9 +129,12 @@ export function createCameraStory({ camera, controls }) {
     smoothWheel: true,
     syncTouch: false, // Ensures mobile touch scrolling uses native GPU compositor momentum
   });
-  lenis.on('scroll', ScrollTrigger.update); // keep GSAP scrub in sync with Lenis
+  lenis.on('scroll', (e) => {
+    ScrollTrigger.update(); // keep GSAP scrub in sync with Lenis
+    if (onScroll) onScroll(e);
+  });
   gsap.ticker.add((time) => lenis.raf(time * 1000)); // drive Lenis through GSAP's ticker
-  gsap.ticker.lagSmoothing(0);
+  gsap.ticker.lagSmoothing(500, 33);
 
   // Scrubbed scroll → camera. Tight 0.25-0.4s scrub eliminates 1s rubber-band lag.
   ScrollTrigger.create({

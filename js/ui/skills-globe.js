@@ -412,14 +412,17 @@ export class SkillsGlobe {
 
   bindEvents() {
     let _resizePending = false;
+    let _lastW = window.innerWidth;
     window.addEventListener(
       'resize',
       () => {
-        if (_resizePending) return; // coalesce the URL-bar resize firehose to 1/frame
+        if (window.innerWidth === _lastW) return; // skip height-only URL bar collapse firehose
+        if (_resizePending) return;
         _resizePending = true;
         requestAnimationFrame(() => {
           _resizePending = false;
-          this.initCanvasSize(); // no-ops when width/height/dpr are unchanged
+          _lastW = window.innerWidth;
+          this.initCanvasSize();
         });
       },
       { passive: true }
@@ -903,12 +906,16 @@ export class SkillsGlobe {
     ctx.beginPath();
     ctx.arc(dotX, dotY, dotR, 0, Math.PI * 2);
     ctx.fillStyle = isHovered ? '#ffffff' : colors.dot;
-    ctx.shadowColor = colors.main;
-    ctx.shadowBlur = (isHovered ? 10 : 4) * S;
+    if (isHovered) {
+      ctx.shadowColor = colors.main;
+      ctx.shadowBlur = 8 * S;
+    }
     ctx.fill();
+    if (isHovered) {
+      ctx.shadowBlur = 0;
+    }
 
     // Text Label
-    ctx.shadowBlur = 0;
     ctx.fillStyle = isHovered
       ? '#ffffff'
       : isSelected

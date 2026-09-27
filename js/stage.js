@@ -27,7 +27,7 @@ window.addEventListener(
 );
 
 // Camera story owns the intro + the Lenis/GSAP scrub loop.
-const story = createCameraStory({ camera, controls });
+const story = createCameraStory({ camera, controls, onScroll: () => wakeRender(25) });
 // gaze reads the robot model via a getter so it can be created before the robot.
 const gaze = createGaze({
   camera,
@@ -231,12 +231,18 @@ window.addEventListener(
       const widthChanged = window.innerWidth !== _lastAppliedW;
       _bubbleW = 0;
       _bubbleH = 0;
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.0));
-      story.onResize?.({ widthChanged }); // camera-story refreshes ScrollTrigger only on width change
-      _lastAppliedW = window.innerWidth;
+      // ONLY reallocate WebGL canvas buffer on width changes (orientation flip).
+      // Height-only changes are the collapsing mobile URL bar; canvas is fixed inset:0.
+      if (widthChanged) {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.0));
+        story.onResize?.({ widthChanged: true });
+        _lastAppliedW = window.innerWidth;
+      } else {
+        story.onResize?.({ widthChanged: false });
+      }
     });
   },
   { passive: true }
@@ -252,18 +258,20 @@ let _isScrolling = true;
 let _settleFrames = 30; // initial frames on page load so scene initializes cleanly
 let _activityTimeout = null;
 
-function wakeRender(frames = 20) {
+function wakeRender(frames = 30) {
   _isScrolling = true;
   _settleFrames = Math.max(_settleFrames, frames);
   clearTimeout(_activityTimeout);
   _activityTimeout = setTimeout(() => {
     _isScrolling = false;
-  }, 140);
+  }, 400); // 400ms covers mobile touch-lift inertial momentum decay
 }
 
-window.addEventListener('scroll', () => wakeRender(20), { passive: true });
-window.addEventListener('wheel', () => wakeRender(20), { passive: true });
-window.addEventListener('touchmove', () => wakeRender(20), { passive: true });
+window.addEventListener('scroll', () => wakeRender(25), { passive: true });
+window.addEventListener('wheel', () => wakeRender(25), { passive: true });
+window.addEventListener('touchstart', () => wakeRender(35), { passive: true });
+window.addEventListener('touchmove', () => wakeRender(35), { passive: true });
+window.addEventListener('touchend', () => wakeRender(35), { passive: true });
 window.addEventListener('mousemove', () => wakeRender(15), { passive: true });
 window.addEventListener('resize', () => wakeRender(30), { passive: true });
 
@@ -277,10 +285,10 @@ function animate(currentTime) {
 
   // Dynamic Adaptive Refresh Rate:
   // - Active scroll / touch / cursor tracking: full 60 FPS for buttery smooth motion (zero judder).
-  // - Stationary reading (bot visible): throttled to 20-24 FPS for low-power idle breathing.
+  // - Stationary reading (bot visible): throttled to 30 FPS for smooth idle breathing without burning GPU.
   // - Stationary reading (bot hidden): deep sleep at 0 FPS (zero draw calls).
   const isInteracting = _isScrolling || _settleFrames > 0;
-  const currentFPS = isInteracting ? 60 : 20;
+  const currentFPS = isInteracting ? 60 : 30;
   const currentInterval = 1000 / currentFPS;
 
   const delta = currentTime - lastRenderTime;
@@ -295,6 +303,7 @@ function animate(currentTime) {
       _settleFrames--;
     } else {
       // GPU SLEEP STATE: Zero draw calls while user reads non-robot sections.
+      telemetry.setIdle?.();
       return;
     }
   }

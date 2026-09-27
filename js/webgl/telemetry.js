@@ -39,6 +39,14 @@ export function createTelemetry(mouse) {
     conn.addEventListener('change', updateNetwork, { passive: true });
   }
 
+  function setIdle() {
+    if (fpsEl && fpsEl.textContent !== 'IDLE') {
+      fpsEl.textContent = 'IDLE';
+    }
+    _fc = 0;
+    _ft = performance.now();
+  }
+
   function update() {
     _fc++;
     const now = performance.now();
@@ -53,5 +61,6 @@ export function createTelemetry(mouse) {
     }
   }
 
-  return { update };
+  return { update, setIdle };
 }
+
