@@ -244,8 +244,37 @@ class VectorRetriever:
         query = query.strip()[:2000]
 
         if self.use_qdrant and self._client and self._embed_model:
-            query_vec = list(self._embed_model.embed([query]))[0].tolist()
+            try:
+                return self._retrieve_dense(query, top_k, t0)
+            except Exception as e:
+                # Retrieval must never take the endpoint down. A vector-store
+                # API change or a model hiccup should degrade to lexical search,
+                # not 500 the whole chatbot.
+                logger.warning(
+                    "Dense retrieval failed (%s: %s). Falling back to TF-IDF for "
+                    "this request.", type(e).__name__, e
+                )
+                self.use_qdrant = False
+                self._ensure_tfidf()
 
+        return self._retrieve_lexical(query, top_k, t0)
+
+    def _retrieve_dense(self, query: str, top_k: int, t0: float):
+        query_vec = list(self._embed_model.embed([query]))[0].tolist()
+
+        # qdrant-client removed QdrantClient.search() in favour of
+        # query_points(). Which one exists depends on the installed version, and
+        # requirements.txt pins only a floor (>=1.9.0), so support both rather
+        # than hard-failing on whichever release pip resolved.
+        if hasattr(self._client, "query_points"):
+            response = self._client.query_points(
+                collection_name=COLLECTION_NAME,
+                query=query_vec,
+                limit=top_k,
+                with_payload=True,
+            )
+            hits = response.points
+        else:
             hits = self._client.search(
                 collection_name=COLLECTION_NAME,
                 query_vector=query_vec,
@@ -253,35 +282,47 @@ class VectorRetriever:
                 with_payload=True,
             )
 
-            results = [
-                {
-                    "id":         hit.payload["id"],
-                    "title":      hit.payload["title"],
-                    "category":   hit.payload["category"],
-                    "content":    hit.payload["content"],
-                    "similarity": round(float(hit.score), 4),
-                }
-                for hit in hits
-            ]
+            return self._finalise(results, top_k, query, t0)
 
-        else:
-            query_vec = self._tfidf_vector(query)
-            scored = [
-                {
-                    **chunk,
-                    "similarity": round(self._cosine_sim(query_vec, self._tfidf_vecs[i]), 4),
-                }
-                for i, chunk in enumerate(self.chunks)
-            ]
-            results = sorted(scored, key=lambda x: x["similarity"], reverse=True)[:top_k]
+    def _retrieve_lexical(self, query: str, top_k: int, t0: float):
+        self._ensure_tfidf()
+        query_vec = self._tfidf_vector(query)
+        scored = [
+            {
+                **chunk,
+                "similarity": round(self._cosine_sim(query_vec, self._tfidf_vecs[i]), 4),
+            }
+            for i, chunk in enumerate(self.chunks)
+        ]
+        results = sorted(scored, key=lambda x: x["similarity"], reverse=True)[:top_k]
+        return self._finalise(results, top_k, query, t0)
 
+    def _ensure_tfidf(self):
+        """Build the lexical index on demand.
+
+        Normally done once in __init__, but if the dense path fails at query
+        time we degrade to lexical -- and on that path the vectors may not have
+        been built yet, because _index_chunks() took the Qdrant branch.
+        """
+        if getattr(self, "_tfidf_vecs", None) and len(self._tfidf_vecs) == len(self.chunks):
+            return
+        texts = [f"{c['title']}: {c['content']}" for c in self.chunks]
+        self._tfidf_vocab = self._build_vocab(texts)
+        self._tfidf_idf = self._build_idf(texts)
+        self._idf = self._tfidf_idf
+        self._tfidf_vecs = [self._tfidf_vector(t) for t in texts]
+        logger.info("Built lexical index for %d chunks (on-demand).", len(self.chunks))
+
+    def _finalise(self, results, top_k, query, t0):
         # Drop anything below the relevance floor, and never return an empty
         # list of "matches" -- if nothing clears the bar, say so.
         results = [r for r in results if r["similarity"] >= MIN_SIMILARITY]
-
         dur_ms = (time.perf_counter() - t0) * 1000
         if not results:
-            logger.info("No chunk cleared MIN_SIMILARITY=%.2f for query %r", MIN_SIMILARITY, query[:60])
+            logger.info(
+                "No chunk cleared MIN_SIMILARITY=%.2f for query %r",
+                MIN_SIMILARITY, query[:60],
+            )
         return results, round(dur_ms, 2)
 
 
