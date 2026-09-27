@@ -45,7 +45,13 @@ jobs:
         run: npm ci
 
       - name: Build
+        # Vite inlines import.meta.env.VITE_* at BUILD time, so a repository
+        # variable does not reach the bundle unless it is explicitly mapped into
+        # the step environment. Without this the site silently builds with an
+        # empty RAG URL and the chat falls back to its offline answer.
         run: npm run build
+        env:
+          VITE_RAG_API_URL: ${{ vars.VITE_RAG_API_URL }}
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
