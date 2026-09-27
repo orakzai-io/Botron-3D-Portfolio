@@ -1,0 +1,64 @@
+# Deploys the static frontend to GitHub Pages on every push to main.
+#
+# Pages serves from a project sub-path (/<repo>/), which relative asset URLs
+# handle fine -- vite.config.js already uses base: "./", so no config change is
+# needed between a root domain and Pages.
+#
+# One-time setup in the GitHub UI (the workflow cannot do this for you):
+#   Settings -> Pages -> Build and deployment -> Source: "GitHub Actions"
+#
+# NOTE: this builds the FRONTEND only. The RAG service in rag/ is deployed
+# separately (FastAPI Cloud) and its URL is injected at build time via
+# VITE_RAG_API_URL. Add it as a repository variable under
+# Settings -> Secrets and variables -> Actions if you want the site to answer.
+
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: {}
+
+# Let the job write to Pages and request the OIDC token the deploy needs.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Never run two deploys at once; queue instead of cancelling mid-publish.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

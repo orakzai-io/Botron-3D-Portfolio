@@ -184,6 +184,10 @@ coarse pointers, where there is no cursor to track.
 **Frontend** — any static host. Build `npm run build`, publish `dist/`. `vite.config.js`
 uses `base: "./"`, so it works on a root domain or a sub-path unchanged.
 
+GitHub Pages is already wired up: pushing to `main` builds and publishes via
+`.github/workflows/deploy-pages.yml`. Set **Settings → Pages → Source** to
+*GitHub Actions* once, and every subsequent push redeploys.
+
 **Backend** — FastAPI Cloud or any container host. Root directory `backend`,
 start command `uvicorn main:app --host 0.0.0.0 --port $PORT`, with `GROQ_API_KEY` and
 `MIN_SIMILARITY` set as environment variables. Full instructions in
