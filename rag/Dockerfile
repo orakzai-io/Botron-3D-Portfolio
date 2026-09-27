@@ -13,8 +13,12 @@ RUN python -c "from fastembed import TextEmbedding; TextEmbedding(model_name='BA
 # Copy application source
 COPY . .
 
-# Expose port (Hugging Face Spaces defaults to 7860, standard to 8000)
-ENV PORT=7860
-EXPOSE 7860
+# Binds to the port the platform injects. Hardcoding a port here (7860 for HF
+# Spaces, 8000 locally) breaks on any host that assigns its own, which is what
+# FastAPI Cloud does -- the container comes up healthy and the platform still
+# reports the app as unreachable.
+ENV PORT=8000
+EXPOSE 8000
 
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "7860"]
+# sh -c so $PORT is expanded at runtime by the shell, not baked in at build time.
+CMD ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port ${PORT:-8000}"]
