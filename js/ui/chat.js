@@ -101,8 +101,7 @@ function scheduleRagWarmup() {
 // choose to emit it, and when it instead describes the photo in words the
 // images silently vanish. So photo intent is detected here and the tag is
 // injected regardless of what the model said. The prose still comes from the
-// RAG; only the image is ours.
-const PHOTO_INTENT = /\b(photo|photos|pic|pics|picture|pictures|image|images|portrait|portraits|snapshot|face|headshot|selfie|photograph|photographs|look\s+like|see\s+(him|his)|show\s+(me|him|his)|send\s+(me|his)|view)\b/i;
+const PHOTO_INTENT = /\b(photo|photos|pic|pics|picture|pictures|image|images|portrait|portraits|snapshot|face|headshot|selfie|photograph|photographs|look\s+like|see\s+(him|his)|show\s+(me|him|his)|send\s+(me|his)|view|who\s+is\s+(shahsawar|he|this|the\s+developer|the\s+creator)|tell\s+me\s+about\s+shahsawar)\b/i;
 const PHOTO_ALL = /\b(all|every|each|both)\b/i;
 const PHOTO_CHESS = /\b(chess|board|game|games|strategy|strategic|tactics)\b/i;
 const PHOTO_SWIM = /\b(swim|swimming|swimmer|medal|medals|medalist|pool|athlet|athletic|coach|coaching|competition)\b/i;
