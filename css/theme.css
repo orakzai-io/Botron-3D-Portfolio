@@ -736,9 +736,15 @@ body[data-bot-visible="0"] .bt-bubble--hero {
   .bt-beat {
     min-height: auto;
     padding: 5rem 0 3rem;
-    /* see the note on the desktop rule above */
-    content-visibility: visible;
-    contain-intrinsic-size: none;
+    /* The desktop performance block at the bottom of this file sets
+       content-visibility:auto + contain-intrinsic-size:750px, which replaces
+       off-screen sections with a fixed 750px placeholder. On mobile the real
+       section height varies wildly by screen width (text wraps more → taller),
+       so the 750px ghost is wrong on every phone and produces different-sized
+       gaps between sections. !important is needed here because that block
+       comes later in the cascade and would otherwise win. */
+    content-visibility: visible !important;
+    contain-intrinsic-size: none !important;
   }
   /* Botron bubble is hidden on mobile — the chat FAB (#bt-chat-fab) is the
      entry point there. The old override (absolute / top:10% / opacity:1)
