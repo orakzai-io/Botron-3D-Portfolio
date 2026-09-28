@@ -30,37 +30,65 @@ const RAG_HEALTH_URL = RAG_API_URL ? RAG_API_URL.replace(/\/chat\/?$/, '/health'
 // the page is idle so that cost is paid before the visitor types, not after.
 const RAG_WAKE_TIMEOUT_MS = 45000;
 
-// 'unknown' -> we have not asked yet; 'waking' -> ping in flight;
-// 'ready' -> answered; 'down' -> unreachable, do not keep trying.
-let ragState = RAG_HEALTH_URL ? 'waking' : 'down';
-let ragWakePromise = null;
+// States: 'probing' | 'waking' | 'ready' | 'offline'
+let ragState = RAG_HEALTH_URL ? 'probing' : 'offline';
+let ragProbeTimeout = null;
 
-function wakeRagBackend() {
-  if (!RAG_HEALTH_URL) return Promise.resolve(false);
-  if (ragState === 'ready') return Promise.resolve(true);
-  if (ragWakePromise) return ragWakePromise;
+async function checkRagHealth(timeoutMs = 15000) {
+  if (!RAG_HEALTH_URL) return false;
   const ctrl = new AbortController();
-  const t = setTimeout(() => ctrl.abort(), RAG_WAKE_TIMEOUT_MS);
-  ragState = 'waking';
-  ragWakePromise = fetch(RAG_HEALTH_URL, { signal: ctrl.signal })
-    .then((r) => {
-      clearTimeout(t);
-      ragState = r.ok ? 'ready' : 'down';
-      return r.ok;
-    })
-    .catch(() => {
-      clearTimeout(t);
-      ragState = 'down';
+  const t = setTimeout(() => ctrl.abort(), timeoutMs);
+
+  try {
+    const res = await fetch(RAG_HEALTH_URL, { signal: ctrl.signal });
+    clearTimeout(t);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+
+    if (data.status === 'ready') {
+      ragState = 'ready';
+      return true;
+    } else {
+      // Backend bound port instantly and is loading weights in background
+      ragState = 'waking';
+      if (ragProbeTimeout) clearTimeout(ragProbeTimeout);
+      ragProbeTimeout = setTimeout(() => checkRagHealth(10000), 2500);
       return false;
-    });
-  return ragWakePromise;
+    }
+  } catch (_err) {
+    clearTimeout(t);
+    ragState = 'offline';
+    // Self-healing: Schedule a background re-probe after 10s so recovery is automatic
+    if (ragProbeTimeout) clearTimeout(ragProbeTimeout);
+    ragProbeTimeout = setTimeout(() => checkRagHealth(15000), 10000);
+    return false;
+  }
+}
+
+// Keep-alive ping while page is visible so free-tier containers don't suspend mid-session
+function setupRagKeepAlive() {
+  if (!RAG_HEALTH_URL) return;
+
+  setInterval(() => {
+    if (document.visibilityState === 'visible' && ragState === 'ready') {
+      fetch(RAG_HEALTH_URL).catch(() => {});
+    }
+  }, 45000);
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && ragState !== 'ready') {
+      checkRagHealth(15000);
+    }
+  });
 }
 
 // Fire the warm-up without competing with the WebGL boot for bandwidth.
-// requestIdleCallback is not in Safari, hence the timeout fallback.
 function scheduleRagWarmup() {
   if (!RAG_HEALTH_URL) return;
-  const go = () => wakeRagBackend();
+  const go = () => {
+    checkRagHealth(RAG_WAKE_TIMEOUT_MS);
+    setupRagKeepAlive();
+  };
   if ('requestIdleCallback' in window) requestIdleCallback(go, { timeout: 4000 });
   else setTimeout(go, 2500);
 }
@@ -528,9 +556,16 @@ export function initChat() {
     input.value = '';
     showTypingIndicator();
 
-    // No backend configured (or it is known down): stay local and instant.
-    // Photos still work, because ensurePhotos() is independent of the backend.
-    if (!RAG_API_URL || ragState === 'down') {
+    // No backend configured: stay local and instant.
+    // If backend is currently offline, answer locally and trigger background probe.
+    if (!RAG_API_URL) {
+      removeTypingIndicator();
+      appendMessage(ensurePhotos(query, offlineAnswer(query)), 'bot');
+      return;
+    }
+
+    if (ragState === 'offline') {
+      checkRagHealth(10000);
       removeTypingIndicator();
       appendMessage(ensurePhotos(query, offlineAnswer(query)), 'bot');
       return;
@@ -538,8 +573,7 @@ export function initChat() {
 
     let timeoutId = null;
     try {
-      // While the host is still waking, allow the full wake window. Falling
-      // back after 3.5s here is what made a slow cold start look broken.
+      // While the host is waking or probing, allow the wake budget.
       const budget = ragState === 'ready' ? 12000 : RAG_WAKE_TIMEOUT_MS;
       const controller = new AbortController();
       timeoutId = setTimeout(() => controller.abort(), budget);
@@ -560,9 +594,7 @@ export function initChat() {
       appendMessage(ensurePhotos(query, formatMarkdown(answer)), 'bot', data);
     } catch (err) {
       if (timeoutId) clearTimeout(timeoutId);
-      // A timeout while we were still warming is NOT a failure of the backend,
-      // so we do not mark it down -- we just report it honestly.
-      const wasWaking = ragState === 'waking';
+      const wasWaking = ragState === 'waking' || ragState === 'probing';
       if (err && err.name === 'AbortError' && wasWaking) {
         removeTypingIndicator();
         appendMessage(
@@ -573,8 +605,9 @@ export function initChat() {
         );
         return;
       }
-      if (err && err.name === 'AbortError') ragState = 'down';
-      else ragState = 'down';
+      ragState = 'offline';
+      if (ragProbeTimeout) clearTimeout(ragProbeTimeout);
+      ragProbeTimeout = setTimeout(() => checkRagHealth(10000), 5000);
       removeTypingIndicator();
       appendMessage(ensurePhotos(query, offlineAnswer(query)), 'bot');
     }

@@ -86,7 +86,7 @@ summary and makes no network requests.
 To run the full RAG locally:
 
 ```bash
-cd backend
+cd rag
 python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 cp .env.example .env                                # add your GROQ_API_KEY
@@ -188,7 +188,7 @@ GitHub Pages is already wired up: pushing to `main` builds and publishes via
 `.github/workflows/deploy-pages.yml`. Set **Settings → Pages → Source** to
 *GitHub Actions* once, and every subsequent push redeploys.
 
-**Backend** — FastAPI Cloud or any container host. Root directory `backend`,
+**Backend** — FastAPI Cloud or any container host. Root directory `rag`,
 start command `uvicorn main:app --host 0.0.0.0 --port $PORT`, with `GROQ_API_KEY` and
 `MIN_SIMILARITY` set as environment variables. Full instructions in
 [rag/README.md](rag/README.md).

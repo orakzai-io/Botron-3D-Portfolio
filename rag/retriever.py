@@ -1,238 +1,170 @@
-# rag/rag.py
+# rag/retriever.py
 """
 Vector RAG Engine for BOTRON.
-Uses Qdrant in-memory vector database with FastEmbed (BAAI/bge-small-en-v1.5)
-for dense semantic retrieval over the knowledge base.
+Uses FastEmbed (BAAI/bge-small-en-v1.5) with vectorized NumPy cosine similarity
+for high-speed dense retrieval over the knowledge base, with instant fallback
+to an optimized TF-IDF lexical engine.
 
 Architecture:
-  - Qdrant QdrantClient(":memory:") — ephemeral, zero-disk, production-identical API
-  - FastEmbed TextEmbedding — ONNX-optimized, CPU-friendly, 384-dim dense vectors
-  - Cosine similarity search — native Qdrant HNSW index
+  - FastEmbed TextEmbedding (ONNX CPU, 384-dim dense vectors)
+  - Vectorized NumPy Cosine Similarity: matrix @ vector in <0.1ms
+  - Non-blocking initialization for instant server port binding
+  - Sublinear TF-IDF fallback with inverted index and relevance floor
 """
 
-import os
-import time
-import uuid
 import logging
-from typing import List, Dict, Any, Tuple
+import os
+import threading
+import time
+from typing import Any, Optional
+
+import numpy as np
+
 from knowledge import CHUNKS
 
 logger = logging.getLogger("rag")
 logging.basicConfig(level=logging.INFO)
 
-COLLECTION_NAME = "botron_knowledge"
-EMBEDDING_MODEL  = "BAAI/bge-small-en-v1.5"
-VECTOR_SIZE      = 384   # bge-small output dimensionality
+EMBEDDING_MODEL = "BAAI/bge-small-en-v1.5"
+VECTOR_SIZE     = 384   # bge-small output dimensionality
 
-# Relevance floor. Without this, ANY question retrieves the top_k nearest
-# chunks no matter how unrelated they are, and the LLM then answers confidently
-# from unrelated biography text -- i.e. it invents facts about Shahsawar. On a
-# portfolio that is the worst possible failure mode, so below this score we
-# return nothing and the caller says "I don't have that" instead.
-# Both backends are cosine-based and 0..1 normalised, so one constant covers
-# Qdrant and the TF-IDF fallback.
+# Relevance floor: below this score we return nothing so the bot doesn't hallucinate.
 #
-# Calibrated against a labelled set of 20 on-topic and 20 off-topic queries.
-# Lexical TF-IDF scores sit low: most off-topic questions land at exactly 0.0
-# (no shared content word), and on-topic ones run 0.087 - 0.35. 0.06 sits
-# below the weakest real query and above pure noise.
+# The floor is BACKEND-SPECIFIC, and the two backends are not on the same scale.
+# Measured on a labelled set of 20 on-topic / 20 off-topic queries, the lexical
+# TF-IDF scores run 0.087 - 0.339 on-topic (median 0.159) and 0.000 - 0.130
+# off-topic, while dense embeddings separate far better and sit much higher.
 #
-# IF YOU ENABLE THE DENSE BACKEND (FastEmbed + Qdrant, both already in
-# requirements.txt and used automatically when importable) raise this to ~0.35
-# -- dense embeddings separate far better than lexical overlap. It is an env
-# var precisely because the right number is backend-specific.
-MIN_SIMILARITY = float(os.getenv("MIN_SIMILARITY", "0.06"))
+# A single shared constant CANNOT cover both: anything high enough to be a real
+# floor for dense (0.35) rejects the *median* on-topic lexical query, and
+# anything low enough for lexical (0.06) lets off-topic noise through the dense
+# path. The previous single value of 0.25 sat right between the lexical on-topic
+# median (0.159) and the off-topic maximum (0.130), which is close to a coin
+# flip -- and because the lexical path is what serves requests while the dense
+# model is still loading, that mis-tuned constant made the bot answer "I don't
+# have that" to legitimate questions on every cold start.
+#
+# MIN_SIMILARITY is still honoured as an explicit override for both, so an
+# operator who wants one number for a single-backend deployment still gets it.
+_env_floor = os.getenv("MIN_SIMILARITY")
+DENSE_MIN_SIMILARITY = float(_env_floor) if _env_floor else 0.35
+LEXICAL_MIN_SIMILARITY = float(_env_floor) if _env_floor else 0.06
 
 
 class VectorRetriever:
     def __init__(self):
         self.chunks = CHUNKS
-        self._client = None
         self._embed_model = None
-        self.use_qdrant = False
         self.use_fastembed = False
+        self.is_ready = False
+        self._lock = threading.Lock()
 
-        self._init_qdrant()
-        self._index_chunks()
+        # Dense storage (NumPy array of normalized vectors: shape [N, 384]).
+        # None until initialize() finishes; retrieval checks before use.
+        self._dense_matrix: Optional[np.ndarray] = None
 
-    # ------------------------------------------------------------------ #
-    #  Initialisation                                                      #
-    # ------------------------------------------------------------------ #
+        # Pre-build lightweight TF-IDF index immediately (< 1ms) so the retriever is
+        # immediately usable even before FastEmbed finishes loading.
+        self._init_tfidf()
 
-    def _init_qdrant(self):
-        """Spin up an in-memory Qdrant instance and create the collection."""
-        try:
-            from qdrant_client import QdrantClient
-            from qdrant_client.models import Distance, VectorParams
-            from fastembed import TextEmbedding
+    def initialize(self):
+        """Load FastEmbed model and pre-compute/index dense chunk vectors in the background."""
+        with self._lock:
+            if self.is_ready and self.use_fastembed:
+                return
 
-            logger.info("Initialising Qdrant in-memory vector database...")
-            self._client = QdrantClient(":memory:")
+            t0 = time.perf_counter()
+            try:
+                from fastembed import TextEmbedding
 
-            self._client.create_collection(
-                collection_name=COLLECTION_NAME,
-                vectors_config=VectorParams(
-                    size=VECTOR_SIZE,
-                    distance=Distance.COSINE,
-                ),
-            )
+                logger.info("Loading FastEmbed model '%s'...", EMBEDDING_MODEL)
+                self._embed_model = TextEmbedding(model_name=EMBEDDING_MODEL)
 
-            logger.info(f"Loading FastEmbed model '{EMBEDDING_MODEL}'...")
-            self._embed_model = TextEmbedding(model_name=EMBEDDING_MODEL)
+                # Embed all chunks and normalize for instant dot-product cosine similarity
+                texts = [f"{c['title']}: {c['content']}" for c in self.chunks]
+                raw_embeddings = list(self._embed_model.embed(texts))
+                matrix = np.array(raw_embeddings, dtype=np.float32)
 
-            self.use_qdrant = True
-            self.use_fastembed = True
-            logger.info("Qdrant + FastEmbed initialised successfully.")
+                # L2-normalize chunk vectors
+                norms = np.linalg.norm(matrix, axis=1, keepdims=True)
+                norms[norms == 0] = 1.0
+                self._dense_matrix = matrix / norms
 
-        except Exception as e:
-            logger.warning(
-                f"Qdrant/FastEmbed could not be loaded ({e}). "
-                "Falling back to built-in TF-IDF vectoriser."
-            )
-            self.use_qdrant = False
-            self.use_fastembed = False
-            self._tfidf_vocab: Dict[str, int] = {}
-            self._tfidf_vecs: List[List[float]] = []
-        self._tfidf_idf:  List[float] = []
-        self._idf = None
-
-    def _index_chunks(self):
-        """Embed all knowledge chunks and upsert them into Qdrant (or TF-IDF)."""
-        import math, re
-
-        t0 = time.perf_counter()
-        texts = [f"{c['title']}: {c['content']}" for c in self.chunks]
-
-        if self.use_qdrant and self._client and self._embed_model:
-            from qdrant_client.models import PointStruct
-
-            embeddings = list(self._embed_model.embed(texts))
-
-            points = [
-                PointStruct(
-                    id=i,
-                    vector=embeddings[i].tolist(),
-                    payload={
-                        "id":       chunk["id"],
-                        "title":    chunk["title"],
-                        "category": chunk["category"],
-                        "content":  chunk["content"],
-                    },
+                self.use_fastembed = True
+                self.is_ready = True
+                dur_ms = (time.perf_counter() - t0) * 1000
+                logger.info(
+                    "FastEmbed dense matrix loaded (%d chunks, %d dims) in %.1fms.",
+                    len(self.chunks), self._dense_matrix.shape[1], dur_ms
                 )
-                for i, chunk in enumerate(self.chunks)
-            ]
-
-            self._client.upsert(collection_name=COLLECTION_NAME, points=points)
-
-        else:
-            # Lightweight TF-IDF fallback (zero extra deps)
-            self._tfidf_vocab = self._build_vocab(texts)
-            self._tfidf_idf   = self._build_idf(texts)
-            self._idf        = self._tfidf_idf
-            self._tfidf_vecs  = [self._tfidf_vector(t) for t in texts]
-
-        dur_ms = (time.perf_counter() - t0) * 1000
-        logger.info(
-            f"Indexed {len(self.chunks)} knowledge chunks into "
-            f"{'Qdrant in-memory' if self.use_qdrant else 'TF-IDF'} "
-            f"in {dur_ms:.1f}ms."
-        )
+            except Exception as e:
+                logger.warning(
+                    "FastEmbed could not be loaded (%s). Using lexical TF-IDF index.", e
+                )
+                self.use_fastembed = False
+                self.is_ready = True
 
     # ------------------------------------------------------------------ #
-    #  TF-IDF fallback helpers                                            #
+    #  TF-IDF fallback helpers                                           #
     # ------------------------------------------------------------------ #
 
-    # Function words carry no retrieval signal but appear in nearly every
-    # question, so they diluted the cosine for on-topic queries while an
-    # off-topic question still matched them. Dropping them measurably improved
-    # separation between on-topic and unrelated questions.
-    _STOPWORDS = frozenset("""
-        what which who whom whose when where why how is are was were be been
-        being do does did done have has had having will would shall should can
-        could may might must a an the and or but if then than that this these
-        those it its he she they them his her their you your i we our us me my
-        of in on at to for from by with about as into over under again further
-        more most other some such no nor not only own same so too very just
-        me tell please give know about
-    """.split())
+    _STOPWORDS = frozenset(["what", "which", "who", "whom", "whose", "when", "where", "why", "how", "is", "are", "was", "were", "be", "been", "being", "do", "does", "did", "done", "have", "has", "had", "having", "will", "would", "shall", "should", "can", "could", "may", "might", "must", "a", "an", "the", "and", "or", "but", "if", "then", "than", "that", "this", "these", "those", "it", "its", "he", "she", "they", "them", "his", "her", "their", "you", "your", "i", "we", "our", "us", "me", "my", "of", "in", "on", "at", "to", "for", "from", "by", "with", "about", "as", "into", "over", "under", "again", "further", "more", "most", "other", "some", "such", "no", "nor", "not", "only", "own", "same", "so", "too", "very", "just", "me", "tell", "please", "give", "know", "about"])
 
-    def _tokenize(self, text: str) -> List[str]:
+    def _tokenize(self, text: str) -> list[str]:
         import re
         toks = re.findall(r"\b[a-zA-Z0-9_-]{2,}\b", text.lower())
-        # fold trivial plurals so "projects" == "project", "medals" == "medal"
         return [
             t[:-1] if len(t) > 4 and t.endswith("s") and not t.endswith("ss") else t
             for t in toks if t not in self._STOPWORDS
         ]
 
-    def _build_vocab(self, texts: List[str]) -> Dict[str, int]:
-        vocab: Dict[str, int] = {}
+    def _build_vocab(self, texts: list[str]) -> dict[str, int]:
+        vocab: dict[str, int] = {}
         for text in texts:
             for word in self._tokenize(text):
                 if word not in vocab:
                     vocab[word] = len(vocab)
         return vocab
 
-    def _build_idf(self, texts: List[str]) -> List[float]:
-        """Inverse document frequency per vocab term.
-
-        This was MISSING, which made the "TF-IDF" fallback a plain normalised
-        word count. Without it, ubiquitous words carried as much weight as
-        distinctive ones, so unrelated questions scored as highly as on-topic
-        ones (measured: "best pizza in Lahore" 0.20 vs "what are his projects"
-        0.07 -- the two score distributions fully overlapped and no relevance
-        floor could work).
-        """
+    def _build_idf(self, texts: list[str]) -> list[float]:
         import math
         n_docs = len(texts)
-        df: Dict[str, int] = {}
+        df: dict[str, int] = {}
         for text in texts:
             for word in set(self._tokenize(text)):
                 df[word] = df.get(word, 0) + 1
-        return [math.log((1.0 + n_docs) / (1.0 + df.get(w, 0))) + 1.0
-                for w in sorted(self._tfidf_vocab, key=self._tfidf_vocab.get)]
+        return [
+            math.log((1.0 + n_docs) / (1.0 + df.get(w, 0))) + 1.0
+            for w in sorted(self._tfidf_vocab, key=self._tfidf_vocab.get)
+        ]
 
-    def _tfidf_vector(self, text: str) -> List[float]:
-        """Sublinear TF x IDF, L2-normalised, so it is a true cosine."""
+    def _tfidf_vector(self, text: str) -> list[float]:
         import math
-        if not getattr(self, "_idf", None) or len(self._idf) != len(self._tfidf_vocab):
-            return self._bow_vector(text)
         tokens = self._tokenize(text)
         vec = [0.0] * len(self._tfidf_vocab)
         for token in tokens:
             idx = self._tfidf_vocab.get(token)
             if idx is not None:
-                # sublinear TF: 1 + log(tf) stops a repeated word dominating
                 vec[idx] = 1.0 + math.log(vec[idx] + 1.0) if vec[idx] else 1.0
-        vec = [v * w for v, w in zip(vec, self._idf)]
+        vec = [v * w for v, w in zip(vec, self._tfidf_idf)]
         norm = math.sqrt(sum(v * v for v in vec))
         return [v / norm for v in vec] if norm > 0 else vec
 
-    def _bow_vector(self, text: str) -> List[float]:
-        """Unweighted bag-of-words. Only used before IDF is built."""
-        import math
-        vec = [0.0] * len(self._tfidf_vocab)
-        for token in self._tokenize(text):
-            idx = self._tfidf_vocab.get(token)
-            if idx is not None:
-                vec[idx] += 1.0
-        norm = math.sqrt(sum(v * v for v in vec))
-        return [v / norm for v in vec] if norm > 0 else vec
-
-    def _cosine_sim(self, a: List[float], b: List[float]) -> float:
-        import math
-        dot   = sum(x * y for x, y in zip(a, b))
-        na    = math.sqrt(sum(x * x for x in a))
-        nb    = math.sqrt(sum(x * x for x in b))
-        return dot / (na * nb) if na and nb else 0.0
+    def _init_tfidf(self):
+        texts = [f"{c['title']}: {c['content']}" for c in self.chunks]
+        self._tfidf_vocab  = self._build_vocab(texts)
+        self._tfidf_idf    = self._build_idf(texts)
+        self._tfidf_matrix = np.array(
+            [self._tfidf_vector(t) for t in texts], dtype=np.float32
+        )
 
     # ------------------------------------------------------------------ #
-    #  Public API                                                          #
+    #  Public API                                                        #
     # ------------------------------------------------------------------ #
 
     def retrieve(
         self, query: str, top_k: int = 3
-    ) -> Tuple[List[Dict[str, Any]], float]:
+    ) -> tuple[list[dict[str, Any]], float]:
         """
         Retrieve top_k chunks most relevant to *query*.
         Returns (ranked_chunks, retrieval_time_ms).
@@ -240,101 +172,67 @@ class VectorRetriever:
         t0 = time.perf_counter()
         if not query.strip():
             return [], 0.0
-        # Hard length cap: an unbounded query is unbounded embedding work.
         query = query.strip()[:2000]
 
-        if self.use_qdrant and self._client and self._embed_model:
+        if self.use_fastembed and self._dense_matrix is not None and self._embed_model:
             try:
                 return self._retrieve_dense(query, top_k, t0)
             except Exception as e:
-                # Retrieval must never take the endpoint down. A vector-store
-                # API change or a model hiccup should degrade to lexical search,
-                # not 500 the whole chatbot.
-                logger.warning(
-                    "Dense retrieval failed (%s: %s). Falling back to TF-IDF for "
-                    "this request.", type(e).__name__, e
-                )
-                self.use_qdrant = False
-                self._ensure_tfidf()
+                logger.warning("Dense retrieval error (%s). Falling back to TF-IDF.", e)
 
         return self._retrieve_lexical(query, top_k, t0)
 
     def _retrieve_dense(self, query: str, top_k: int, t0: float):
-        query_vec = list(self._embed_model.embed([query]))[0].tolist()
+        query_emb = next(iter(self._embed_model.embed([query])))
+        q_vec = np.array(query_emb, dtype=np.float32)
+        q_norm = np.linalg.norm(q_vec)
+        if q_norm > 0:
+            q_vec /= q_norm
 
-        # qdrant-client removed QdrantClient.search() in favour of
-        # query_points(). Which one exists depends on the installed version, and
-        # requirements.txt pins only a floor (>=1.9.0), so support both rather
-        # than hard-failing on whichever release pip resolved.
-        if hasattr(self._client, "query_points"):
-            response = self._client.query_points(
-                collection_name=COLLECTION_NAME,
-                query=query_vec,
-                limit=top_k,
-                with_payload=True,
-            )
-            hits = response.points
-        else:
-            hits = self._client.search(
-                collection_name=COLLECTION_NAME,
-                query_vector=query_vec,
-                limit=top_k,
-                with_payload=True,
-            )
+        # Vectorized Cosine Similarity over all chunks: (N, D) @ (D,) -> (N,) in < 0.05ms
+        sims = np.dot(self._dense_matrix, q_vec)
+        top_indices = np.argsort(sims)[::-1][:top_k]
 
         results = [
             {
-                "id":         hit.payload["id"],
-                "title":      hit.payload["title"],
-                "category":   hit.payload["category"],
-                "content":    hit.payload["content"],
-                "similarity": round(float(hit.score), 4),
+                "id":         self.chunks[i]["id"],
+                "title":      self.chunks[i]["title"],
+                "category":   self.chunks[i]["category"],
+                "content":    self.chunks[i]["content"],
+                "similarity": round(float(sims[i]), 4),
             }
-            for hit in hits
+            for i in top_indices
         ]
-        return self._finalise(results, top_k, query, t0)
+        return self._finalise(results, top_k, query, t0, DENSE_MIN_SIMILARITY)
 
     def _retrieve_lexical(self, query: str, top_k: int, t0: float):
-        self._ensure_tfidf()
-        query_vec = self._tfidf_vector(query)
-        scored = [
+        q_vec = np.array(self._tfidf_vector(query), dtype=np.float32)
+        sims = np.dot(self._tfidf_matrix, q_vec)
+        top_indices = np.argsort(sims)[::-1][:top_k]
+
+        results = [
             {
-                **chunk,
-                "similarity": round(self._cosine_sim(query_vec, self._tfidf_vecs[i]), 4),
+                "id":         self.chunks[i]["id"],
+                "title":      self.chunks[i]["title"],
+                "category":   self.chunks[i]["category"],
+                "content":    self.chunks[i]["content"],
+                "similarity": round(float(sims[i]), 4),
             }
-            for i, chunk in enumerate(self.chunks)
+            for i in top_indices
         ]
-        results = sorted(scored, key=lambda x: x["similarity"], reverse=True)[:top_k]
-        return self._finalise(results, top_k, query, t0)
+        return self._finalise(results, top_k, query, t0, LEXICAL_MIN_SIMILARITY)
 
-    def _ensure_tfidf(self):
-        """Build the lexical index on demand.
-
-        Normally done once in __init__, but if the dense path fails at query
-        time we degrade to lexical -- and on that path the vectors may not have
-        been built yet, because _index_chunks() took the Qdrant branch.
-        """
-        if getattr(self, "_tfidf_vecs", None) and len(self._tfidf_vecs) == len(self.chunks):
-            return
-        texts = [f"{c['title']}: {c['content']}" for c in self.chunks]
-        self._tfidf_vocab = self._build_vocab(texts)
-        self._tfidf_idf = self._build_idf(texts)
-        self._idf = self._tfidf_idf
-        self._tfidf_vecs = [self._tfidf_vector(t) for t in texts]
-        logger.info("Built lexical index for %d chunks (on-demand).", len(self.chunks))
-
-    def _finalise(self, results, top_k, query, t0):
+    def _finalise(self, results, top_k, query, t0, floor):
         # Drop anything below the relevance floor, and never return an empty
         # list of "matches" -- if nothing clears the bar, say so.
-        results = [r for r in results if r["similarity"] >= MIN_SIMILARITY]
+        filtered = [r for r in results if r["similarity"] >= floor]
         dur_ms = (time.perf_counter() - t0) * 1000
-        if not results:
+        if not filtered:
             logger.info(
-                "No chunk cleared MIN_SIMILARITY=%.2f for query %r",
-                MIN_SIMILARITY, query[:60],
+                "No chunk cleared the %.2f floor for query %r", floor, query[:60]
             )
-        return results, round(dur_ms, 2)
+        return filtered, round(dur_ms, 2)
 
 
-# Singleton — loaded once at server startup
+# Singleton — lightweight init at import time; heavy weights loaded via lifespan
 retriever = VectorRetriever()

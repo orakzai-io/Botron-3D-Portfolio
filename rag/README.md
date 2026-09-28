@@ -106,7 +106,7 @@ a formatter or linter does not helpfully reorder it back.
 ## Running locally
 
 ```bash
-cd backend
+cd rag
 python -m venv .venv
 source .venv/bin/activate          # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
@@ -134,7 +134,7 @@ Connect this repository and set:
 
 | Setting | Value |
 | :--- | :--- |
-| Root directory | `backend` |
+| Root directory | `rag` |
 | Build command | `pip install -r requirements.txt` |
 | Start command | `uvicorn main:app --host 0.0.0.0 --port $PORT` |
 | Environment | `GROQ_API_KEY`, `MIN_SIMILARITY=0.35`, `GROQ_MODELS` |
@@ -146,7 +146,7 @@ subscription for CPU Basic Docker Spaces**; use it only if you already have one.
 ### Any container host
 
 ```bash
-docker build -t botron-rag ./backend
+docker build -t botron-rag ./rag
 docker run -p 8000:8000 --env-file rag/.env botron-rag
 ```
 

@@ -1,12 +1,9 @@
 # The [standard] extra pulls in the `fastapi run` CLI plus uvicorn[standard].
-# The platform invokes the `fastapi` command, which hard-fails at import time
-# without it: RuntimeError: To use the fastapi command, please install
-# "fastapi[standard]". Installing the extra also covers plain `uvicorn`.
 fastapi[standard]>=0.110.0
 uvicorn>=0.28.0
 groq>=0.9.0
 fastembed>=0.2.7
-qdrant-client>=1.9.0
 numpy>=1.24.0
 python-dotenv>=1.0.0
 pydantic>=2.6.0
+ruff>=0.4.0

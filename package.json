@@ -9,8 +9,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "fonts": "node scripts/fetch-fonts.mjs",
-    "format": "prettier --write \"js/**/*.js\" \"css/**/*.css\" \"*.{html,json}\" \"backend/**/*.py\"",
-    "format:check": "prettier --check \"js/**/*.js\" \"css/**/*.css\" \"*.{html,json}\" \"backend/**/*.py\""
+    "format": "prettier --write \"js/**/*.js\" \"css/**/*.css\" \"*.{html,json}\"",
+    "format:check": "prettier --check \"js/**/*.js\" \"css/**/*.css\" \"*.{html,json}\""
   },
   "dependencies": {
     "gsap": "3.12.5",
