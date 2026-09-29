@@ -509,48 +509,6 @@ body[data-bot-visible="0"] .bt-bubble--hero {
 
 /* ---------- skills: 3D holographic globe & telemetry HUD ---------- */
 .bt-beat--skills { align-items: center; }
-.bt-skills-grid {
-  width: min(1280px, 92vw);
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: minmax(0, 520px) 1fr;
-  gap: clamp(1.5rem, 5vw, 4.5rem);
-  align-items: center;
-}
-
-/* Category Filter Bar */
-.bt-filter-bar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-top: 1.4rem;
-  margin-bottom: 1.6rem;
-  pointer-events: auto;
-}
-.bt-filter-pill {
-  font-family: var(--font-ui);
-  font-size: 0.68rem;
-  letter-spacing: 0.08em;
-  padding: 0.42rem 0.85rem;
-  border-radius: 6px;
-  border: 1px solid var(--line);
-  color: var(--silver-3);
-  cursor: pointer;
-  transition: all 0.25s ease;
-  user-select: none;
-}
-.bt-filter-pill:hover {
-  color: var(--silver-1);
-  border-color: var(--line-2);
-  background: rgba(15, 23, 42, 0.85);
-  transform: translateY(-1px);
-}
-.bt-filter-pill.active {
-  color: var(--cyan);
-  border-color: var(--cyan);
-  background: rgba(0, 240, 255, 0.12);
-  box-shadow: 0 0 16px rgba(0, 240, 255, 0.2);
-}
 
 /* Telemetry HUD Card */
 .bt-telemetry-hud {
