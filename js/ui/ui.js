@@ -3,6 +3,8 @@
 (function () {
   const fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
   const root = document.documentElement;
+  const coarseMQ = window.matchMedia('(hover: none) and (pointer: coarse)');
+  const LIT_CARDS = '.bt-proj, .bt-timeline-card, .bt-edu, .bt-quote';
   if (fine) root.classList.add('bt-cursor-on');
 
   const cursor = document.getElementById('bt-cursor');
@@ -264,7 +266,7 @@
         });
         btn.textContent = res.ok ? 'TRANSMISSION SENT ✓' : 'TRANSMISSION FAILED ✕';
         if (res.ok) contactForm.reset();
-      } catch (err) {
+      } catch {
         btn.textContent = 'TRANSMISSION FAILED ✕';
       }
       setTimeout(() => {
@@ -315,4 +317,27 @@
       }
     });
   }
+
+  // Tap stands in for hover. :hover never fires under a finger, and the touch
+  // block in theme.css deliberately strips it so a tap cannot leave a card
+  // stuck lifted -- so a tap sets .bt-lit instead, which carries the same
+  // declarations as the desktop :hover rules. The next tap anywhere clears it,
+  // so exactly one card is lit at a time. :focus is not used: it outlives the
+  // tap and would recreate the stuck-card problem the reset avoids.
+  //
+  // Bound per element rather than through one document listener, so no other
+  // module can interpose. There is deliberately NO hover/pointer capability
+  // check here or in the CSS: gating on maxTouchPoints or a (hover: none)
+  // query silently disables the whole feature in a desktop browser's device
+  // emulator, which is where it was debugged and failed every time. Desktop is
+  // unaffected -- its :hover rules are untouched, and .bt-lit is only ever added
+  // by a real click.
+  document.querySelectorAll(LIT_CARDS).forEach((card) => {
+    card.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const wasLit = card.classList.contains('bt-lit');
+      document.querySelectorAll('.bt-lit').forEach((el) => el.classList.remove('bt-lit'));
+      if (!wasLit) card.classList.add('bt-lit');
+    });
+  });
 })();

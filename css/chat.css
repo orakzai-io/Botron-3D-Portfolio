@@ -257,6 +257,20 @@
   font-weight: 600;
 }
 
+/* The photo caption ("Tap any photo to view full size.") is emitted as <em> by
+   ensurePhotos() in js/ui/chat.js. There was no rule for it, so it inherited the
+   bubble's full-contrast body colour and read as ordinary prose competing with
+   the photo itself. Dimmed to match .bt-meta-details below so the hint recedes
+   and the image stays the focus. font-style is reset because italic mono at
+   this size reads as noise. */
+.bt-chat-msg--bot .bt-chat-bubble em {
+  color: #94a3b8;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.62rem;
+  font-style: normal;
+  letter-spacing: 0.04em;
+}
+
 .bt-chat-msg--user .bt-chat-bubble {
   background: linear-gradient(135deg, rgba(0, 240, 255, 0.25), rgba(99, 102, 241, 0.35));
   border: 1px solid rgba(0, 240, 255, 0.45);
@@ -272,7 +286,7 @@
   padding: 0 0.25rem;
 }
 
-.bt-chat-meta {
+.bt-chat-msg-meta {
   display: inline-flex;
   align-items: center;
   flex-wrap: wrap;
@@ -567,16 +581,13 @@
   box-shadow: 0 0 12px rgba(0, 240, 255, 0.3);
 }
 
-/* Flat panels for the chat chrome (was the bt-lite tier, now the only look).
-   See docs/quality-tiers.md. */
+/* Flat panels for the chat chrome — the only look. */
 .bt-chat-fab,
 .bt-chat-window {
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
   background: rgba(6, 10, 20, 0.96) !important;
 }
-/* shown in place of the photo when the file is missing (see the photo-error
-   guard in chat.js) -- sized like a thumbnail so the layout does not jump */
 /* Chat links are coloured here rather than with inline style="color:#00f0ff",
    because the HTML sanitiser strips the style attribute. */
 .bt-chat-bubble a {
@@ -588,6 +599,8 @@
   color: #67e8f9;
   border-bottom-color: #67e8f9;
 }
+/* shown in place of a photo when the file is missing (see the photo-error guard
+   in chat.js) -- sized like a thumbnail so the layout does not jump */
 .photo-error {
   display: block;
   width: 100%;

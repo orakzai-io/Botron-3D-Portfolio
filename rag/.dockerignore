@@ -1,6 +1,6 @@
 # Keep secrets and local virtualenvs out of the image.
 # The Dockerfile does `COPY . .`, so without this a local `docker build` bakes
-# backend/.env (which holds a real GROQ_API_KEY) into a layer.
+# rag/.env (which holds a real GROQ_API_KEY) into a layer.
 .env
 .env.*
 !.env.example

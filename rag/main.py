@@ -50,13 +50,25 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# Enable CORS for static frontend
+# CORS for the static frontend. Override with ALLOWED_ORIGINS (comma separated).
+# A wildcard is deliberately NOT used: allow_origins=["*"] together with
+# allow_credentials=True is rejected by browsers anyway, and an open wildcard on a
+# metered LLM endpoint invites abuse. The browser sends no credentials, so
+# allow_credentials stays off.
+_allowed_origins = [
+    origin.strip()
+    for origin in os.getenv(
+        "ALLOWED_ORIGINS",
+        "https://orakzai.io,https://www.orakzai.io,https://orakzai-io.github.io",
+    ).split(",")
+    if origin.strip()
+]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=_allowed_origins,
+    allow_credentials=False,
+    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["Content-Type", "Accept"],
 )
 
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
@@ -234,5 +246,8 @@ def chat(payload: ChatRequest):
 
 if __name__ == "__main__":
     import uvicorn
+
     port = int(os.getenv("PORT", 8000))
-    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=True)
+    # No reload=True: this is a documented entry point, not a dev convenience.
+    # Use `uvicorn main:app --reload` locally instead.
+    uvicorn.run("main:app", host="0.0.0.0", port=port)

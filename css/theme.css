@@ -1,24 +1,24 @@
 /* ============================================================
    BOTRON — POLISHED MECH · black & silver, scarce cyan
-   Loaded last so it cleanly overrides the boilerplate UI.
+   Loaded after base.css. NOTE: base.css marks a few elements !important, and it
+   wins on those regardless of load order — changes here will not take effect.
 
    ============================================================ */
 
-/* Fonts are loaded via <link rel="stylesheet"> in index.html <head>
-   (preconnect + single css2 request) — @import here caused a serial
-   CSS → fonts-CSS → font-files waterfall that delayed first paint. */
+/* Fonts are self-hosted and loaded via <link rel="stylesheet"> in index.html
+   <head> (css/fonts.css). An @import here would add a serial CSS → fonts-CSS →
+   font-files waterfall that delays first paint. */
 
 :root {
   --bg: #04050a;
   --bg1: #0a0c12;
-  --bg2: #10141b;
   --line: rgba(205, 215, 228, 0.10);
   --line-2: rgba(205, 215, 228, 0.22);
   --silver: #e8edf4;
+  --silver-1: #cfd8e3;
   --silver-2: #b6bfca;
   --silver-3: #8a94a1;
   --silver-4: #555f6d;
-  --ink: #0b0d12;
   --cyan: #00f0ff;
   --cyan-dim: rgba(0, 240, 255, 0.30);
   --font-disp: 'Space Grotesk', 'Inter', sans-serif;
@@ -59,7 +59,7 @@ body {
 .stage-container { position: fixed; inset: 0; z-index: 1; }
 .stage-container canvas { width: 100% !important; height: 100% !important; display: block; }
 
-/* film overlay -- vignette (the scanline layer was removed; see docs/quality-tiers.md) */
+/* film overlay -- vignette (the scanline ::before layer is gone) */
 .bt-fx { position: fixed; inset: 0; z-index: 5; pointer-events: none; }
 .bt-fx::after {
   content: ""; position: absolute; inset: 0;
@@ -119,7 +119,7 @@ body.intro-complete .bt-boot { opacity: 0; visibility: hidden; }
 @keyframes bAppear { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
 @keyframes bRise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
 
-/* navigation — black glass, silver hairline progress */
+/* navigation — flat black panel, silver hairline progress */
 .bt-nav {
   position: fixed; top: 0; left: 0; width: 100%; z-index: 20;
   display: flex; align-items: center; gap: 2.5rem;
@@ -1311,11 +1311,6 @@ html.lenis body { height: auto; }
   box-shadow: 0 0 14px var(--cyan-dim);
   transform: scale(1.08);
 }
-/* keep old avatar selector inert */
-.bt-quote:hover .bt-avatar {
-  border-color: var(--cyan);
-  box-shadow: 0 0 10px var(--cyan-dim);
-}
 .bt-author-info {
   display: flex;
   flex-direction: column;
@@ -1347,11 +1342,6 @@ html.lenis body { height: auto; }
 }
 .bt-quote:hover .bt-quote-platform {
   opacity: 1;
-}
-/* keep old avatar selector inert — replaced by .bt-avatar-wrap system */
-.bt-quote:hover .bt-avatar {
-  border-color: var(--cyan);
-  box-shadow: 0 0 10px var(--cyan-dim);
 }
 
 
@@ -1906,10 +1896,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
   box-shadow: 0 0 0 3px rgba(0, 240, 255, 0.1), 0 0 22px rgba(0, 240, 255, 0.08);
 }
 
-/* --- footer: gradient hairline + social glow --- */
-.bt-footer {
-  border-top: 1px solid transparent;
-}
+/* --- footer: social glow (the gradient-hairline trick is gone) --- */
 .bt-social-link:hover {
   box-shadow: 0 4px 16px rgba(0, 240, 255, 0.2), 0 0 26px rgba(0, 240, 255, 0.08);
 }
@@ -1927,12 +1914,17 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
 /* ==========================================================================
    LOW-GPU & MOBILE ULTRA-FAST PERFORMANCE OPTIMIZATIONS
    Single look now -- the old glass/quality-tier system was removed on purpose;
-   every visitor gets the flat-panel look. See docs/quality-tiers.md for the
-   removed glass design and how to bring it back.
+   every visitor gets the flat-panel look.
    ========================================================================== */
 
 /* Off-screen narrative beats layout skipping.
-   NOTE: this optimization is desktop-only. contain-intrinsic-size substitutes a
+   NOTE: this block is deliberately NOT wrapped in a desktop media query; it is
+   neutralised on phones by the `content-visibility: visible !important`
+   override in the max-width:900px block above. contain-intrinsic-size
+   substitutes a fixed-height box for every off-screen beat, and on phones
+   the beats are TALLER than the 750px guess (100svh + padding), so without
+   that override scrolling swapped real sections for 750px ghosts and
+   produced large empty bands plus a jumpy scroll length. Keep the two in sync.
    fixed-height box whenever a beat is off-screen, and on phones the beats are
    TALLER than the 750px guess (100svh + padding), so scrolling swapped real
    sections for 750px ghosts and produced large empty bands plus a jumpy scroll
@@ -1958,9 +1950,9 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
   background: rgba(8, 12, 22, 0.94);
 }
 
-/* These declarations exist with !important in the earlier base.css stylesheet,
-   so they need matching priority here. Their own hover/active selectors are
-   equally/more specific and remain later in this file. */
+/* base.css declares these with !important, so matching priority is needed here or
+   base.css silently wins. Their hover/active selectors are equally or more
+   specific and come later in this file. */
 .bt-filter-pill,
 .bt-telemetry-hud,
 .bt-contact-info .bt-mini {
@@ -2032,8 +2024,85 @@ body::after {
   .bt-social-link:hover { box-shadow: none !important; }
   .bt-filter-pill:hover { box-shadow: none !important; }
   .bt-nav-link:hover::after { transform: scaleX(0); }
+
 }
 
-.bt-fx::before {
-  display: none !important;
+/* --- touch: tap stands in for :hover --------------------------------------
+   Deliberately NOT wrapped in (hover: none) and (pointer: coarse). That query
+   reports hover:hover / pointer:fine inside a desktop browser's responsive
+   device emulator, so a media-gated version silently does nothing for anyone
+   previewing mobile on a laptop -- which is exactly how this went unnoticed.
+   There is deliberately NO capability gate here or in js/ui/ui.js. Scoping
+   these rules to a class that JS only adds when it detects touch made the whole
+   feature dead in a desktop browser's device emulator, where maxTouchPoints is 0
+   and the (hover: none) query is false. Unconditional: the selectors match
+   .bt-lit, which only ever exists because a real click put it there.
+
+   The reset above strips :hover on touch so a tap cannot leave a card stuck
+   lifted. These give touch that treatment back, in two layers:
+
+     :active  the press itself, live only while the finger is down
+     .bt-lit  the persistent tap state, cleared on the next tap anywhere
+
+   :focus is not used: it outlives the tap and would recreate the exact
+   stuck-card problem the reset avoids. Every value is copied from the matching
+   desktop :hover rule so touch matches desktop rather than approximating it.
+   Durations are shortened because these cards ease over 0.3s, which a tap
+   never reaches before it reverses -- that reads as a flicker, not a press. */
+.bt-proj,
+.bt-timeline-card,
+.bt-edu,
+.bt-quote { transition-duration: 0.11s !important; }
+
+:is(.bt-proj, .bt-timeline-card, .bt-edu, .bt-quote):active,
+:is(.bt-proj, .bt-timeline-card, .bt-edu, .bt-quote).bt-lit {
+  transform: translateY(-4px) !important;
 }
+:is(.bt-proj, .bt-timeline-card):active,
+:is(.bt-proj, .bt-timeline-card).bt-lit {
+  border-color: rgba(0, 240, 255, 0.45) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45), 0 0 28px rgba(0, 240, 255, 0.14) !important;
+}
+.bt-proj:active::before,
+.bt-proj.bt-lit::before { opacity: 1 !important; }
+.bt-proj:active .bt-proj-thumb img,
+.bt-proj.bt-lit .bt-proj-thumb img { filter: brightness(1) saturate(1.05) !important; }
+
+.bt-edu:active,
+.bt-edu.bt-lit {
+  border-color: var(--line-2) !important;
+  background: rgba(255, 255, 255, 0.03) !important;
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.05) !important;
+}
+.bt-edu:active::before,
+.bt-edu:active::after,
+.bt-edu.bt-lit::before,
+.bt-edu.bt-lit::after { width: 15px !important; height: 15px !important; }
+.bt-edu:active::before,
+.bt-edu.bt-lit::before {
+  border-top-color: var(--cyan) !important;
+  border-left-color: var(--cyan) !important;
+}
+.bt-edu:active::after,
+.bt-edu.bt-lit::after {
+  border-bottom-color: var(--cyan) !important;
+  border-right-color: var(--cyan) !important;
+}
+
+.bt-quote:active,
+.bt-quote.bt-lit {
+  border-color: var(--cyan-dim) !important;
+  background: linear-gradient(180deg, rgba(8, 10, 14, 0.7) 0%, rgba(4, 5, 10, 0.7) 100%) !important;
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.08) !important;
+}
+.bt-quote:active .bt-quote-body,
+.bt-quote.bt-lit .bt-quote-body {
+  border-left-color: var(--cyan) !important;
+  color: var(--silver) !important;
+}
+
+/* The quotes carousel deliberately keeps its quotes flat (theme.css lifts
+   nothing inside .bt-quotes-track), so neither tap state may introduce a lift
+   the desktop hover does not have. */
+.bt-quotes-track .bt-quote:active,
+.bt-quotes-track .bt-quote.bt-lit { transform: none !important; }

@@ -9,8 +9,18 @@ import professionalPhoto from '../../assets/professionalpic.webp';
 import swimmingPhoto from '../../assets/swimmingpic.webp';
 import chessPhoto from '../../assets/chesspic.webp';
 
+// No loading="lazy" here, unlike the project screenshots in index.html.
+// These photos are only ever requested AFTER the visitor has typed a photo
+// query, so intent is already proven and the cost is at most 3 files of
+// <=71 KB. Worse, they are injected while the chat window is still closed and
+// land inside .bt-chat-messages, an overflow-y:auto scroll container that is
+// display:none until the panel opens. Chrome computes the lazy-load threshold
+// against the document viewport, so inside a hidden inner scroller it defers
+// the fetch: the first photo (nearest the trigger point) paints, and the ones
+// below it sit as empty boxes until some scroll or resize forces a
+// re-evaluation. width/height are still declared, so there is no layout shift.
 const PHOTO_TAG = (url, alt, w, h) =>
-  '<img class="bt-chat-photo" src="' + url + '" alt="' + alt + '" width="' + w + '" height="' + h + '" loading="lazy" decoding="async">';
+  '<img class="bt-chat-photo" src="' + url + '" alt="' + alt + '" width="' + w + '" height="' + h + '" decoding="async">';
 
 const PRO_PHOTO = PHOTO_TAG(professionalPhoto, 'Shahsawar Orakzai in a suit and tie', 577, 576);
 const SWIM_PHOTO = PHOTO_TAG(swimmingPhoto, 'Shahsawar Orakzai at a swimming pool wearing a medal', 635, 634);
@@ -100,7 +110,7 @@ function scheduleRagWarmup() {
 // contained the <img> tag. With the RAG answering, the model would have to
 // choose to emit it, and when it instead describes the photo in words the
 // images silently vanish. So photo intent is detected here and the tag is
-// injected regardless of what the model said. The prose still comes from the
+// injected regardless of what the model said — only the prose is generated.
 const PHOTO_INTENT = /\b(photo|photos|pic|pics|picture|pictures|image|images|portrait|portraits|snapshot|face|headshot|selfie|photograph|photographs|look\s+like|see\s+(him|his)|show\s+(me|him|his)|send\s+(me|his)|view|who\s+is\s+(shahsawar|he|this|the\s+developer|the\s+creator)|tell\s+me\s+about\s+shahsawar)\b/i;
 const PHOTO_ALL = /\b(all|every|each|both)\b/i;
 const PHOTO_CHESS = /\b(chess|board|game|games|strategy|strategic|tactics)\b/i;
@@ -324,17 +334,17 @@ export function initChat() {
     img.src = src;
     img.alt = alt || '';
     box.appendChild(img);
-    const close = () => box.remove();
+    // One teardown path for both exits (click and Escape), so the document-level
+    // keydown listener can never outlive the overlay it belongs to.
+    function onKey(e) {
+      if (e.key === 'Escape') close();
+    }
+    const close = () => {
+      document.removeEventListener('keydown', onKey, true);
+      box.remove();
+    };
     box.addEventListener('click', close);
-    document.addEventListener(
-      'keydown',
-      function onKey(e) {
-        if (e.key !== 'Escape') return;
-        close();
-        document.removeEventListener('keydown', onKey);
-      },
-      true
-    );
+    document.addEventListener('keydown', onKey, true);
     document.body.appendChild(box);
   }
 
@@ -388,7 +398,7 @@ export function initChat() {
   // Blocks javascript:, data:, vbscript: and every other scheme.
   // NOTE: "assets/..." is allowed because the resume PDF is linked that way
   // (assets/Shahsawar.dev.pdf). Without it the sanitiser stripped the href.
-  const SANITIZE_URL = /^(https?:\/\/|mailto:|\/|\.\/|\.\.\/|assets\/|#)/i;
+  const SANITIZE_URL = /^(https?:\/\/|mailto:|\/(?!\/)|\.\/|\.\.\/|assets\/|#)/i;
 
   function escapeHtml(str) {
     return String(str)
@@ -446,10 +456,18 @@ export function initChat() {
     ['assets/chesspic.webp', chessPhoto],
   ]);
   function remapPhotoSrc(html) {
-    return html.replace(/(<img[^>]*?src=")([^"]+)(")/g, (full, pre, src, post) => {
-      const mapped = PHOTO_SRC_MAP.get(src.trim());
-      return mapped ? pre + mapped + post : full;
-    });
+    // Any <img> in a reply is a photo we injected, and it renders inside
+    // .bt-chat-messages (an overflow-y:auto scroller that is display:none until
+    // the panel opens). A loading="lazy" there makes Chrome defer the fetch
+    // against the document viewport, so the first photo paints and the rest
+    // never load at all. The attribute is stripped from every incoming tag
+    // rather than trusting the model prompt to omit it.
+    return html
+      .replace(/(<img[^>]*?)\s+loading=(["'])lazy\2/gi, '$1')
+      .replace(/(<img[^>]*?src=")([^"]+)(")/g, (full, pre, src, post) => {
+        const mapped = PHOTO_SRC_MAP.get(src.trim());
+        return mapped ? pre + mapped + post : full;
+      });
   }
 
   function formatMarkdown(text) {
@@ -457,7 +475,7 @@ export function initChat() {
     // The knowledge base and the LLM both emit real markup, so most replies
     // match this. It must be sanitised, not returned raw -- an earlier version
     // returned early here, which meant sanitizeHtml() below never executed.
-    if (/<(strong|em|a|code|br|span|ul|li|img)[\s>]/i.test(text)) {
+    if (/<(?:a|b|br|code|div|em|i|img|li|ol|p|pre|span|strong|ul)[\s>]/i.test(text)) {
       return sanitizeHtml(remapPhotoSrc(text));
     }
     let html = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -487,7 +505,7 @@ export function initChat() {
         : '';
       const latency = meta.retrieval_time_ms ? ` • ${meta.retrieval_time_ms}ms` : '';
       metaHtml = `
-        <div class="bt-chat-meta">
+        <div class="bt-chat-msg-meta">
           <span class="bt-meta-badge">⚡ VECTOR RAG</span>
           <span class="bt-meta-details">${topSources}${sim}${latency}</span>
         </div>

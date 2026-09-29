@@ -9,19 +9,25 @@ a Groq LLM answer using only those chunks.
 Retrieval and generation are **two separate phases that run at completely different
 times** — this is the single most important thing to understand about this service.
 
-### Phase A — once, at startup
+### Phase A — in the background, after the port binds
 
 ```
-retriever.py:203   retriever = VectorRetriever()      # module-level, runs on import
-  ├── _init_qdrant()                           # loads BAAI/bge-small-en-v1.5
-  └── _index_chunks()                          # embeds ALL chunks in one batch
-        ├── embeddings = model.embed(texts)    # 16 texts -> 16 x 384-dim vectors
-        └── client.upsert(...)                  # stored in memory
+retriever.py:238   retriever = VectorRetriever()   # module-level, runs on import
+  └── _init_tfidf()                       # lexical index, built in < 1ms
+
+main.py lifespan                          # AFTER uvicorn has bound the port
+  └── asyncio.to_thread(retriever.initialize)
+        ├── TextEmbedding(BAAI/bge-small-en-v1.5)   # ~90 MB ONNX load
+        └── embeds all 16 chunks -> normalized [16, 384] NumPy matrix
 ```
 
-This is the expensive part (model load, then one batch embed). **User traffic does not
-trigger it.** The index is built once and waits. Only the *retriever* is a singleton
-across all requests; nothing is re-indexed.
+The dense load is the expensive part (weights, then one batch embed), and it runs
+**after** the port is bound so a cold container answers health checks immediately. Traffic
+*can* therefore arrive mid-load — which is exactly why the lexical backend below exists.
+The retriever is a singleton across all requests; nothing is re-indexed per request.
+
+Nothing here uses Qdrant: the chunk vectors live in a NumPy matrix and similarity is one
+`matrix @ vector` dot product.
 
 ### Phase B — per request
 
@@ -30,7 +36,7 @@ POST /chat  {"query": "what is REDNOTE?", "top_k": 3}
   │
   ├── 1. query_vec = model.embed([query])          # ONE text, not 16
   │      cosine search against the 16 stored vectors
-  │      drop anything below MIN_SIMILARITY
+  │      drop anything below the ACTIVE backend's floor
   │
   ├── 2. nothing cleared the floor?
   │      └── YES → return "I don't have that". The LLM is never called.
@@ -53,12 +59,15 @@ messages.
 | :--- | :--- | :--- |
 | Engine | FastEmbed `BAAI/bge-small-en-v1.5` | built-in TF-IDF |
 | Dimensions | 384, dense | sparse, L2-normalised |
-| Store | Qdrant in-memory, cosine | plain Python lists |
-| Startup | ~90 MB model load | instant |
-| `MIN_SIMILARITY` | **~0.35** | **0.06** |
+| Store | normalized NumPy matrix, cosine | normalized NumPy matrix, cosine |
+| Startup | ~90 MB model load, off the request path | built at import, < 1 ms |
+| Relevance floor | `DENSE_MIN_SIMILARITY` = **0.35** | `LEXICAL_MIN_SIMILARITY` = **0.06** |
 
-Both are cosine-based in 0..1, so one constant covers both — but the right value is
-backend-specific, which is why it is an environment variable.
+Both are cosine-based in 0..1, but on **different scales** — the dense model separates far
+more aggressively than TF-IDF does, so no single threshold serves both. A value high
+enough to be a real floor for dense rejects the *median* on-topic lexical query. Hence two
+knobs, with `MIN_SIMILARITY` kept as an override that sets both (only sane for a
+single-backend deployment).
 
 ## The relevance floor
 
@@ -123,8 +132,9 @@ curl -X POST http://localhost:8000/chat \
   -d '{"query":"what is REDNOTE?"}'
 ```
 
-The `/health` response reports `indexed_chunks` and whether FastEmbed or the lexical
-fallback is active.
+`/health` reports `status` (`ready` or `waking`), `groq_ready`, the configured `models` and
+`embedding_mode`. The frontend keys off `status === "ready"`. `GET /` is what reports
+`indexed_chunks`.
 
 ## Deploying
 
@@ -137,11 +147,12 @@ Connect this repository and set:
 | Root directory | `rag` |
 | Build command | `pip install -r requirements.txt` |
 | Start command | `uvicorn main:app --host 0.0.0.0 --port $PORT` |
-| Environment | `GROQ_API_KEY`, `MIN_SIMILARITY=0.35`, `GROQ_MODELS` |
+| Environment | `GROQ_API_KEY`, `GROQ_MODELS`, `ALLOWED_ORIGINS` |
 
-Secrets go in the dashboard — never in a committed `.env`. The included `Dockerfile`
-targets port 7860 for Hugging Face Spaces, but note that **HF now requires a PRO
-subscription for CPU Basic Docker Spaces**; use it only if you already have one.
+Secrets go in the dashboard — never in a committed `.env`. The included `Dockerfile` binds
+to the platform-injected `$PORT` (falling back to 8000), so it works on any container host
+— including Hugging Face Spaces, where **CPU Basic Docker Spaces now require a PRO
+subscription**; only use that path if you already have one.
 
 ### Any container host
 
@@ -186,7 +197,8 @@ reports "backend is still waking" rather than silently degrading.
 distinguishing "nothing relevant" from "the model failed".
 
 ### `GET /health`
-`{ "status": "healthy", "indexed_chunks": 16, "embedding_mode": "FastEmbed" }`
+`{ "status": "ready", "groq_ready": true, "models": ["openai/gpt-oss-120b", ...],
+   "embedding_mode": "FastEmbed (NumPy Cosine)" }`
 
 ## Files
 

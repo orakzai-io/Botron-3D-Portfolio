@@ -12,8 +12,8 @@ CHUNKS = [
         "content": (
             "If the visitor asks for a photo, picture, portrait, image or snapshot of Shahsawar (including \"swimming photo\", \"chess photo\", or just \"swimming\"/\"chess\" when clearly about an image), reply with an html <img> tag and no other words.\n"
             "Choose the file by topic: assets/professionalpic.webp for a general portrait or headshot; assets/swimmingpic.webp for swimming, medals, coaching or athletics; assets/chesspic.webp for chess. Emit all three in that order only if they ask for every photo.\n"
-            "Every tag must carry class=\"bt-chat-photo\", alt text describing the photo, and loading=\"lazy\". Example:\n"
-            '<img class="bt-chat-photo" src="assets/professionalpic.webp" alt="Shahsawar Orakzai in a suit and tie" loading="lazy">'
+            "Every tag must carry class=\"bt-chat-photo\" and alt text describing the photo. Do NOT add loading=\"lazy\": the reply is injected into a scroll container that is still display:none, so Chrome defers the fetch and only the first photo paints while the rest stay blank. Example:\n"
+            '<img class="bt-chat-photo" src="assets/professionalpic.webp" alt="Shahsawar Orakzai in a suit and tie">'
             "Never describe a photograph in words and never invent any other image URL.\n"
         )
     },    {
@@ -183,9 +183,9 @@ CHUNKS = [
             "Starred by BOTRON, an interactive 3D robot model with real-time inverse-kinematics cursor gaze tracking and procedural dot-matrix LED eyes.\n"
             "• 3D & Graphics Engine: Custom Three.js stage, PMREM environment lighting, procedural room reflection, mathematical 3D spherical skills globe "
             "rendered on 2D canvas with zero WebGL context overhead.\n"
-            "• Choreography & Performance: Lenis smooth-scroll engine synchronized with a GSAP ScrollTrigger ticker. Render loop targets 60 FPS during active scroll, touch and cursor tracking, and throttles to 20 FPS when idle so the tab stays cheap and cool.\n"
+            "• Choreography & Performance: Lenis smooth-scroll engine synchronized with a GSAP ScrollTrigger ticker. Render loop targets 60 FPS during active scroll, touch and cursor tracking, and throttles to 30 FPS when idle so the tab stays cheap and cool.\n"
             "• Asset Optimization: Extracted the binary GLB model directly from raw glTF buffers and optimized it to 322 KB with the Meshopt decoder, cutting it roughly in half for fast mobile loading.\n"
-            "• Deliberate Low-Power Render Path: The Three.js renderer requests a low-power GPU, disables antialiasing and shadow maps, drops the ground plane, and runs 70 atmosphere particles. A second, richer quality tier (380 particles, shadow maps, higher DPR) is preserved in docs/quality-tiers.md.\n"
+            "• Deliberate Low-Power Render Path: The Three.js renderer requests a low-power GPU, disables antialiasing and shadow maps, drops the ground plane, and runs 70 atmosphere particles.\n"
             "• AI Assistant (BOTRON): Autonomous AI wired to a vector RAG pipeline with Groq LLM (120B/27B/20B automatic multi-model failover).\n"
             "• Code Repository: https://github.com/orakzai-io/Personal-Portfolio.git\n"
             "• Live Website: https://orakzai.io"

@@ -4,6 +4,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { signalBoot } from '../boot-gate.js';
+import { ROBOT_BASE_X_DESKTOP } from './config.js';
 
 // Exponential decay damping: 100% framerate-independent, never overshoots
 function damp(current, target, lambda, dt) {
@@ -87,13 +88,11 @@ function mergeByPivot(model, headBone, handNodes) {
   });
 
   // Merge each bucket
-  const mergedMeshes = [];
   for (const [pivot, matMap] of buckets) {
     const parent = pivot || model;
     for (const [mat, meshes] of matMap) {
       if (meshes.length === 1) {
-        // Nothing to merge — keep as-is
-        mergedMeshes.push(meshes[0]);
+        // Nothing to merge — the original mesh stays in the graph
         continue;
       }
 
@@ -142,16 +141,13 @@ function mergeByPivot(model, headBone, handNodes) {
       if (!merged) {
         // Attribute mismatch fallback — keep originals, log warning
         console.warn('[botron] mergeGeometries returned null for', mat.name, '— keeping originals');
-        meshes.forEach((m) => mergedMeshes.push(m));
         geos.forEach((g) => g.dispose());
         continue;
       }
 
+      // No shadow flags: the renderer's shadowMap is disabled (see scene.js).
       const mergedMesh = new THREE.Mesh(merged, mat);
-      mergedMesh.castShadow = true;
-      mergedMesh.receiveShadow = true;
       parent.add(mergedMesh);
-      mergedMeshes.push(mergedMesh);
 
       // Dispose originals (already detached; toDispose holds only baked eyes)
       meshes.forEach((m) => {
@@ -169,10 +165,13 @@ function mergeByPivot(model, headBone, handNodes) {
   });
 }
 
-export function createRobot({ scene, renderer, modelUrl, mouse, gazeState, storyState, env }) {
+export function createRobot({ scene, modelUrl, mouse, gazeState, storyState, env }) {
   let robotModel = null;
   let headBone = null;
-  let initialBaseX = 58;
+  // Seed position for the single frame between load and the first update() call.
+  // update() then overwrites X every frame from storyState.robotBaseX, which
+  // is 0 on mobile — so this only needs the desktop staging value.
+  const initialBaseX = ROBOT_BASE_X_DESKTOP;
   let initialBaseY = 0;
 
   let handNodes = [];
@@ -419,11 +418,10 @@ export function createRobot({ scene, renderer, modelUrl, mouse, gazeState, story
     });
   }
 
-  // --- Model load (un-deferred: the boot gate covers the wait) ---
-  // This used to be kicked to idle time so the GLB wouldn't compete with first
-  // paint. The boot overlay now holds until the bot is actually on screen
-  // (signalBoot below), so the wait is invisible and fetching immediately is
-  // both safe and strictly faster.
+  // --- Model load (started immediately, competing with first paint on purpose) ---
+  // This used to be deferred to idle time so the GLB would not compete with first
+  // paint. It now starts straight away: the reveal no longer waits on the 3D, so
+  // the bot scales in behind the content and an earlier start is strictly better.
   const loader = new GLTFLoader();
   loader.setMeshoptDecoder(MeshoptDecoder);
   const startLoading = () =>
@@ -434,8 +432,6 @@ export function createRobot({ scene, renderer, modelUrl, mouse, gazeState, story
         robotModel = model;
         model.traverse((obj) => {
           if (obj.isMesh) {
-            obj.castShadow = true;
-            obj.receiveShadow = true;
             if (obj.material && typeof obj.material.roughness === 'number') {
               obj.material.roughness = Math.max(obj.material.roughness, 0.04);
             }
@@ -466,17 +462,14 @@ export function createRobot({ scene, renderer, modelUrl, mouse, gazeState, story
         // Step 2: runtime merge — 83 draws → ~5
         mergeByPivot(model, headBone, handNodes);
 
-        // Step 3: update shadow map once from merged geometry
-        renderer.shadowMap.needsUpdate = true;
-
-        // Boot gate: fire two rAF ticks later so the first frame the user sees
-        // already contains the drawn bot, not merely the added model.
+        // DEV signal only (the gate requires fonts, not the model). Fired two rAF ticks
+        // later so the bot is actually drawn, not merely added to the scene.
         requestAnimationFrame(() => requestAnimationFrame(() => signalBoot('model')));
       },
       undefined,
       (err) => {
         console.error('Model load failed (robot will not spawn):', err.message || err);
-        // Release the gate anyway — a missing bot must never block the site.
+        // Still report the signal so the DEV log reflects a finished (failed) load.
         signalBoot('model');
       }
     );

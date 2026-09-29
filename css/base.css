@@ -1,5 +1,5 @@
 /* ==========================================================================
-   BASE STYLESHEET — moved verbatim out of index.html's inline <style>.
+   BASE STYLESHEET — reset plus the load-bearing layout overrides.
    Loaded FIRST (before fonts.css / theme.css / chat.css) so the cascade
    order that theme.css relies on ("loads last, overrides the boilerplate")
    is unchanged.
@@ -61,7 +61,7 @@
         }
 
 
-        /* === EXPERIENCE CARD WIDTH — critical, inlined so a cached theme.css can never shrink these === */
+        /* === EXPERIENCE CARD WIDTH — critical: must out-rank theme.css, hence !important === */
         @media (min-width: 901px) {
             #experience .bt-beat-grid {
                 grid-template-columns: 1fr !important;
@@ -79,7 +79,7 @@
             }
         }
 
-        /* === SKILLS SECTION: 3D GLOBE & TELEMETRY HUD (Inlined to prevent cache issues) === */
+        /* === SKILLS SECTION: 3D GLOBE & TELEMETRY HUD === */
         .bt-skills-grid {
             display: grid !important;
             grid-template-columns: minmax(0, 520px) 1fr !important;
@@ -511,6 +511,6 @@
 
         }
 
-        /* closes the @media (max-width: 900px) opened at line ~746 — browsers
-           implicitly closed it at end-of-stylesheet; Vite/PostCSS requires
-           this to be explicit (no visual behavior change) */
+        /* Closes the @media (max-width: 900px) block opened further up. Browsers
+           would implicitly close it at end-of-stylesheet, but PostCSS requires
+           the brace to be explicit (no visual change). */

@@ -318,8 +318,6 @@ export class SkillsGlobe {
     this.container = this.canvas.parentElement;
 
     // Single look: always the 1x backing store, no canvas shadows, ~30fps cap.
-    // (These were the low-power tier values; see docs/quality-tiers.md for the
-    // full-tier numbers.)
     this.isIntersecting = false; // gates per-event getBoundingClientRect reads
     this._lastT = 0;
     // Per-frame caches (see render / drawNodeBadge / drawCyberCore)
@@ -389,7 +387,7 @@ export class SkillsGlobe {
 
   initCanvasSize() {
     const rect = this.container.getBoundingClientRect();
-    const dpr = 1; // 1x backing store - see docs/quality-tiers.md
+    const dpr = 1; // 1x backing store — the only look
     const w = rect.width || 420;
     const h = rect.height || 420;
     // Skip the backing-store realloc when nothing changed — mobile browsers

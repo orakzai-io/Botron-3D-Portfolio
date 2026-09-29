@@ -7,22 +7,25 @@
 //   model      — robot.js, two rAF ticks after the bot is added to the scene
 //   fonts      — here, once document.fonts settles (raced with a short timeout)
 //
+// Only `fonts` is REQUIRED (see REQUIRED below). `firstFrame` and `model` are
+// still emitted, but solely to fill the DEV debug line — the reveal no longer
+// waits on the 3D, so the bot scales in behind the content after the gate lifts.
+//
 // Release rule: every required signal in AND BOOT_MIN_MS elapsed — OR the
 // BOOT_MAX_MS absolute deadline is hit, whichever comes first. Deadlines use
 // performance.now() directly because it already counts from navigation start;
 // subtracting a script-start t0 would undercount by the whole JS parse.
 //
 // index.html carries the nets for the "bundle never evaluated" case (a failed
-// SCRIPT error listener + an 8s backstop) and sets window.__bBootInit's
-// counterpart state; this module owns the reveal from the moment it evaluates
-// and marks that with window.__bBootInit / window.__bBootDone.
+// SCRIPT error listener + an 8s backstop); this module owns the reveal from the
+// moment it evaluates and marks that with window.__bBootInit / window.__bBootDone.
 import { BOOT_MIN_MS, BOOT_MAX_MS, BOOT_FONTS_TIMEOUT_MS } from './webgl/config.js';
 
 window.__bBootInit = true;
 
 // Progressive hydration: release on fonts ONLY (≤ BOOT_FONTS_TIMEOUT_MS plus a
 // few frame ticks). The stage chunk hydrates right after the shell paints, and
-// the 583 KB bot streams in behind the content and scales up smoothly when it
+// the 322 KB bot streams in behind the content and scales up smoothly when it
 // lands — the user reads the page while the 3D boots, never a spinner.
 const REQUIRED = new Set(['fonts']);
 
@@ -62,8 +65,9 @@ function maybeRelease() {
 if (document.hidden) release();
 else window.addEventListener('visibilitychange', onVisibilityChange);
 
-// Fonts come from fonts.googleapis.com and can stall for seconds when slow or
-// blocked — race them against BOOT_FONTS_TIMEOUT_MS so they never gate alone.
+// Fonts are self-hosted (css/fonts.css) but can still stall on a slow first
+// visit before the browser cache warms — race them against
+// BOOT_FONTS_TIMEOUT_MS so they never gate the reveal alone.
 const fontsReady =
   document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve();
 Promise.race([

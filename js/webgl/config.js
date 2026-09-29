@@ -7,15 +7,16 @@ export const ROBOT_BASE_X_DESKTOP = 58; // right-of-center staging (desktop)
 // Quality tiers were removed on purpose. The site ships ONE look on every device:
 // flat panels (no CSS glass blur) and the low-power 3D path. The FULL/glass tier,
 // the weak-device heuristic, the ?quality=lite|full overrides and the one-shot FPS
-// watchdog all lived here -- see docs/quality-tiers.md for that code and how to
-// bring it back if you ever want the glass design again.
+// watchdog all lived here and are gone. Re-adding a tier means restoring all of
+// that coherently, not flipping a single flag.
 
 // --- Boot gate (js/boot-gate.js) ---
-// The boot overlay releases once firstFrame + model + fonts are all in, but
-// never before BOOT_MIN_MS (no warm-cache flicker) and never after BOOT_MAX_MS.
-// Set to 0: zero artificial delay. The instant the concurrent background loader
-// renders the model and first frame, the boot screen lifts immediately.
-export const BOOT_MIN_MS = 0;
+// The overlay lifts when `fonts` settles, or when the BOOT_MAX_MS absolute
+// deadline is hit — whichever comes first. `firstFrame` and `model` are still
+// signalled by stage.js / robot.js, but they are DEV diagnostics only: the
+// reveal no longer waits on the 3D, so the shell lifts on fonts and the bot
+// scales in behind the content once its GLB arrives.
+export const BOOT_MIN_MS = 0; // no artificial delay — lift the moment fonts settle
 export const BOOT_MAX_MS = 3500;
 // fonts.googleapis.com can stall for seconds when slow or blocked; race it.
 export const BOOT_FONTS_TIMEOUT_MS = 600;

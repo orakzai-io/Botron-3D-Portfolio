@@ -9,11 +9,13 @@ Architecture:
   - FastEmbed TextEmbedding (ONNX CPU, 384-dim dense vectors)
   - Vectorized NumPy Cosine Similarity: matrix @ vector in <0.1ms
   - Non-blocking initialization for instant server port binding
-  - Sublinear TF-IDF fallback with inverted index and relevance floor
+  - Sublinear TF-IDF fallback over a dense term-weight matrix, with a relevance floor
 """
 
 import logging
+import math
 import os
+import re
 import threading
 import time
 from typing import Any, Optional
@@ -44,11 +46,18 @@ VECTOR_SIZE     = 384   # bge-small output dimensionality
 # model is still loading, that mis-tuned constant made the bot answer "I don't
 # have that" to legitimate questions on every cold start.
 #
-# MIN_SIMILARITY is still honoured as an explicit override for both, so an
-# operator who wants one number for a single-backend deployment still gets it.
+# Resolution order: a backend-specific var wins, then MIN_SIMILARITY as an
+# explicit "set both" override for single-backend deployments, then the default.
+# Shipping one value for both is exactly the trap described above.
 _env_floor = os.getenv("MIN_SIMILARITY")
-DENSE_MIN_SIMILARITY = float(_env_floor) if _env_floor else 0.35
-LEXICAL_MIN_SIMILARITY = float(_env_floor) if _env_floor else 0.06
+_env_dense = os.getenv("DENSE_MIN_SIMILARITY")
+_env_lexical = os.getenv("LEXICAL_MIN_SIMILARITY")
+DENSE_MIN_SIMILARITY = (
+    float(_env_dense or _env_floor) if (_env_dense or _env_floor) else 0.35
+)
+LEXICAL_MIN_SIMILARITY = (
+    float(_env_lexical or _env_floor) if (_env_lexical or _env_floor) else 0.06
+)
 
 
 class VectorRetriever:
@@ -108,10 +117,9 @@ class VectorRetriever:
     #  TF-IDF fallback helpers                                           #
     # ------------------------------------------------------------------ #
 
-    _STOPWORDS = frozenset(["what", "which", "who", "whom", "whose", "when", "where", "why", "how", "is", "are", "was", "were", "be", "been", "being", "do", "does", "did", "done", "have", "has", "had", "having", "will", "would", "shall", "should", "can", "could", "may", "might", "must", "a", "an", "the", "and", "or", "but", "if", "then", "than", "that", "this", "these", "those", "it", "its", "he", "she", "they", "them", "his", "her", "their", "you", "your", "i", "we", "our", "us", "me", "my", "of", "in", "on", "at", "to", "for", "from", "by", "with", "about", "as", "into", "over", "under", "again", "further", "more", "most", "other", "some", "such", "no", "nor", "not", "only", "own", "same", "so", "too", "very", "just", "me", "tell", "please", "give", "know", "about"])
+    _STOPWORDS = frozenset(["what", "which", "who", "whom", "whose", "when", "where", "why", "how", "is", "are", "was", "were", "be", "been", "being", "do", "does", "did", "done", "have", "has", "had", "having", "will", "would", "shall", "should", "can", "could", "may", "might", "must", "a", "an", "the", "and", "or", "but", "if", "then", "than", "that", "this", "these", "those", "it", "its", "he", "she", "they", "them", "his", "her", "their", "you", "your", "i", "we", "our", "us", "me", "my", "of", "in", "on", "at", "to", "for", "from", "by", "with", "about", "as", "into", "over", "under", "again", "further", "more", "most", "other", "some", "such", "no", "nor", "not", "only", "own", "same", "so", "too", "very", "just", "tell", "please", "give", "know"])
 
     def _tokenize(self, text: str) -> list[str]:
-        import re
         toks = re.findall(r"\b[a-zA-Z0-9_-]{2,}\b", text.lower())
         return [
             t[:-1] if len(t) > 4 and t.endswith("s") and not t.endswith("ss") else t

@@ -34,7 +34,7 @@ clears it, the LLM is *never called* — it cannot confabulate an answer to "who
 confident false statement is the worst possible failure mode.
 
 **2. The fallback retriever is real TF-IDF.** The dense path uses FastEmbed
-(`BAAI/bge-small-en-v1.5`, 384-dim) in Qdrant. When those aren't installed it falls
+(`BAAI/bge-small-en-v1.5`, 384-dim) into a vectorized NumPy cosine index. When those aren't installed it falls
 back to lexical retrieval — and that fallback originally *omitted the IDF term
 entirely*, so it was a normalised bag-of-words count. Measured result: "best pizza in
 Lahore" scored **0.2009** while "what are his projects" scored **0.0662** — the score
@@ -57,8 +57,8 @@ the image is deterministic.
 - **BOTRON** — RAG chatbot with health-check warm-up, cold-start handling, and a
   deterministic photo layer
 - **Skills globe** — mathematical 3D projection on a 2D canvas, zero extra WebGL contexts
-- **Adaptive performance** — 60 FPS while interacting, 20 FPS idle, deliberate
-  low-power render path, chosen deliberately for battery and thermal headroom
+- **Adaptive performance** — 60 FPS while interacting, 30 FPS idle, and a deep
+  sleep (zero draw calls) once the bot is off-screen and the page has settled
 - **Mobile-tuned** — safe-area insets, collapse-to-circle FAB, `100svh` beats,
   touch-only states
 
@@ -69,8 +69,8 @@ the image is deterministic.
 | 3D | Three.js, WebGL, GLTF/GLB + Meshopt, PMREM |
 | Motion | GSAP ScrollTrigger, Lenis smooth scroll |
 | Frontend | Vanilla ES modules, Vite, modern CSS (custom properties) |
-| Retrieval | FastEmbed `bge-small-en-v1.5`, Qdrant (in-memory), TF-IDF fallback |
-| LLM | Groq — `gpt-oss-120b` → `qwen3-27b` → `gpt-oss-20b` failover |
+| Retrieval | FastEmbed `bge-small-en-v1.5`, NumPy cosine index, TF-IDF fallback |
+| LLM | Groq — `openai/gpt-oss-120b` → `qwen/qwen3.8-27b` → `openai/gpt-oss-20b` failover |
 | Backend | FastAPI, Pydantic, Uvicorn |
 
 ## Quick start
@@ -105,20 +105,21 @@ VITE_RAG_API_URL=http://localhost:8000/chat
 .
 ├── index.html            # single page, all sections
 ├── css/
-│   ├── base.css          # resets, tokens, typography
+│   ├── base.css          # reset + the !important layout overrides
 │   ├── theme.css         # design system, sections, enhancement layer
-│   └── chat.css          # BOTRON chat UI
+│   ├── chat.css          # BOTRON chat UI
+│   └── fonts.css         # self-hosted @font-face subsets
 ├── js/
 │   ├── main.js           # entry: progressive hydration
 │   ├── boot-gate.js      # owns the reveal, releases on fonts
 │   ├── stage.js          # WebGL stage orchestration
-│   ├── models/botron.glb   # 322 KB, Meshopt-compressed
+│   ├── models/           # botron.glb — 322 KB, Meshopt-compressed
 │   ├── webgl/            # scene, robot, gaze, camera story, telemetry
 │   └── ui/               # chat, skills globe, UI wiring
 ├── assets/               # project screenshots, photos, fonts (Vite-imported)
 ├── public/                # files served verbatim, NOT processed by Vite
 │   └── assets/Shahsawar.dev.pdf
-├── rag/              # FastAPI RAG service  (see rag/README.md)
+├── rag/                  # FastAPI RAG service (see rag/README.md)
 │   ├── main.py           # /chat, /health, request model
 │   ├── retriever.py      # retrieval: dense + TF-IDF, relevance floor
 │   └── knowledge.py      # the indexed knowledge chunks
@@ -128,7 +129,9 @@ VITE_RAG_API_URL=http://localhost:8000/chat
 > **Not in this repository.** `.prettierrc.json` / `.prettierignore` are a personal
 > formatting preference and are excluded locally, as is `docs/` (internal
 > architecture notes). Prettier still runs without them using its defaults, so
-> `npm run format` works for anyone who clones.
+> `npm run format` works for anyone who clones — but note that the shipped code was
+> formatted with the local config, so `npm run format:check` will report diffs on a
+> fresh clone. That is expected, not a bug.
 
 > **Two `assets` directories, on purpose.** `assets/` holds files the bundler
 > processes — they are imported in JS, content-hashed, and emitted to `dist/assets/`.
@@ -156,7 +159,8 @@ These were measured, not guessed:
 - **Low-power render path** — `powerPreference: 'low-power'`, antialiasing and shadow
   maps off, no ground plane, 70 dust particles.
 - **Adaptive frame rate** — 60 FPS while scrolling, touching or tracking the cursor;
-  20 FPS idle. A constant 60 wastes battery on a page nobody is animating.
+  30 FPS while idle with the bot on screen; and no draw calls at all once the bot is
+  off-screen and the page has settled. A constant 60 wastes battery on a static page.
 - **`content-visibility` disabled on mobile** — `contain-intrinsic-size: 1px 750px`
   substitutes a fixed 750px box when a section scrolls away. On a phone these sections
   are *taller* than 750px, so scrolling swapped real content for placeholders and
@@ -198,7 +202,7 @@ The frontend must be told where the backend lives via `VITE_RAG_API_URL` at buil
 ## Security notes
 
 - `rag/.env` is gitignored and a `.dockerignore` keeps it out of container images
-- `RAG_API_URL` is a build-time env var, so no deployment URL is committed
+- `VITE_RAG_API_URL` is a build-time env var, so no deployment URL is committed
 - The Groq key is only ever used server-side; the browser never sees it
 - Bot replies pass through an allowlist HTML sanitiser before reaching `innerHTML`
 

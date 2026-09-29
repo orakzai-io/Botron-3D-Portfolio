@@ -11,7 +11,7 @@ import botronModelUrl from './models/botron.glb?url';
 import { signalBoot } from './boot-gate.js';
 
 const container = document.getElementById('stage-container');
-const { renderer, scene, camera, controls, glowRing, particles, keyLight, ground } = setupScene({
+const { renderer, scene, camera, controls, glowRing, particles } = setupScene({
   container,
 });
 
@@ -26,7 +26,7 @@ window.addEventListener(
   { passive: true }
 );
 
-// Camera story owns the intro + the Lenis/GSAP scrub loop.
+// Camera story owns the scroll scrub loop (Lenis + GSAP ScrollTrigger).
 const story = createCameraStory({ camera, controls, onScroll: () => wakeRender(25) });
 // gaze reads the robot model via a getter so it can be created before the robot.
 const gaze = createGaze({
@@ -39,7 +39,6 @@ const gaze = createGaze({
 
 const robot = createRobot({
   scene,
-  renderer,
   modelUrl: botronModelUrl,
   mouse,
   gazeState: gaze.state,
@@ -50,7 +49,8 @@ const robot = createRobot({
 const telemetry = createTelemetry(mouse);
 
 // --- BOTRON Bubble: tracks the robot's head/mouth in screen space ---
-// BOTRON is only present on 'hero' and 'about'. On any section where there is no bot, hide bubble.
+// BOTRON renders on the beats whose POSES entry sets bot: true (hero, about,
+// contact). On every other beat the bubble is hidden.
 const _headPos = new THREE.Vector3();
 const botronBubble = document.getElementById('botron-bubble');
 const botronBubbleText = botronBubble ? botronBubble.querySelector('p') : null;
@@ -58,25 +58,9 @@ let _bubbleW = 0,
   _bubbleH = 0;
 let _currentBeatId = null;
 
-if (botronBubble && botronBubbleText) {
-  let _feedbackTimer = null;
-  botronBubble.addEventListener('click', () => {
-    clearTimeout(_feedbackTimer);
-    const win = document.getElementById('bt-chat-window');
-    // If win has 'is-open', chat just opened -> show option to close
-    // If win does NOT have 'is-open', chat just closed -> show option to reopen
-    const isOpen = win && win.classList.contains('is-open');
-    if (isOpen) {
-      botronBubbleText.innerHTML = `// <span style="color:#00f0ff">RAG ONLINE • [CLICK TO CLOSE]</span>`;
-    } else {
-      botronBubbleText.innerHTML = `// <span style="color:#00f0ff">BOTRON IDLE • [CLICK TO REOPEN]</span>`;
-    }
-    _feedbackTimer = setTimeout(() => {
-      const msg = BOTRON_BEAT_MESSAGES[_currentBeatId] || BOTRON_BEAT_MESSAGES.hero;
-      botronBubbleText.innerHTML = msg;
-    }, 2800);
-  });
-}
+// The bubble click is owned by js/ui/chat.js (it already tracks the open state
+// and has syncBubbleState). Keeping a second handler here duplicated the same
+// text and then reverted it after 2.8s while the chat was still open.
 
 const BOTRON_BEAT_MESSAGES = {
   hero: `// I'M BOTRON • ASK ME ANYTHING <span style="color:#00f0ff">[CLICK TO CHAT]</span>`,
@@ -103,6 +87,10 @@ function hideBubble() {
 
 function updateBotronBubble() {
   if (!botronBubble) return;
+  // The chat window owns the bubble copy while it is open: never overwrite the
+  // call to action under the visitor's cursor.
+  const chatWin = document.getElementById('bt-chat-window');
+  if (chatWin && chatWin.classList.contains('is-open')) return;
 
   // Hide bubble whenever the bot model is not visible this beat.
   if (!story.state.botVisible) {
@@ -283,10 +271,10 @@ function animate(currentTime) {
   if (document.hidden) return;
 
 
-  // Dynamic Adaptive Refresh Rate:
-  // - Active scroll / touch / cursor tracking: full 60 FPS for buttery smooth motion (zero judder).
-  // - Stationary reading (bot visible): throttled to 30 FPS for smooth idle breathing without burning GPU.
-  // - Stationary reading (bot hidden): deep sleep at 0 FPS (zero draw calls).
+  // Adaptive frame rate:
+  // - Interacting (scroll / touch / cursor): 60 FPS, for judder-free motion.
+  // - Idle with the bot visible: 30 FPS, enough for the idle breathing cycle.
+  // - Idle with the bot hidden: skip the frame entirely (zero draw calls).
   const isInteracting = _isScrolling || _settleFrames > 0;
   const currentFPS = isInteracting ? 60 : 30;
   const currentInterval = 1000 / currentFPS;
@@ -312,7 +300,6 @@ function animate(currentTime) {
   const dt = Math.min(delta / 1000, 0.05);
   const elapsedTime = clock.getElapsedTime();
 
-  story.update(elapsedTime, dt); // camera-story
   mouse.currentX = damp(mouse.currentX, mouse.targetX, 6.0, dt);
   mouse.currentY = damp(mouse.currentY, mouse.targetY, 6.0, dt);
 
@@ -322,9 +309,8 @@ function animate(currentTime) {
   }
   robot.update(elapsedTime, dt);
 
-  // DEV instrumentation: the moment the bot is actually on screen, report how
-  // long it took and whether the GLB was served from cache. The model pipeline
-  // is identical on every device (robot.js never reads a tier flag).
+  // DEV instrumentation: once the bot is on screen, report how long it took and
+  // whether the GLB was served from cache.
   if (import.meta.env.DEV && !_perfLogged && robot.model) {
     _perfLogged = true;
     const glb = performance.getEntriesByType('resource').find((e) => /botron.*\.glb/.test(e.name));

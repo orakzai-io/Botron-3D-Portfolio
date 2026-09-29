@@ -1,5 +1,6 @@
 // js/webgl/camera-story.js
-// Story-driven camera: a 5-beat scroll tour plus the cinematic intro.
+// Story-driven camera: one pose per scroll beat (POSES in config.js — 8 of them
+// today), driven purely by scroll position. There is no intro animation.
 // Backed by the Lenis + GSAP ScrollTrigger smooth-scroll stack.
 import * as THREE from 'three';
 import { gsap } from 'gsap';
@@ -57,7 +58,7 @@ export function createCameraStory({ camera, controls, onScroll }) {
     measure();
   }
 
-  // Snaps the camera to a scroll Y across the 5-beat tour (camera + gaze beat).
+  // Snaps the camera to a scroll Y across the beat tour (camera + gaze beat).
   function applyCameraFromScroll(y) {
     if (beats.length < 2) return;
     const vh = window.innerHeight || 1;
@@ -118,10 +119,10 @@ export function createCameraStory({ camera, controls, onScroll }) {
     }
   }
 
-  // story.update() no-op since intro is removed; camera is immediately scroll-driven
-  function update() {
-    return false;
-  }
+  // Kept as a no-op for the shape of the returned API. The camera is driven
+  // entirely by the scroll scrub below, so there is no intro or per-frame camera
+  // work left to do.
+  function update() {}
 
   // ---------- Lenis + GSAP smooth-scroll stack ----------
   const lenis = new Lenis({

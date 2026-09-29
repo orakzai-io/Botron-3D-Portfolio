@@ -4,19 +4,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Shahsawar Orakzai (Shaso) — Full-Stack AI Engineer | orakzai.io</title>
+    <title>Shahsawar Orakzai — Full-Stack AI Engineer</title>
         <link rel="stylesheet" href="css/base.css">
 
     <!-- Quality tiers were removed on purpose: the site ships ONE look on every
          device (flat panels, no CSS glass blur, the low-power 3D path). The old
-         gate script that put an bt-lite class on <html>, the weak-device
+         gate script that put a bt-lite class on <html>, the weak-device
          heuristic, the ?quality=lite|full overrides and the FPS watchdog are all
-         deleted. See docs/quality-tiers.md for the removed code and how to
-         restore the glass design if you ever want it back. -->
+         deleted. Restoring a tier means bringing back all of it coherently. -->
     <!-- Self-hosted variable fonts (css/fonts.css): the same unicode-range
          subsetting Google serves, but same-origin — no third-party DNS/TLS
-         round-trips, no render-blocking external stylesheet. The two faces the
-         hero + boot overlay paint with are preloaded; Inter swaps in via CSS. -->
+         round-trips, no render-blocking external stylesheet. The faces the hero
+         paints with are preloaded; the rest swap in via CSS. -->
     <link rel="preload" href="assets/fonts/jetbrains-mono-latin.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="assets/fonts/space-grotesk-latin.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="css/fonts.css">
@@ -96,11 +95,11 @@
             <span class="bt-bubble-dot"></span>
             <p>// I'M BOTRON • ASK ME ANYTHING <span style="color:var(--cyan, #00f0ff)">[CLICK TO CHAT]</span></p>
         </div>
-        <!-- Glassmorphic Navbar -->
+        <!-- Flat-panel navbar -->
         <nav class="bt-nav" id="bt-nav">
             <a href="#hero" class="bt-brand">
                 <span class="bt-cube" aria-hidden="true"><i></i><i></i><i></i></span>
-                <span class="bt-brand-name">ORAKZAI<span>.IO</span></span>
+                <span class="bt-brand-name">ORAKZAI</span>
             </a>
             <!-- Desktop links -->
             <ul class="bt-nav-links">
@@ -204,7 +203,7 @@
 
                     <!-- Category Filter Tabs -->
                     <div class="bt-filter-bar">
-                        <button type="button" class="bt-filter-pill active" data-category="all">ALL (25)</button>
+                        <button type="button" class="bt-filter-pill active" data-category="all">ALL (29)</button>
                         <button type="button" class="bt-filter-pill" data-category="ai">AI & LLM (9)</button>
                         <button type="button" class="bt-filter-pill" data-category="backend">BACKEND (7)</button>
                         <button type="button" class="bt-filter-pill" data-category="devops">DEVOPS (4)</button>
