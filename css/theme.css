@@ -502,7 +502,6 @@ body[data-bot-visible="0"] .bt-bubble--hero {
   border-radius: 999px; background: rgba(255, 255, 255, 0.025);
 }
 
-
 /* reveal on scroll */
 .bt-reveal { opacity: 0; transform: translateY(26px); transition: opacity 0.9s var(--ease), transform 0.9s var(--ease); }
 .is-in .bt-reveal, .bt-reveal.is-in { opacity: 1; transform: none; }
@@ -512,126 +511,15 @@ body[data-bot-visible="0"] .bt-bubble--hero {
 
 /* Telemetry HUD Card */
 .bt-telemetry-hud {
-  padding: 1.25rem 1.4rem;
-  border-radius: 12px;
-  border: 1px solid var(--line-2);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), inset 0 0 20px rgba(0, 240, 255, 0.04);
-  pointer-events: auto;
-  position: relative;
-  overflow: hidden;
   transition: border-color 0.3s ease;
 }
-.bt-telemetry-hud::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 4px;
-  height: 100%;
-  background: var(--cyan);
-  box-shadow: 0 0 12px var(--cyan);
-}
-.bt-telemetry-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.65rem;
-}
-.bt-telemetry-badge {
-  display: flex;
-  align-items: center;
-  gap: 0.45rem;
-}
-.bt-telemetry-icon {
-  font-size: 0.95rem;
-}
-.bt-telemetry-cat {
-  font-family: var(--font-ui);
-  font-size: 0.64rem;
-  letter-spacing: 0.14em;
-  padding: 0.15rem 0.5rem;
-  border-radius: 4px;
-  border: 1px solid var(--cyan-dim);
-  color: var(--cyan);
-  background: rgba(0, 240, 255, 0.08);
-}
-.bt-telemetry-status {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-}
 .bt-telemetry-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--cyan);
-  box-shadow: 0 0 8px var(--cyan);
   animation: bBlink 1.8s infinite;
 }
-.bt-telemetry-level {
-  font-family: var(--font-ui);
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: var(--silver-1);
-}
-.bt-telemetry-title {
-  font-family: var(--font-disp);
-  font-size: 1.18rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  color: var(--silver-1);
-  margin-bottom: 0.35rem;
-}
-.bt-telemetry-desc {
-  font-size: 0.8rem;
-  line-height: 1.45;
-  color: var(--silver-3);
-  margin-bottom: 0.9rem;
-  min-height: 2.3em;
-}
 .bt-telemetry-meter {
-  width: 100%;
-  height: 5px;
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 3px;
-  overflow: hidden;
   position: relative;
-}
-.bt-telemetry-fill {
-  height: 100%;
-  background: var(--cyan);
-  border-radius: 3px;
-  box-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
-  transition: width 0.4s ease, background-color 0.4s ease;
-}
-.bt-telemetry-hint {
-  font-family: var(--font-ui);
-  font-size: 0.58rem;
-  letter-spacing: 0.16em;
-  color: var(--silver-4);
-  margin-top: 0.65rem;
-  text-align: right;
 }
 
-/* 3D Skills Stage */
-.bt-skills-stage {
-  position: relative;
-  width: 100%;
-  max-width: 520px;
-  aspect-ratio: 1 / 1;
-  justify-self: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  pointer-events: auto;
-}
-.bt-skills-stage canvas {
-  width: 100%;
-  height: 100%;
-  display: block;
-  touch-action: none;
-}
 /* Touch flash hardening: no long-press text-selection / magnifier flash on the
    globe stage or the telemetry HUD card (mirrors .bt-filter-pill's treatment).
    Canvas box is the biggest tap target on mobile, so opt it out explicitly. */
@@ -712,7 +600,9 @@ body[data-bot-visible="0"] .bt-bubble--hero {
   .bt-bubble--hero {
     display: none !important;
   }
-  .bt-skills-stage { max-width: min(90vw, 360px); margin: 1.2rem auto 0; }
+  /* Globe stage: max-width is owned by base.css (520px !important), so only the
+     mobile margin is declared here. */
+  .bt-skills-stage { margin: 1.2rem auto 0; }
 }
 
 /* Fallback for browsers without svh support (older iOS): 100vh is better than
@@ -1302,7 +1192,6 @@ html.lenis body { height: auto; }
   opacity: 1;
 }
 
-
 /* ---------- 5. Contact: Unified Console & Robot Stage (Option 1) ---------- */
 .bt-contact-grid {
   width: min(1280px, 92vw);
@@ -1451,7 +1340,6 @@ html.lenis body { height: auto; }
   width: 100%;
 }
 
-
 /* ---------- 6. Cyber Footer ---------- */
 .bt-footer {
   position: relative;
@@ -1537,7 +1425,6 @@ html.lenis body { height: auto; }
     justify-content: center;
   }
 }
-
 
 /* ---------- Responsive Layouts ---------- */
 @media (max-width: 900px) {
@@ -1835,7 +1722,6 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
 }
 
 /* --- telemetry HUD accent bar --- */
-.bt-telemetry-hud::before { background: linear-gradient(180deg, var(--cyan), var(--cyan-soft)); }
 
 /* --- filter pill active: dual glow --- */
 .bt-filter-pill.active { box-shadow: 0 0 0 1px rgba(0, 240, 255, 0.35), 0 0 18px rgba(0, 240, 255, 0.22), 0 0 38px rgba(0, 240, 255, 0.10); }
