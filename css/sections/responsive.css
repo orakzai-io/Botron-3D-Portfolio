@@ -4,7 +4,11 @@
 
 /* ---------- responsive ---------- */
 @media (max-width: 900px) {
-  .bt-hero-grid, .bt-beat-grid, .bt-skills-grid { grid-template-columns: 1fr; text-align: left; }
+  .bt-hero-grid, .bt-beat-grid { grid-template-columns: 1fr; }
+  /* .bt-skills-grid is absent above: base.css already sets
+     grid-template-columns: 1fr !important for it at <=900px, so declaring it
+     here is dead. text-align is not set by base.css and is still needed. */
+  .bt-hero-grid, .bt-beat-grid, .bt-skills-grid { text-align: left; }
   /* .bt-stage: the empty 3D canvas slot that sits alongside text in the desktop
      2-column grid. On mobile the grid is single-column so the stage becomes a
      spacer row. 44vh was too tall on narrow phones with lots of content — the
@@ -38,9 +42,9 @@
   .bt-bubble--hero {
     display: none !important;
   }
-  /* Globe stage: max-width is owned by base.css (520px !important), so only the
-     mobile margin is declared here. */
-  .bt-skills-stage { margin: 1.2rem auto 0; }
+  /* Globe stage: max-width AND margin are both owned by base.css, which sets
+     them with !important inside its own <=900px block, so anything declared
+     here is dead. base.css:397-400 wins over this file regardless of order. */
 }
 
 /* Fallback for browsers without svh support (older iOS): 100vh is better than
@@ -62,7 +66,7 @@ html.bt-cursor-on .bt-cursor { display: block; }
    the interactive pieces take pointer events back */
 .ui-overlay { pointer-events: none; }
 .bt-nav, .bt-brand, .bt-nav-links, .bt-status, .bt-actions,
-.bt-beat-copy, .bt-chip, .bt-mini, .bt-proj, .bt-timeline, .bt-timeline-card, .bt-quotes-viewport, .bt-contact,
+.bt-beat-copy, .bt-chip, .bt-mini, .bt-proj, .bt-timeline, .bt-timeline-card, .bt-quotes-viewport,
 .bt-filter-bar, .bt-filter-pill, .bt-telemetry-hud, .bt-skills-stage, #skills-globe { pointer-events: auto; }
 
 /* BOTRON chat — always interactive regardless of overlay stacking */

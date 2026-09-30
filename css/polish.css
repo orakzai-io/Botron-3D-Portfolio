@@ -259,10 +259,6 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
   }
 }
 
-/* --- telemetry HUD accent bar --- */
-
-/* --- filter pill active: dual glow --- */
-
 /* --- quotes carousel --- */
 .bt-quotes-dot.active { background: linear-gradient(90deg, var(--cyan), var(--cyan-soft)); }
 .bt-quotes-arrow:hover {

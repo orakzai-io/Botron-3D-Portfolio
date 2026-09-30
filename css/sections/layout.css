@@ -4,9 +4,6 @@
 
 /* ---------- Responsive Layouts ---------- */
 @media (max-width: 900px) {
-  .bt-contact {
-    grid-template-columns: 1fr;
-  }
   /* timeline collapses to a left rail */
   .bt-timeline::before {
     left: 20px;

@@ -63,7 +63,6 @@
 }
 .bt-quotes-dot.active {
   width: 26px;
-  background: var(--cyan);
   box-shadow: 0 0 10px var(--cyan-dim);
 }
 
