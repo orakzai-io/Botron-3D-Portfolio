@@ -1,0 +1,409 @@
+/* Accent + override layer (carries the !important rules that beat base.css)
+   Extracted verbatim from theme.css lines 1357-1762. Do not reorder imports
+   in theme.css — see the cascade note there. */
+
+/* --- ambient aurora atmosphere (static gradients behind the 3D stage) --- */
+body::before, body::after {
+  content: "";
+  position: fixed;
+  z-index: 0;
+  width: 62vw;
+  height: 62vw;
+  border-radius: 50%;
+  pointer-events: none;
+}
+body::before {
+  top: -24vw; right: -16vw;
+  background: radial-gradient(circle, rgba(0, 240, 255, 0.13), transparent 65%);
+}
+body::after {
+  bottom: -28vw; left: -20vw;
+  background: radial-gradient(circle, rgba(0, 240, 255, 0.08), transparent 65%);
+}
+/* --- selection, scrollbar, focus rings --- */
+::selection { background: rgba(0, 240, 255, 0.2); color: #fff; }
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(0, 240, 255, 0.45), rgba(103, 232, 249, 0.35));
+  border-radius: 6px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, rgba(0, 240, 255, 0.7), rgba(103, 232, 249, 0.6));
+}
+a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible {
+  outline: 2px solid var(--cyan-dim);
+  outline-offset: 3px;
+}
+
+/* --- nav: gradient hover underline --- */
+.bt-nav-link::after { background: linear-gradient(90deg, var(--cyan), rgba(103, 232, 249, 0.4), transparent); }
+
+/* --- hero: accent gradient on the name (caret stays OUTSIDE the clip
+   so its opacity blink actually toggles — a background-clip:text parent
+   paints the glyph shape through the mask and defeats child opacity) --- */
+.bt-title-name {
+  background: linear-gradient(100deg, #f2f7fa 8%, var(--cyan-soft) 78%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+.bt-caret {
+  color: var(--cyan);
+  -webkit-text-fill-color: var(--cyan);
+  animation: bCaretBlink 1.1s steps(1) infinite;
+}
+@keyframes bCaretBlink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+/* --- buttons: sheen sweep + dual-accent glow --- */
+.bt-btn { position: relative; overflow: hidden; }
+.bt-btn::after {
+  content: "";
+  position: absolute;
+  top: 0; left: -70%;
+  width: 45%; height: 100%;
+  background: linear-gradient(105deg, transparent, rgba(255, 255, 255, 0.16), transparent);
+  transform: skewX(-22deg);
+  transition: left 0.65s var(--ease);
+  pointer-events: none;
+}
+.bt-btn:hover::after { left: 135%; }
+.bt-btn:hover {
+  border-color: rgba(0, 240, 255, 0.45);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5), 0 0 22px rgba(0, 240, 255, 0.16), 0 0 34px rgba(0, 240, 255, 0.08);
+}
+.bt-actions .bt-btn:not(.bt-btn--ghost),
+.bt-contact-form .bt-btn {
+  background: linear-gradient(135deg, rgba(0, 240, 255, 0.13), rgba(103, 232, 249, 0.13));
+  border-color: rgba(0, 240, 255, 0.35);
+}
+.bt-actions .bt-btn:not(.bt-btn--ghost):hover,
+.bt-contact-form .bt-btn:hover {
+  background: linear-gradient(135deg, rgba(0, 240, 255, 0.22), rgba(103, 232, 249, 0.22));
+  border-color: rgba(0, 240, 255, 0.6);
+}
+/* --- tags: hover accent --- */
+.bt-tag { transition: all 0.25s var(--ease); }
+.bt-tag:hover {
+  color: var(--silver);
+  border-color: rgba(0, 240, 255, 0.4);
+  background: rgba(0, 240, 255, 0.06);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(0, 240, 255, 0.12);
+}
+
+/* --- cards: quiet education-style treatment (subtle silver hairline, soft shadow) --- */
+.bt-proj, .bt-timeline-card, .bt-quote, .bt-telemetry-hud {
+  border: 1px solid var(--line);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+}
+.bt-proj:hover, .bt-timeline-card:hover, .bt-quote:hover {
+  border-color: var(--line-2);
+  background: linear-gradient(135deg, rgba(17, 22, 33, 0.62), rgba(9, 12, 19, 0.78));
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+  transform: translateY(-4px);
+}
+
+/* --- projects: mission-deck accents -----------------------------------
+   The cards keep the quiet neutral base above, but get the section's cyan
+   treatment back (same polish level as the timeline spine / HUD bar / pill
+   halo): cyan hover, a gradient hairline, a sheen sweep over the screenshot
+   and a live status readout. All transform/opacity/shadow — no layout cost.
+   The always-on pieces also read on touch, where :hover never fires. */
+.bt-proj { position: relative; }
+.bt-proj::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--cyan), var(--cyan-soft));
+  opacity: 0.32;
+  z-index: 3;
+  pointer-events: none;
+  transition: opacity 0.3s var(--ease);
+}
+.bt-proj:hover::before { opacity: 1; }
+.bt-proj:hover {
+  border-color: rgba(0, 240, 255, 0.45);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45), 0 0 28px rgba(0, 240, 255, 0.14);
+}
+.bt-proj-thumb img { filter: brightness(0.85) saturate(0.95); }
+.bt-proj:hover .bt-proj-thumb img { filter: brightness(1) saturate(1.05); }
+.bt-proj-thumb::after {
+  content: "";
+  position: absolute;
+  top: 0; left: -70%;
+  width: 45%; height: 100%;
+  background: linear-gradient(105deg, transparent, rgba(0, 240, 255, 0.14), transparent);
+  transform: skewX(-22deg);
+  transition: left 0.65s var(--ease);
+  pointer-events: none;
+  z-index: 1; /* above the scanlines (::before), below the mission overlay (2) */
+}
+.bt-proj:hover .bt-proj-thumb::after { left: 135%; }
+.bt-proj-idx {
+  opacity: 1;
+  background: linear-gradient(135deg, var(--cyan), var(--cyan-soft));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+.bt-proj-status { display: inline-flex; align-items: center; gap: 0.42em; }
+.bt-proj-status::before {
+  content: "";
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--cyan);
+  box-shadow: 0 0 8px rgba(0, 240, 255, 0.85);
+  animation: bStatusPulse 1.9s ease-in-out infinite;
+}
+@keyframes bStatusPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+/* Same cyan hover treatment as the projects block, exposed only to precise pointers.
+   The timeline top bar is a background layer on hover, so border-radius clips it
+   to the corner curve without clipping the card or affecting its glass/blur state. */
+/* live status readout in the card header — this span was previously unstyled,
+   so it collapsed to a 0x0 (invisible) inline box; same 6px lamp as
+   .bt-proj-status::before. */
+.bt-pulse-light {
+  align-self: center;
+  flex: none;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--cyan);
+  box-shadow: 0 0 8px rgba(0, 240, 255, 0.85);
+  animation: bStatusPulse 1.9s ease-in-out infinite;
+}
+/* standby: a lamp that is deliberately NOT live. The pulse is what reads as
+   "active", so the dim variant stays static -- but it is still a lit lens with a
+   soft halo, otherwise it reads as a dead pixel instead of a status. */
+.bt-pulse-light--dim {
+  background: var(--silver-2);
+  box-shadow: 0 0 8px rgba(205, 215, 228, 0.30);
+  animation: none;
+  opacity: 1;
+}
+
+/* hover-only polish: never fires under a finger, so touch keeps the static look */
+@media (hover: hover) and (pointer: fine) {
+  .bt-timeline-card:hover {
+    border-color: rgba(0, 240, 255, 0.45);
+    /* layer 1 is the cyan top bar. As a background layer it is clipped by the
+       12px border-radius exactly like the border is: it tapers into the corner
+       curve with no step, needs no overflow:hidden, and fuses with the cyan border
+       above it into one lit top edge instead of two parallel lines. */
+    background: linear-gradient(90deg, rgba(0, 240, 255, 0.45), rgba(103, 232, 249, 0.45)) no-repeat top left / 100% 2px,
+      linear-gradient(135deg, rgba(19, 26, 38, 0.66), rgba(10, 14, 22, 0.8));
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45), 0 0 28px rgba(0, 240, 255, 0.14);
+    transform: translateY(-4px);
+  }
+  /* the standby lamp acknowledges the row without pretending to be live: the
+     pulse stays off, only the lens brightens */
+  .bt-timeline-card:hover .bt-pulse-light--dim {
+    background: var(--silver);
+    box-shadow: 0 0 8px rgba(205, 215, 228, 0.5);
+  }
+  /* the row's tags warm up with the card; a single tag's own hover stays the
+     louder state (lift + glow), which is why the non-hovered ones are targeted */
+  .bt-timeline-card:hover .bt-tag:not(:hover) {
+    color: var(--silver);
+    border-color: rgba(0, 240, 255, 0.30);
+    background: rgba(0, 240, 255, 0.05);
+  }
+}
+
+/* --- section titles: subtle accent gradient text --- */
+.bt-beat-title {
+  background: linear-gradient(95deg, #ffffff 18%, var(--cyan-soft) 92%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 26px rgba(0, 240, 255, 0.14);
+}
+
+/* --- timeline: gradient spine, accent dots, violet alternation --- */
+.bt-timeline::before {
+  background: linear-gradient(180deg, transparent, rgba(0, 240, 255, 0.35) 8%, rgba(103, 232, 249, 0.42) 50%, rgba(0, 240, 255, 0.35) 92%, transparent);
+}
+.bt-timeline-dot { background: linear-gradient(135deg, var(--cyan), var(--cyan-soft)); }
+.bt-timeline-item:nth-child(even) .bt-timeline-dot {
+  background: linear-gradient(135deg, var(--cyan-soft), var(--cyan));
+  box-shadow: 0 0 0 4px rgba(0, 240, 255, 0.14), 0 0 12px var(--cyan);
+}
+.bt-timeline-item:nth-child(even) .bt-timeline-date {
+  color: var(--cyan);
+  border-color: var(--cyan-dim);
+  background: rgba(0, 240, 255, 0.07);
+}
+
+/* The dot answers the row it belongs to (translateX keeps it centred on the
+   spine, incl. the <=900px left rail). This MUST stay below the nth-child(even)
+   dot rule above: both selectors are 0,3,0, so the later one wins, and from up in
+   the card's hover block the even row's default glow was silently overriding this
+   bloom -- its dot scaled but never lit up. */
+@media (hover: hover) and (pointer: fine) {
+  .bt-timeline-dot {
+    transition: transform 0.35s var(--ease), box-shadow 0.35s var(--ease);
+  }
+  .bt-timeline-item:hover .bt-timeline-dot {
+    transform: translateX(-50%) scale(1.18);
+    box-shadow: 0 0 0 5px rgba(0, 240, 255, 0.16), 0 0 22px rgba(0, 240, 255, 0.9);
+  }
+}
+
+/* --- telemetry HUD accent bar --- */
+
+/* --- filter pill active: dual glow --- */
+
+/* --- quotes carousel --- */
+.bt-quotes-dot.active { background: linear-gradient(90deg, var(--cyan), var(--cyan-soft)); }
+.bt-quotes-arrow:hover {
+  border-color: rgba(0, 240, 255, 0.5);
+  color: var(--cyan);
+  box-shadow: 0 0 16px rgba(0, 240, 255, 0.18), 0 0 26px rgba(0, 240, 255, 0.08);
+}
+
+/* --- contact form focus: dual-accent ring --- */
+.bt-field input:focus, .bt-field textarea:focus {
+  border-color: rgba(0, 240, 255, 0.45);
+  box-shadow: 0 0 0 3px rgba(0, 240, 255, 0.1), 0 0 22px rgba(0, 240, 255, 0.08);
+}
+
+/* --- footer: social glow (the gradient-hairline trick is gone) --- */
+.bt-social-link:hover {
+  box-shadow: 0 4px 16px rgba(0, 240, 255, 0.2), 0 0 26px rgba(0, 240, 255, 0.08);
+}
+
+/* --- reduced motion: disable ambient drift + sheen --- */
+@media (prefers-reduced-motion: reduce) {
+  .bt-btn::after { display: none; }
+  .bt-proj-thumb::after { display: none; }
+  .bt-proj-status::before { animation: none; }
+  .bt-pulse-light { animation: none; }
+  /* keep the timeline dot's hover glow, drop the scale pop */
+  .bt-timeline-item:hover .bt-timeline-dot { transform: translateX(-50%); }
+}
+
+/* ==========================================================================
+   LOW-GPU & MOBILE ULTRA-FAST PERFORMANCE OPTIMIZATIONS
+   Single look now -- the old glass/quality-tier system was removed on purpose;
+   every visitor gets the flat-panel look.
+   ========================================================================== */
+
+/* Off-screen narrative beats layout skipping.
+   NOTE: this block is deliberately NOT wrapped in a desktop media query; it is
+   neutralised on phones by the `content-visibility: visible !important`
+   override in the max-width:900px block above. contain-intrinsic-size
+   substitutes a fixed-height box for every off-screen beat, and on phones
+   the beats are TALLER than the 750px guess (100svh + padding), so without
+   that override scrolling swapped real sections for 750px ghosts and
+   produced large empty bands plus a jumpy scroll length. Keep the two in sync.
+   fixed-height box whenever a beat is off-screen, and on phones the beats are
+   TALLER than the 750px guess (100svh + padding), so scrolling swapped real
+   sections for 750px ghosts and produced large empty bands plus a jumpy scroll
+   length. The 900px override below turns it off for touch layouts. */
+.bt-beat {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 750px;
+}
+
+/* The flat panels are the only look on every device. The explicit `none`
+   resets are kept as a guard if an older cached stylesheet reintroduces glass. */
+.bt-nav,
+.bt-bubble,
+.bt-btn,
+.bt-filter-pill,
+.bt-telemetry-hud,
+.bt-timeline-card,
+.bt-quote,
+.bt-proj,
+.bt-mini {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background: rgba(8, 12, 22, 0.94);
+}
+
+/* base.css declares these with !important, so matching priority is needed here or
+   base.css silently wins. Their hover/active selectors are equally or more
+   specific and come later in this file. */
+.bt-filter-pill,
+.bt-telemetry-hud,
+.bt-contact-info .bt-mini {
+  background: rgba(8, 12, 22, 0.94) !important;
+}
+
+.bt-strip {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background: rgba(6, 8, 12, 0.94) !important;
+}
+
+.bt-nav-drawer {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background: rgba(6, 9, 16, 0.97) !important;
+}
+
+.bt-footer {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background: rgba(5, 7, 12, 0.94) !important;
+}
+
+.bt-timeline-card,
+.bt-proj,
+.bt-quote {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+}
+
+body::before,
+body::after {
+  filter: none !important;
+  animation: none !important;
+}
+
+/* Touch devices never rely on hover for essential state. Reset decorative
+   hover effects so a tap cannot leave a lifted card, bright image, sheen, or
+   glowing control stuck on screen; focus-visible remains available for keyboards. */
+@media (hover: none) and (pointer: coarse) {
+  .bt-nav-link:hover,
+  .bt-proj:hover,
+  .bt-timeline-card:hover,
+  .bt-quote:hover,
+  .bt-edu:hover,
+  .bt-btn:hover,
+  .bt-tag:hover,
+  .bt-filter-pill:hover,
+  .bt-quotes-arrow:hover,
+  .bt-social-link:hover,
+  .bt-chat-fab:hover,
+  .bt-chat-chip:hover,
+  .bt-chat-send-btn:hover,
+  .bt-chat-scroll-btn:hover,
+  .bt-contact-info .bt-mini:hover {
+    transform: none !important;
+  }
+
+  .bt-proj:hover {
+    border-color: var(--line) !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6) !important;
+  }
+  .bt-proj:hover::before { opacity: 0.32; }
+  .bt-proj:hover .bt-proj-thumb img { filter: brightness(0.85) saturate(0.95); }
+  .bt-proj:hover .bt-proj-thumb::after,
+  .bt-btn:hover::after { display: none; }
+  .bt-edu:hover::before,
+  .bt-edu:hover::after { width: 0; height: 0; border-color: transparent; }
+  .bt-social-link:hover { box-shadow: none !important; }
+  .bt-filter-pill:hover { box-shadow: none !important; }
+  .bt-nav-link:hover::after { transform: scaleX(0); }
+
+}

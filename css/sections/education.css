@@ -1,0 +1,108 @@
+/* Education — 3-column deck
+   Extracted verbatim from theme.css lines 878-982. Do not reorder imports
+   in theme.css — see the cascade note there. */
+
+/* ---------- 3. Education: 3-Column Deck ---------- */
+.bt-edu-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  width: 100%;
+}
+.bt-edu {
+  position: relative;
+  padding: 1.5rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.015);
+  transition: border-color 0.3s, background 0.3s, transform 0.3s var(--ease), box-shadow 0.3s;
+  display: flex;
+  flex-direction: column;
+}
+.bt-edu:hover {
+  border-color: var(--line-2);
+  background: rgba(255, 255, 255, 0.03);
+  transform: translateY(-4px);
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.05);
+}
+
+/* cyber corner tech brackets appearing on hover */
+.bt-edu::before, .bt-edu::after {
+  content: "";
+  position: absolute;
+  width: 0;
+  height: 0;
+  border: 2px solid transparent;
+  pointer-events: none;
+  transition: border-color 0.3s, width 0.3s, height 0.3s;
+}
+.bt-edu::before {
+  top: -1px;
+  left: -1px;
+}
+.bt-edu::after {
+  bottom: -1px;
+  right: -1px;
+}
+.bt-edu:hover::before {
+  border-top-color: var(--cyan);
+  border-left-color: var(--cyan);
+  width: 15px;
+  height: 15px;
+}
+.bt-edu:hover::after {
+  border-bottom-color: var(--cyan);
+  border-right-color: var(--cyan);
+  width: 15px;
+  height: 15px;
+}
+
+.bt-edu-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.8rem;
+  font-family: var(--font-ui);
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+}
+.bt-edu-type {
+  color: var(--silver-3);
+}
+.bt-edu-status {
+  color: var(--cyan);
+}
+.bt-edu h3 {
+  font-family: var(--font-disp);
+  font-weight: 600;
+  font-size: 1.05rem;
+  color: var(--silver);
+  margin-bottom: 0.25rem;
+}
+.bt-edu-school {
+  font-family: var(--font-ui);
+  font-size: 0.72rem;
+  color: var(--cyan);
+  margin-bottom: 0.6rem;
+  font-weight: normal;
+  letter-spacing: 0.08em;
+}
+.bt-edu .bt-beat-txt {
+  font-size: 0.84rem;
+  line-height: 1.6;
+  color: var(--silver-4);
+  margin-bottom: 0.5rem;
+  max-width: 100%;
+}
+.bt-edu .bt-btn {
+  margin-top: auto;
+  align-self: flex-start;
+  padding: 0.45rem 1rem;
+  font-size: 0.6rem;
+  border-radius: 6px;
+}
+.bt-edu-verify:hover {
+  background: rgba(0, 240, 255, 0.05);
+  border-color: var(--cyan);
+  box-shadow: 0 0 12px var(--cyan-dim);
+}

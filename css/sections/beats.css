@@ -1,0 +1,38 @@
+/* Scroll beat scaffolding + reveal-on-scroll
+   Extracted verbatim from theme.css lines 474-508. Do not reorder imports
+   in theme.css — see the cascade note there. */
+
+/* ---------- scroll beats — the narrative sections ---------- */
+.bt-beat {
+  position: relative; min-height: 100vh; display: flex; align-items: center;
+  padding: 6.5rem 0 4rem; pointer-events: none;
+}
+.bt-beat-grid {
+  width: min(1280px, 92vw); margin: 0 auto;
+  display: grid; grid-template-columns: minmax(0, 520px) 1fr; gap: clamp(1.5rem, 5vw, 5rem);
+  align-items: center;
+}
+.bt-beat-copy { pointer-events: auto; z-index: 3; }
+.bt-kicker {
+  font-family: var(--font-ui); font-size: 0.68rem; letter-spacing: 0.24em;
+  color: var(--silver-3); margin-bottom: 1.1rem;
+}
+.bt-kicker::before { content: "//  "; color: var(--cyan); }
+.bt-beat-title {
+  font-family: var(--font-disp); font-weight: 600; font-size: clamp(1.8rem, 3.4vw, 2.9rem);
+  letter-spacing: -0.01em; color: var(--silver); margin-bottom: 1.1rem; line-height: 1.05;
+}
+.bt-beat-txt {
+  font-size: 0.95rem; line-height: 1.7; color: var(--silver-4); max-width: 46ch; margin-bottom: 1.6rem;
+}
+
+.bt-tags { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+.bt-tag {
+  font-family: var(--font-ui); font-size: 0.66rem; letter-spacing: 0.14em;
+  color: var(--silver-2); padding: 0.42rem 0.85rem; border: 1px solid var(--line);
+  border-radius: 999px; background: rgba(255, 255, 255, 0.025);
+}
+
+/* reveal on scroll */
+.bt-reveal { opacity: 0; transform: translateY(26px); transition: opacity 0.9s var(--ease), transform 0.9s var(--ease); }
+.is-in .bt-reveal, .bt-reveal.is-in { opacity: 1; transform: none; }

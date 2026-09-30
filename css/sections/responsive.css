@@ -1,0 +1,106 @@
+/* Responsive — hero/stage/beats/skills at <=900px
+   Extracted verbatim from theme.css lines 536-638. Do not reorder imports
+   in theme.css — see the cascade note there. */
+
+/* ---------- responsive ---------- */
+@media (max-width: 900px) {
+  .bt-hero-grid, .bt-beat-grid, .bt-skills-grid { grid-template-columns: 1fr; text-align: left; }
+  /* .bt-stage: the empty 3D canvas slot that sits alongside text in the desktop
+     2-column grid. On mobile the grid is single-column so the stage becomes a
+     spacer row. 44vh was too tall on narrow phones with lots of content — the
+     section stretched past a full screen height and stacked up as visible dead
+     space. Set to auto so the row only takes what it needs; the robot still
+     renders in the fixed WebGL canvas behind the whole page. */
+  .bt-stage { min-height: 0; height: auto; order: 2; }
+  /* 100vh is the TALL viewport on mobile (it ignores the collapsing URL bar),
+     so every beat overhung the visible screen and stacked up as empty space
+     below the copy. svh is the small/stable viewport and does not jump when
+     the bar hides. Padding is trimmed for the same reason. */
+  .bt-hero { min-height: 100svh; }
+  .bt-beat {
+    min-height: auto;
+    padding: 5rem 0 3rem;
+    /* The desktop performance block at the bottom of this file sets
+       content-visibility:auto + contain-intrinsic-size:750px, which replaces
+       off-screen sections with a fixed 750px placeholder. On mobile the real
+       section height varies wildly by screen width (text wraps more → taller),
+       so the 750px ghost is wrong on every phone and produces different-sized
+       gaps between sections. !important is needed here because that block
+       comes later in the cascade and would otherwise win. */
+    content-visibility: visible !important;
+    contain-intrinsic-size: none !important;
+  }
+  /* Botron bubble is hidden on mobile — the chat FAB (#bt-chat-fab) is the
+     entry point there. The old override (absolute / top:10% / opacity:1)
+     pinned the bubble 10% down the whole .ui-overlay document-height and
+     forced it visible over the hero copy; JS placement also can't help at
+     these widths (the pill alone is ~74% of the screen). */
+  .bt-bubble--hero {
+    display: none !important;
+  }
+  /* Globe stage: max-width is owned by base.css (520px !important), so only the
+     mobile margin is declared here. */
+  .bt-skills-stage { margin: 1.2rem auto 0; }
+}
+
+/* Fallback for browsers without svh support (older iOS): 100vh is better than
+   leaving the declaration invalid. */
+@supports not (height: 100svh) {
+  @media (max-width: 900px) {
+    .bt-hero { min-height: 100vh; }
+    /* .bt-beat is now min-height:auto — no svh fallback needed */
+  }
+}
+
+/* custom cursor — active only on precise pointers; native cursor hidden */
+@media (hover: hover) and (pointer: fine) {
+  html.bt-cursor-on, html.bt-cursor-on * { cursor: none !important; }
+}
+html.bt-cursor-on .bt-cursor { display: block; }
+
+/* explicit interaction layer — beats are transparent to clicks,
+   the interactive pieces take pointer events back */
+.ui-overlay { pointer-events: none; }
+.bt-nav, .bt-brand, .bt-nav-links, .bt-status, .bt-actions,
+.bt-beat-copy, .bt-chip, .bt-mini, .bt-proj, .bt-timeline, .bt-timeline-card, .bt-quotes-viewport, .bt-contact,
+.bt-filter-bar, .bt-filter-pill, .bt-telemetry-hud, .bt-skills-stage, #skills-globe { pointer-events: auto; }
+
+/* BOTRON chat — always interactive regardless of overlay stacking */
+.bt-chat-fab,
+.bt-chat-window,
+.bt-chat-window *,
+.bt-chat-input,
+.bt-chat-send-btn,
+.bt-chat-close-btn,
+.bt-chat-chip { pointer-events: auto !important; }
+
+/* ============================================================
+   Lenis smooth-scroll (wired up in js/webgl/camera-story.js).
+   Lenis hijacks the document scroller, so native CSS smooth
+   scrolling must be disabled to avoid fighting the JS scroll.
+   ============================================================ */
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+html.lenis { height: auto; }
+html.lenis body { height: auto; }
+
+/* ============================================================
+   BOT-OFF SECTIONS: DASHBOARD GRIDS & TELEMETRY CONSOLE
+   ============================================================ */
+
+/* interaction layer addition for moved and interactive sections */
+.bt-proj-grid, .bt-edu-grid, .bt-quotes-viewport, .bt-edu, .bt-quote, .bt-proj,
+.bt-contact-info, .bt-contact-form, .bt-field { 
+  pointer-events: auto; 
+}
+
+/* Dashboard full-width section layout */
+.bt-beat--dashboard .bt-beat-grid {
+  grid-template-columns: 1fr;
+  max-width: 1600px;
+  width: min(1600px, 94vw);
+  align-items: start;
+}
+.bt-beat--dashboard .bt-beat-copy {
+  max-width: 680px;
+  margin-bottom: 2.5rem;
+}

@@ -1,0 +1,83 @@
+/* Touch layer — hover reset + .bt-lit tap feedback
+   Extracted verbatim from theme.css lines 1763-1841. Do not reorder imports
+   in theme.css — see the cascade note there. */
+
+/* --- touch: tap stands in for :hover --------------------------------------
+   Deliberately NOT wrapped in (hover: none) and (pointer: coarse). That query
+   reports hover:hover / pointer:fine inside a desktop browser's responsive
+   device emulator, so a media-gated version silently does nothing for anyone
+   previewing mobile on a laptop -- which is exactly how this went unnoticed.
+   There is deliberately NO capability gate here or in js/ui/ui.js. Scoping
+   these rules to a class that JS only adds when it detects touch made the whole
+   feature dead in a desktop browser's device emulator, where maxTouchPoints is 0
+   and the (hover: none) query is false. Unconditional: the selectors match
+   .bt-lit, which only ever exists because a real click put it there.
+
+   The reset above strips :hover on touch so a tap cannot leave a card stuck
+   lifted. These give touch that treatment back, in two layers:
+
+     :active  the press itself, live only while the finger is down
+     .bt-lit  the persistent tap state, cleared on the next tap anywhere
+
+   :focus is not used: it outlives the tap and would recreate the exact
+   stuck-card problem the reset avoids. Every value is copied from the matching
+   desktop :hover rule so touch matches desktop rather than approximating it.
+   Durations are shortened because these cards ease over 0.3s, which a tap
+   never reaches before it reverses -- that reads as a flicker, not a press. */
+.bt-proj,
+.bt-timeline-card,
+.bt-edu,
+.bt-quote { transition-duration: 0.11s !important; }
+
+:is(.bt-proj, .bt-timeline-card, .bt-edu, .bt-quote):active,
+:is(.bt-proj, .bt-timeline-card, .bt-edu, .bt-quote).bt-lit {
+  transform: translateY(-4px) !important;
+}
+:is(.bt-proj, .bt-timeline-card):active,
+:is(.bt-proj, .bt-timeline-card).bt-lit {
+  border-color: rgba(0, 240, 255, 0.45) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45), 0 0 28px rgba(0, 240, 255, 0.14) !important;
+}
+.bt-proj:active::before,
+.bt-proj.bt-lit::before { opacity: 1 !important; }
+.bt-proj:active .bt-proj-thumb img,
+.bt-proj.bt-lit .bt-proj-thumb img { filter: brightness(1) saturate(1.05) !important; }
+
+.bt-edu:active,
+.bt-edu.bt-lit {
+  border-color: var(--line-2) !important;
+  background: rgba(255, 255, 255, 0.03) !important;
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.05) !important;
+}
+.bt-edu:active::before,
+.bt-edu:active::after,
+.bt-edu.bt-lit::before,
+.bt-edu.bt-lit::after { width: 15px !important; height: 15px !important; }
+.bt-edu:active::before,
+.bt-edu.bt-lit::before {
+  border-top-color: var(--cyan) !important;
+  border-left-color: var(--cyan) !important;
+}
+.bt-edu:active::after,
+.bt-edu.bt-lit::after {
+  border-bottom-color: var(--cyan) !important;
+  border-right-color: var(--cyan) !important;
+}
+
+.bt-quote:active,
+.bt-quote.bt-lit {
+  border-color: var(--cyan-dim) !important;
+  background: linear-gradient(180deg, rgba(8, 10, 14, 0.7) 0%, rgba(4, 5, 10, 0.7) 100%) !important;
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.08) !important;
+}
+.bt-quote:active .bt-quote-body,
+.bt-quote.bt-lit .bt-quote-body {
+  border-left-color: var(--cyan) !important;
+  color: var(--silver) !important;
+}
+
+/* The quotes carousel deliberately keeps its quotes flat (theme.css lifts
+   nothing inside .bt-quotes-track), so neither tap state may introduce a lift
+   the desktop hover does not have. */
+.bt-quotes-track .bt-quote:active,
+.bt-quotes-track .bt-quote.bt-lit { transform: none !important; }

@@ -1,0 +1,72 @@
+/* Contact — unified console + robot stage
+   Extracted verbatim from theme.css lines 1164-1232. Do not reorder imports
+   in theme.css — see the cascade note there. */
+
+/* ---------- 5. Contact: Unified Console & Robot Stage (Option 1) ---------- */
+
+.bt-contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.05rem;
+}
+.bt-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+.bt-field label {
+  font-family: var(--font-ui);
+  font-size: 0.62rem;
+  letter-spacing: 0.16em;
+  color: var(--silver-4);
+  transition: color 0.3s;
+}
+.bt-field:focus-within label {
+  color: var(--cyan);
+}
+.bt-field input,
+.bt-field textarea {
+  width: 100%;
+  padding: 0.8rem 0.95rem;
+  background: rgba(8, 10, 14, 0.55);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  color: var(--silver);
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  outline: none;
+  resize: vertical;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+.bt-field input::placeholder,
+.bt-field textarea::placeholder {
+  color: var(--silver-4);
+}
+.bt-field input:focus,
+.bt-field textarea:focus {
+  border-color: var(--cyan-dim);
+  box-shadow: 0 0 0 3px rgba(0, 240, 255, 0.10), 0 0 18px rgba(0, 240, 255, 0.08);
+}
+.bt-field-error {
+  font-family: var(--font-ui);
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  color: var(--danger);
+  min-height: 0.9rem;
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+.bt-field.has-error label {
+  color: var(--danger);
+}
+.bt-field.has-error input,
+.bt-field.has-error textarea {
+  border-color: var(--danger);
+  box-shadow: 0 0 0 3px var(--danger-glow);
+}
+.bt-field.has-error .bt-field-error {
+  opacity: 1;
+}
+.bt-contact-form .bt-btn {
+  width: 100%;
+}

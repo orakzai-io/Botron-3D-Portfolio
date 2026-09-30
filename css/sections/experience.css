@@ -1,0 +1,108 @@
+/* Experience — centred zig-zag timeline
+   Extracted verbatim from theme.css lines 639-742. Do not reorder imports
+   in theme.css — see the cascade note there. */
+
+/* ---------- 1. Experience: Centered Zig-Zag Timeline ---------- */
+.bt-timeline {
+  position: relative;
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 0.25rem 0 1rem;
+}
+.bt-timeline::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 2px;
+  transform: translateX(-50%);
+  background: linear-gradient(180deg, transparent, var(--cyan-dim) 10%, var(--cyan-dim) 90%, transparent);
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.35);
+}
+.bt-timeline-item {
+  position: relative;
+  padding: 18px 0;
+}
+.bt-timeline-dot {
+  position: absolute;
+  left: 50%;
+  top: 18px;
+  transform: translateX(-50%);
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--cyan);
+  border: 3px solid var(--bg);
+  box-shadow: 0 0 0 4px rgba(162, 168, 168, 0.18), 0 0 12px var(--cyan);
+  z-index: 2;
+}
+.bt-timeline-date {
+  position: absolute;
+  left: calc(50% + 30px);
+  top: 18px;
+  font-family: var(--font-ui);
+  font-size: 0.66rem;
+  letter-spacing: 0.1em;
+  color: var(--cyan);
+  padding: 0.4rem 0.9rem;
+  border: 1px solid var(--cyan-dim);
+  border-radius: 999px;
+  background: rgba(0, 240, 255, 0.06);
+  white-space: nowrap;
+}
+.bt-timeline-item:nth-child(even) .bt-timeline-date {
+  left: auto;
+  right: calc(50% + 30px);
+}
+.bt-timeline-card {
+  /* Flat panel is intentionally unclipped: the timeline top bar is a background layer,
+     so border-radius follows the corner curve without overflow:hidden or paint
+     containment. This also keeps the flat-panel treatment consistent. */
+  width: calc(50% - 70px);
+  margin-right: auto;
+  margin-left: 0;
+  padding: 16px 22px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+  transition: border-color 0.3s, box-shadow 0.3s, transform 0.3s var(--ease);
+}
+.bt-timeline-item:nth-child(even) .bt-timeline-card {
+  margin-right: 0;
+  margin-left: auto;
+}
+/* No hover state here on purpose: the shared card rule further down
+   (".bt-proj:hover, .bt-timeline-card:hover, .bt-quote:hover") outranks anything
+   declared at this point, so the cyan treatment lives in the ENHANCEMENT LAYER
+   next to the mission-deck accents. */
+.bt-timeline-card .bt-card-status {
+  display: inline-flex;
+  gap: 0.45rem;
+  font-family: var(--font-ui);
+  font-size: 0.66rem;
+  color: var(--silver-4);
+  letter-spacing: 0.12em;
+  margin-bottom: 0.5rem;
+}
+.bt-timeline-card .bt-role {
+  font-family: var(--font-disp);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--silver);
+  margin-bottom: 0.2rem;
+}
+.bt-timeline-card .bt-org {
+  font-family: var(--font-ui);
+  font-size: 0.75rem;
+  color: var(--cyan);
+  letter-spacing: 0.08em;
+  font-weight: normal;
+  margin-bottom: 0.6rem;
+}
+.bt-timeline-card .bt-beat-txt {
+  font-size: 0.92rem;
+  line-height: 1.7;
+  color: var(--silver-3);
+  margin-bottom: 0.25rem;
+}

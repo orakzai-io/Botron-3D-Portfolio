@@ -1,0 +1,41 @@
+/* Responsive layout overrides
+   Extracted verbatim from theme.css lines 1319-1356. Do not reorder imports
+   in theme.css — see the cascade note there. */
+
+/* ---------- Responsive Layouts ---------- */
+@media (max-width: 900px) {
+  .bt-contact {
+    grid-template-columns: 1fr;
+  }
+  /* timeline collapses to a left rail */
+  .bt-timeline::before {
+    left: 20px;
+  }
+  .bt-timeline-dot {
+    left: 20px;
+    top: 2rem;
+  }
+  .bt-timeline-date,
+  .bt-timeline-item:nth-child(even) .bt-timeline-date {
+    position: static;
+    display: inline-block;
+    margin: 0 0 0.6rem 50px;
+  }
+  .bt-timeline-card,
+  .bt-timeline-item:nth-child(even) .bt-timeline-card {
+    width: calc(100% - 50px);
+    margin-left: 50px;
+    margin-right: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .bt-proj-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ============================================================
+   ENHANCEMENT LAYER — cyan UI polish (violet reserved for bot scene & skills atom)
+   Appended last so it wins over everything above.
+   ============================================================ */

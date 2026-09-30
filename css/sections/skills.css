@@ -1,0 +1,30 @@
+/* Skills — 3D globe + telemetry HUD
+   Extracted verbatim from theme.css lines 509-535. Do not reorder imports
+   in theme.css — see the cascade note there. */
+
+/* ---------- skills: 3D holographic globe & telemetry HUD ---------- */
+.bt-beat--skills { align-items: center; }
+
+/* Telemetry HUD Card */
+.bt-telemetry-hud {
+  transition: border-color 0.3s ease;
+}
+.bt-telemetry-dot {
+  animation: bBlink 1.8s infinite;
+}
+.bt-telemetry-meter {
+  position: relative;
+}
+
+/* Touch flash hardening: no long-press text-selection / magnifier flash on the
+   globe stage or the telemetry HUD card (mirrors .bt-filter-pill's treatment).
+   Canvas box is the biggest tap target on mobile, so opt it out explicitly. */
+.bt-skills-stage,
+.bt-skills-stage canvas,
+.bt-telemetry-hud {
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* 2. Projects moved below — see "selected projects" deck */
