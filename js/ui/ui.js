@@ -141,7 +141,7 @@
       const count = slides.length;
       let idx = 0;
       let timer = null;
-      const AUTO_MS = 6000;
+      const AUTO_MS = 2000;
 
       // build the dot indicators
       if (dotsEl) {
