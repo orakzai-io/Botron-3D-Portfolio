@@ -257,12 +257,11 @@
   font-weight: 600;
 }
 
-/* The photo caption ("Tap any photo to view full size.") is emitted as <em> by
-   ensurePhotos() in js/ui/chat.js. There was no rule for it, so it inherited the
+/* <em> in a bot bubble comes from the RAG-waking fallback in js/ui/chat.js
+   (the "backend is still waking up" notice). Without a rule it inherited the
    bubble's full-contrast body colour and read as ordinary prose competing with
-   the photo itself. Dimmed to match .bt-meta-details below so the hint recedes
-   and the image stays the focus. font-style is reset because italic mono at
-   this size reads as noise. */
+   the answer. Dimmed so that notice recedes. font-style is reset because
+   italic mono at this size reads as noise. */
 .bt-chat-msg--bot .bt-chat-bubble em {
   color: #94a3b8;
   font-family: 'JetBrains Mono', monospace;
@@ -307,8 +306,14 @@
   letter-spacing: 0.04em;
 }
 
+/* Cyan, matching the VECTOR RAG badge it sits beside. This colour was
+   reaching the text only by accident: the chat header rule
+   ".bt-chat-meta span" (0,1,1) outranked this one (0,1,0), so the rule was
+   dead and the sources line was painted by the header. Renaming the message
+   row to .bt-chat-msg-meta removed that overlap, which left the text with no
+   colour of its own -- hence the stated colour here. */
 .bt-meta-details {
-  color: #94a3b8;
+  color: rgba(0, 240, 255, 0.85);
   font-size: 0.58rem;
 }
 
@@ -358,7 +363,8 @@
   transform: translateY(-1px);
 }
 
-/* Typing / Retrieving Indicator */
+/* Typing indicator (generic label: the wait is retrieval + generation, so it
+   does not name either one) */
 .bt-chat-typing {
   display: flex;
   align-items: center;

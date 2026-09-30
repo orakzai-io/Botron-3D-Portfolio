@@ -139,7 +139,7 @@ function ensurePhotos(query, answerHtml) {
   if (!tags) return answerHtml;
   if (/<img[^>]*class="[^"]*bt-chat-photo/.test(answerHtml)) return answerHtml;
   const label = PHOTO_CHESS.test(query) ? 'Chess.' : PHOTO_SWIM.test(query) ? 'Swimming.' : 'This is Shahsawar.';
-  return answerHtml + '<br><strong>' + label + '</strong><br>' + tags + '<br><em>Tap any photo to view full size.</em>';
+  return answerHtml + '<br><strong>' + label + '</strong><br>' + tags;
 }
 
 export function initChat() {
@@ -553,7 +553,7 @@ export function initChat() {
       <span class="bt-chat-typing-dot"></span>
       <span class="bt-chat-typing-dot"></span>
       <span class="bt-chat-typing-dot"></span>
-      <span class="bt-chat-typing-txt">RETRIEVING FROM KNOWLEDGE BASE...</span>
+      <span class="bt-chat-typing-txt">BOTRON IS THINKING...</span>
     `;
     messagesContainer.appendChild(typingEl);
     scrollToBottom(true);
