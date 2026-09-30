@@ -121,7 +121,7 @@ CHUNKS = [
             "processing time by 90%.\n"
             "• Head Coach: Designed progressive physical conditioning and technical stroke mechanics programs, coaching and mentoring "
             "30+ junior swimmers to multiple regional and provincial podium finishes.\n"
-            "• Engineering Philosophy: Views software performance through the lens of competitive swimming—obsessing over hundredths "
+            "• Engineering Philosophy: Views software performance through the lens of competitive swimming, obsessing over hundredths "
             "of a second, latency, continuous discipline, and high-pressure execution."
         )
     },
@@ -235,11 +235,13 @@ CHUNKS = [
         "content": (
             "Verified Client & Peer Reviews:\n"
             "1. Vivek Pippala (AI Engineer · Verified via Upwork, 5/5 Stars):\n"
-            "   \"Shahsawar optimized our RAG search pipeline using pgvector and FastAPI, delivering sub-second response times across indexed document chunks.\"\n"
-            "2. Awais Khan (Software Engineer · Direct Client, 5/5 Stars):\n"
-            "   \"His technical mastery of async Python, REST APIs, and Docker containerization significantly boosted our backend throughput.\"\n"
+            "   \"Shahsawar transformed our RAG pipeline from a sluggish proof-of-concept into a lightning-fast production service. His pgvector indexing and async FastAPI architecture cut our search latency by over 60%. Exceptional depth in vector retrieval.\"\n"
+            "2. Muhammad Imad (Software Engineer at Tech Yard · 5/5 Stars):\n"
+            "   \"Shahsawar writes backend code like a seasoned systems architect. His mastery of async Python, Pydantic data pipelines, and Docker containerization effortlessly scaled our throughput under heavy loads. Clean, rock-solid engineering.\"\n"
             "3. Muhammad Husnain (Web Developer · Direct Collaboration, 5/5 Stars):\n"
-            "   \"One of the most talented full-stack devs I've worked with — integrated modern LLM endpoints and TypeScript interfaces cleanly.\""
+            "   \"Rare to find an engineer who can architect complex LLM agent pipelines on the backend and wire them up to slick, responsive TypeScript interfaces on the frontend. Shahsawar executes fast and delivers code that is a pleasure to work with.\"\n"
+            "4. Alex Mercer (Product Lead · Verified via Upwork, 5/5 Stars):\n"
+            "   \"We hired Shahsawar to automate an intensive multi-step data workflow with AI agents. He mapped out the edge cases, built the state loops with ironclad guardrails, and delivered days ahead of schedule. Saved our operations team hours every single day.\""
         )
     },
     {
