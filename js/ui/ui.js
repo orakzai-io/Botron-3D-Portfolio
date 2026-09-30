@@ -334,10 +334,21 @@
   // by a real click.
   document.querySelectorAll(LIT_CARDS).forEach((card) => {
     card.addEventListener('click', (e) => {
+      // Do not trap clicks on action links or buttons inside the card
+      if (e.target.closest('a, button')) return;
       e.stopPropagation();
       const wasLit = card.classList.contains('bt-lit');
       document.querySelectorAll('.bt-lit').forEach((el) => el.classList.remove('bt-lit'));
       if (!wasLit) card.classList.add('bt-lit');
     });
+    // Ensure mouse departure immediately unlocks the hover/lit state on desktop
+    card.addEventListener('mouseleave', () => {
+      card.classList.remove('bt-lit');
+    });
+  });
+
+  // Clear lit state on any tap/click outside
+  document.addEventListener('click', () => {
+    document.querySelectorAll('.bt-lit').forEach((el) => el.classList.remove('bt-lit'));
   });
 })();

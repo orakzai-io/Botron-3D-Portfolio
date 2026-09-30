@@ -24,7 +24,7 @@ CHUNKS = [
         "content": (
             "Shahsawar Orakzai is a Full-Stack AI Engineer, backend systems architect, "
             "and Computer Science undergraduate maintaining a perfect 4.0 CGPA at the University of Agriculture, Peshawar (UAP). "
-            "He specializes in designing autonomous multi-agent systems, sub-250ms vector RAG architectures, and high-throughput "
+            "He specializes in designing autonomous multi-agent systems, high-performance vector RAG architectures, and scalable "
             "async backends. Beyond software engineering, he competed for a decade as a National Swimmer winning 10+ medals "
             "(including Gold at National Junior Swimming Championships), serves as IT Manager & Head Coach for KP Swimming Association, "
             "and trains tactical foresight in competitive chess.\n"
@@ -46,7 +46,7 @@ CHUNKS = [
         "content": (
             "Key Personal & Professional Traits of Shahsawar Orakzai:\n"
             "1. High Attention to Detail: Obsesses over architectural elegance, type safety, strict runtime schema "
-            "validation via Pydantic, sub-250ms query SLAs, and cryptographic precision (e.g. zero-knowledge AES-256-GCM in VaultGuard).\n"
+            "validation via Pydantic, low-latency query response, and cryptographic precision (e.g. zero-knowledge AES-256-GCM in VaultGuard).\n"
             "2. Fast Learner & Intellectual Curiosity: Maintains a perfect 4.0 CGPA at the University of Agriculture, Peshawar (UAP), "
             "earned dual Harvard University credentials (CS50x & CS50P), and rapidly self-masters state-of-the-art AI tooling "
             "(Qdrant, pgvector, FastEmbed, Groq SLMs, LangChain, n8n).\n"
@@ -197,7 +197,7 @@ CHUNKS = [
         "category": "skills",
         "content": (
             "Comprehensive AI & LLM Technical Competencies:\n"
-            "• RAG Systems: Dense semantic vector search, recursive semantic chunking, hybrid keyword-vector retrieval, sub-250ms query latency.\n"
+            "• RAG Systems: Dense semantic vector search, recursive semantic chunking, hybrid keyword-vector retrieval, and optimized query response times.\n"
             "• Vector Databases & Indexes: pgvector (IVFFlat and HNSW indexing in PostgreSQL), Qdrant, ChromaDB, FastEmbed.\n"
             "• LLM APIs & Frameworks: Groq Cloud API (Llama, Qwen, GPT-OSS), OpenAI API (GPT-4o, o1, o3-mini), LangChain, LangSmith (observability & tracing).\n"
             "• Autonomous Agents: Multi-agent orchestration, state loops, tool-calling pipelines, structured Pydantic outputs, system guardrails.\n"

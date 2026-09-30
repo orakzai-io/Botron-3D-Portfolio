@@ -615,8 +615,8 @@ export function initChat() {
       if (err && err.name === 'AbortError' && wasWaking) {
         removeTypingIndicator();
         appendMessage(
-          '<em>// RAG BACKEND IS STILL WAKING UP — sleeping hosts take 20-45s to start. ' +
-            'It may be back shortly; meanwhile BOTRON can still show you his work.</em><br>' +
+          '<em>// RAG BACKEND IS STILL WAKING UP // sleeping hosts take 20-45s to start. ' +
+            'It may be back shortly; meanwhile BOTRON can still show you his projects.</em><br>' +
             ensurePhotos(query, offlineAnswer(query)),
           'bot'
         );
@@ -632,14 +632,14 @@ export function initChat() {
 
   function offlineAnswer(query) {
     return (
-      "<em>// RAG BACKEND OFFLINE — answering from the local index.</em><br>" +
+      "<em>// RAG BACKEND OFFLINE // answering from the local index.</em><br>" +
       "Shahsawar Orakzai is a Full-Stack AI Engineer and Computer Science undergraduate at UAP " +
       "with a 4.0 CGPA and dual Harvard CS50x/CS50P credentials. He has delivered 5+ production " +
-      "AI applications, including <strong>REDNOTE</strong> (sub-250ms vector RAG over 10,000+ chunks), " +
+      "AI applications, including <strong>REDNOTE</strong> (vector RAG over 10,000+ chunks), " +
       "an async scraping intelligence pipeline, and <strong>VaultGuard</strong>, a zero-knowledge " +
       "credential vault. He is also a former MINDGIGS Python intern, a 10-year National Swimmer, " +
-      "and a competitive chess player.<br><br>Once the backend is reachable I can answer in detail — " +
-      "try again in a moment."
+      "and a competitive chess player.<br><br>Once the backend is reachable I can answer in detail. " +
+      "Please try again in a moment."
     );
   }
 

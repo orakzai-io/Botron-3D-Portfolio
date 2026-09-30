@@ -114,7 +114,7 @@ class ChatResponse(BaseModel):
 
 
 SYSTEM_PROMPT_TEMPLATE = """You are BOTRON, an advanced autonomous AI assistant embedded in Shahsawar Orakzai's 3D interactive portfolio (orakzai.io).
-Your task is to answer visitor questions concisely, accurately, and authoritatively about Shahsawar's technical work, projects, background, and athletic career.
+Your task is to answer visitor questions concisely, accurately, and authoritatively about Shahsawar's technical projects, background, and athletic career.
 
 === GROUND TRUTH RETRIEVED CONTEXT ===
 {context}
@@ -159,8 +159,8 @@ def chat(payload: ChatRequest):
         return ChatResponse(
             answer=(
                 "I don't have anything indexed on that. My knowledge base covers Shahsawar's "
-                "engineering work (REDNOTE, Async Web Scraper, VaultGuard), his academics and "
-                "Harvard credentials, his work experience, and his swimming and chess background. "
+                "engineering projects (REDNOTE, Async Web Scraper, VaultGuard), his academics and "
+                "Harvard credentials, his professional experience, and his swimming and chess background. "
                 "Try one of those, or ask how to contact him."
             ),
             sources=[],
