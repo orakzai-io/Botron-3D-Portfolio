@@ -55,16 +55,21 @@ textarea:focus-visible {
 }
 
 
-/* hero last word: static white → electric cyan colour-break + the shared 3 s gleam */
+/* hero last word: static white → electric cyan colour-break + a slow steel-white
+   sheen gliding across every 3 s. */
 .bt-title-name {
   display: inline-block;
   background-image:
     linear-gradient(
       100deg,
       transparent 0%,
-      transparent 40%,
-      rgba(255, 255, 255, 0.9) 50%,
-      transparent 60%,
+      transparent 43%,
+      rgba(255, 255, 255, 0.12) 46%,
+      rgba(255, 255, 255, 0.65) 49%,
+      rgba(255, 255, 255, 0.95) 50%,
+      rgba(255, 255, 255, 0.65) 51%,
+      rgba(255, 255, 255, 0.12) 54%,
+      transparent 57%,
       transparent 100%
     ),
     linear-gradient(100deg, #f2f7fa 8%, var(--cyan) 78%);
@@ -75,19 +80,23 @@ textarea:focus-visible {
   background-clip: text;
   color: transparent;
   -webkit-text-fill-color: transparent;
-  animation: headingGleam 3s linear infinite;
+  animation: headingGleam 3s ease-in-out infinite;
 }
 /* section accent word: static white → electric cyan colour-break, matched to the
-   hero last word (ORAKZAI), + the shared 3 s gleam. */
+   hero last word (ORAKZAI), + the slow 3 s sheen. */
 .bt-beat-accent {
   display: inline-block;
   background-image:
     linear-gradient(
       100deg,
       transparent 0%,
-      transparent 40%,
-      rgba(255, 255, 255, 0.9) 50%,
-      transparent 60%,
+      transparent 43%,
+      rgba(255, 255, 255, 0.12) 46%,
+      rgba(255, 255, 255, 0.65) 49%,
+      rgba(255, 255, 255, 0.95) 50%,
+      rgba(255, 255, 255, 0.65) 51%,
+      rgba(255, 255, 255, 0.12) 54%,
+      transparent 57%,
       transparent 100%
     ),
     linear-gradient(100deg, #f2f7fa 8%, var(--cyan) 78%);
@@ -98,16 +107,16 @@ textarea:focus-visible {
   background-clip: text;
   color: var(--cyan);
   -webkit-text-fill-color: transparent;
-  animation: headingGleam 3s linear infinite;
+  animation: headingGleam 3s ease-in-out infinite;
 }
-/* shared keyframe: a single soft-white gleam drifts left → right, then rests.
-   3 s cycle = it "comes once every 3 seconds" (≈0.7 s sweep + ~2.4 s rest). */
+/* shared keyframe: a soft steel-white sheen glides left → right, then rests.
+   3 s cycle = a slow ~2 s glide, then ~1 s of calm. */
 @keyframes headingGleam {
   0%,
-  22% {
+  16% {
     background-position: 0% 0, 0 0;
   }
-  46%,
+  82%,
   100% {
     background-position: 100% 0, 0 0;
   }
@@ -338,8 +347,8 @@ textarea:focus-visible {
 }
 
 /* --- main section headings: static silver chrome (same gradient as the hero
-   title) with a single soft-white gleam drifting across every 3 s.
-   Two background layers: [gleam][static base]; width: fit-content keeps the
+   title) with a slow steel-white sheen gliding across every 3 s.
+   Two background layers: [sheen][static base]; width: fit-content keeps the
    gradient mapped to the text width, not the full grid column. */
 .bt-beat-title {
   width: fit-content;
@@ -348,9 +357,13 @@ textarea:focus-visible {
     linear-gradient(
       100deg,
       transparent 0%,
-      transparent 40%,
-      rgba(255, 255, 255, 0.85) 50%,
-      transparent 60%,
+      transparent 43%,
+      rgba(255, 255, 255, 0.12) 46%,
+      rgba(255, 255, 255, 0.65) 49%,
+      rgba(255, 255, 255, 0.95) 50%,
+      rgba(255, 255, 255, 0.65) 51%,
+      rgba(255, 255, 255, 0.12) 54%,
+      transparent 57%,
       transparent 100%
     ),
     linear-gradient(
@@ -370,7 +383,7 @@ textarea:focus-visible {
   background-clip: text;
   color: var(--silver);
   -webkit-text-fill-color: transparent;
-  animation: headingGleam 3s linear infinite;
+  animation: headingGleam 3s ease-in-out infinite;
 }
 
 /* --- timeline: gradient spine, accent dots, violet alternation --- */
