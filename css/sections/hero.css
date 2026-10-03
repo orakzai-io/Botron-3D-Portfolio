@@ -90,36 +90,34 @@ body.intro-complete .bt-copy .bt-in {
 }
 .bt-title-line {
   display: block;
+  width: fit-content;
   font-size: clamp(2.2rem, 5.5vw, 4.4rem);
   background: linear-gradient(
     115deg,
     #ffffff 0%,
-    #ffffff 12%,
-    #c6cfda 38%,
-    #6e7887 52%,
-    #ffffff 68%,
-    #ffffff 90%,
+    #ffffff 35%,
+    #8a94a1 48%,
+    #2a303b 50%,
+    #8a94a1 52%,
+    #ffffff 65%,
     #ffffff 100%
   );
+  background-size: 200% 100%;
+  background-position: 50% 0;
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
   -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 0 26px rgba(180, 196, 214, 0.18));
+  filter: drop-shadow(0 0 12px rgba(180, 196, 214, 0.45))
+    drop-shadow(0 0 4px rgba(255, 255, 255, 0.8));
+  animation: headingShimmer 3.5s linear infinite;
 }
 .bt-title-line--last {
   background: none;
-  -webkit-text-fill-color: #dfe6ee;
-  color: #dfe6ee;
-  filter: drop-shadow(0 0 26px rgba(180, 196, 214, 0.14));
-}
-/* the hero's metallic line shares the section headings' cinematic sweep
-   (headingShimmer lives in polish.css); the cyan name line stays static so the
-   accent does not shimmer */
-.bt-title-line:not(.bt-title-line--last) {
-  background-size: 200% 100%;
-  background-position: 50% 0;
-  animation: headingShimmer 3.5s linear infinite;
+  animation: none;
+  filter: none;
+  -webkit-text-fill-color: unset;
+  color: unset;
 }
 .bt-caret {
   color: var(--cyan);

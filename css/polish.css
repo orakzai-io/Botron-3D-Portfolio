@@ -69,15 +69,17 @@ textarea:focus-visible {
     background-position: 250% 0;
   }
 }
-.bt-title-name,
-.bt-beat-accent {
+/* hero name keeps the original cyan shimmer sweep — hero-specific character */
+.bt-title-name {
+  display: inline-block;
   background: linear-gradient(
-    100deg,
-    #f2f7fa 0%,
-    #f2f7fa 35%,
-    var(--cyan) 50%,
-    #f2f7fa 65%,
-    #f2f7fa 100%
+    115deg,
+    var(--cyan) 0%,
+    var(--cyan) 35%,
+    #ffffff 48%,
+    #ffffff 52%,
+    var(--cyan) 65%,
+    var(--cyan) 100%
   );
   background-size: 200% 100%;
   background-position: 50% 0;
@@ -85,7 +87,28 @@ textarea:focus-visible {
   background-clip: text;
   color: transparent;
   -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 14px rgba(0, 240, 255, 0.45));
   animation: headingShimmer 3.5s linear infinite;
+}
+/* section accent word: solid electric cyan + slow breathing glow.
+   Intentionally matches the // kicker colour (var(--cyan) = #00f0ff) so
+   both UI signals speak the same language. No moving sweep — just presence. */
+.bt-beat-accent {
+  display: inline-block;
+  background: none;
+  color: var(--cyan);
+  -webkit-text-fill-color: var(--cyan);
+  filter: drop-shadow(0 0 12px rgba(0, 240, 255, 0.55)) drop-shadow(0 0 4px rgba(0, 240, 255, 0.3));
+  animation: accentGlow 3s ease-in-out infinite;
+}
+@keyframes accentGlow {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 8px rgba(0, 240, 255, 0.4)) drop-shadow(0 0 2px rgba(0, 240, 255, 0.2));
+  }
+  50% {
+    filter: drop-shadow(0 0 18px rgba(0, 240, 255, 0.75)) drop-shadow(0 0 6px rgba(0, 240, 255, 0.4));
+  }
 }
 .bt-caret {
   color: var(--cyan);
@@ -312,33 +335,26 @@ textarea:focus-visible {
   }
 }
 
-/* --- main section headings: the hero's metallic gradient wrapped in the same
-   seamless cinematic sweep the accent word uses (headingShimmer, defined up
-   top). 0% and 100% are both #fff so the tiled edges join invisibly; the
-   deepened trough + bright crest make the moving gleam read clearly.
-   width: fit-content maps the gradient to the TEXT, not the 1fr grid column. */
+/* --- main section headings: static silver — no moving sweep.
+   The accent word carries the colour energy; the title body stays calm.
+   A slow breathing glow keeps it alive without competing for attention.
+   width: fit-content maps the glow to the TEXT, not the 1fr grid column. */
 .bt-beat-title {
   width: fit-content;
   max-width: 100%;
-  background: linear-gradient(
-    115deg,
-    #ffffff 0%,
-    #ffffff 35%,
-    #8a94a1 48%,
-    #2a303b 50%,
-    #8a94a1 52%,
-    #ffffff 65%,
-    #ffffff 100%
-  );
-  background-size: 200% 100%;
-  background-position: 50% 0;
-  -webkit-background-clip: text;
-  background-clip: text;
+  background: none;
   color: var(--silver);
-  -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 0 12px rgba(180, 196, 214, 0.45))
-    drop-shadow(0 0 4px rgba(255, 255, 255, 0.8));
-  animation: headingShimmer 3.5s linear infinite;
+  -webkit-text-fill-color: var(--silver);
+  animation: headingGlow 4s ease-in-out infinite;
+}
+@keyframes headingGlow {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 10px rgba(232, 237, 244, 0.2));
+  }
+  50% {
+    filter: drop-shadow(0 0 22px rgba(232, 237, 244, 0.5));
+  }
 }
 
 /* --- timeline: gradient spine, accent dots, violet alternation --- */
