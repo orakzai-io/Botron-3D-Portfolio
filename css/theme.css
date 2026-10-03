@@ -18,20 +18,20 @@
    build time (postcss-import), so this costs no extra HTTP requests.
    ============================================================ */
 
-@import "./core.css";
-@import "./components/cursor.css";
-@import "./components/nav.css";
-@import "./components/strip.css";
-@import "./sections/hero.css";
-@import "./sections/beats.css";
-@import "./sections/skills.css";
-@import "./sections/responsive.css";
-@import "./sections/experience.css";
-@import "./sections/projects.css";
-@import "./sections/education.css";
-@import "./sections/testimonials.css";
-@import "./sections/contact.css";
-@import "./sections/footer.css";
-@import "./sections/layout.css";
-@import "./polish.css";
-@import "./touch.css";
+@import './core.css';
+@import './components/cursor.css';
+@import './components/nav.css';
+@import './components/strip.css';
+@import './sections/hero.css';
+@import './sections/beats.css';
+@import './sections/skills.css';
+@import './sections/responsive.css';
+@import './sections/experience.css';
+@import './sections/projects.css';
+@import './sections/education.css';
+@import './sections/testimonials.css';
+@import './sections/contact.css';
+@import './sections/footer.css';
+@import './sections/layout.css';
+@import './polish.css';
+@import './touch.css';

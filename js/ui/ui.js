@@ -332,11 +332,19 @@
   // emulator, which is where it was debugged and failed every time. Desktop is
   // unaffected -- its :hover rules are untouched, and .bt-lit is only ever added
   // by a real click.
+  // On old iOS (e.g. iPhone 7 / iOS 12), stopPropagation on the synthetic
+  // click can leak through to the document handler, causing .bt-lit to be
+  // added by the card handler and then immediately cleared by the document
+  // handler in the same event loop tick — the card appears to "jump" twice.
+  // cardJustClicked suppresses the document clear for exactly that one tick.
+  let cardJustClicked = false;
+
   document.querySelectorAll(LIT_CARDS).forEach((card) => {
     card.addEventListener('click', (e) => {
       // Do not trap clicks on action links or buttons inside the card
       if (e.target.closest('a, button')) return;
       e.stopPropagation();
+      cardJustClicked = true;
       const wasLit = card.classList.contains('bt-lit');
       document.querySelectorAll('.bt-lit').forEach((el) => el.classList.remove('bt-lit'));
       if (!wasLit) card.classList.add('bt-lit');
@@ -347,8 +355,14 @@
     });
   });
 
-  // Clear lit state on any tap/click outside
+  // Clear lit state on any tap/click outside.
+  // Guard: if the click originated on a card (cardJustClicked), skip —
+  // stopPropagation should have handled it, but old iOS may still dispatch here.
   document.addEventListener('click', () => {
+    if (cardJustClicked) {
+      cardJustClicked = false;
+      return;
+    }
     document.querySelectorAll('.bt-lit').forEach((el) => el.classList.remove('bt-lit'));
   });
 })();

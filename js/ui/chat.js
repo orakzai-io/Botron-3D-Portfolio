@@ -20,10 +20,23 @@ import chessPhoto from '../../assets/chesspic.webp';
 // below it sit as empty boxes until some scroll or resize forces a
 // re-evaluation. width/height are still declared, so there is no layout shift.
 const PHOTO_TAG = (url, alt, w, h) =>
-  '<img class="bt-chat-photo" src="' + url + '" alt="' + alt + '" width="' + w + '" height="' + h + '" decoding="async">';
+  '<img class="bt-chat-photo" src="' +
+  url +
+  '" alt="' +
+  alt +
+  '" width="' +
+  w +
+  '" height="' +
+  h +
+  '" decoding="async">';
 
 const PRO_PHOTO = PHOTO_TAG(professionalPhoto, 'Shahsawar Orakzai in a suit and tie', 577, 576);
-const SWIM_PHOTO = PHOTO_TAG(swimmingPhoto, 'Shahsawar Orakzai at a swimming pool wearing a medal', 635, 634);
+const SWIM_PHOTO = PHOTO_TAG(
+  swimmingPhoto,
+  'Shahsawar Orakzai at a swimming pool wearing a medal',
+  635,
+  634
+);
 const CHESS_PHOTO = PHOTO_TAG(chessPhoto, 'Shahsawar Orakzai playing chess', 720, 1196);
 
 // ---------------------------------------------------------------------------
@@ -111,10 +124,12 @@ function scheduleRagWarmup() {
 // choose to emit it, and when it instead describes the photo in words the
 // images silently vanish. So photo intent is detected here and the tag is
 // injected regardless of what the model said — only the prose is generated.
-const PHOTO_INTENT = /\b(photo|photos|pic|pics|picture|pictures|image|images|portrait|portraits|snapshot|face|headshot|selfie|photograph|photographs|look\s+like|see\s+(him|his)|show\s+(me|him|his)|send\s+(me|his)|view|who\s+is\s+(shahsawar|he|this|the\s+developer|the\s+creator)|tell\s+me\s+about\s+shahsawar)\b/i;
+const PHOTO_INTENT =
+  /\b(photo|photos|pic|pics|picture|pictures|image|images|portrait|portraits|snapshot|face|headshot|selfie|photograph|photographs|look\s+like|see\s+(him|his)|show\s+(me|him|his)|send\s+(me|his)|view|who\s+is\s+(shahsawar|he|this|the\s+developer|the\s+creator)|tell\s+me\s+about\s+shahsawar)\b/i;
 const PHOTO_ALL = /\b(all|every|each|both)\b/i;
 const PHOTO_CHESS = /\b(chess|board|game|games|strategy|strategic|tactics)\b/i;
-const PHOTO_SWIM = /\b(swim|swimming|swimmer|medal|medals|medalist|pool|athlet|athletic|coach|coaching|competition)\b/i;
+const PHOTO_SWIM =
+  /\b(swim|swimming|swimmer|medal|medals|medalist|pool|athlet|athletic|coach|coaching|competition)\b/i;
 
 function photoTagsFor(query) {
   const q = String(query || '');
@@ -138,7 +153,11 @@ function ensurePhotos(query, answerHtml) {
   const tags = photoTagsFor(query);
   if (!tags) return answerHtml;
   if (/<img[^>]*class="[^"]*bt-chat-photo/.test(answerHtml)) return answerHtml;
-  const label = PHOTO_CHESS.test(query) ? 'Chess.' : PHOTO_SWIM.test(query) ? 'Swimming.' : 'This is Shahsawar.';
+  const label = PHOTO_CHESS.test(query)
+    ? 'Chess.'
+    : PHOTO_SWIM.test(query)
+      ? 'Swimming.'
+      : 'This is Shahsawar.';
   return answerHtml + '<br><strong>' + label + '</strong><br>' + tags;
 }
 
@@ -383,11 +402,34 @@ export function initChat() {
   // parsed and rebuilt from an allowlist: unknown elements are unwrapped, and
   // any attribute not explicitly permitted is dropped.
   const SANITIZE_TAGS = new Set([
-    'A', 'B', 'BR', 'CODE', 'DIV', 'EM', 'I', 'IMG',
-    'LI', 'OL', 'P', 'PRE', 'SPAN', 'STRONG', 'UL',
+    'A',
+    'B',
+    'BR',
+    'CODE',
+    'DIV',
+    'EM',
+    'I',
+    'IMG',
+    'LI',
+    'OL',
+    'P',
+    'PRE',
+    'SPAN',
+    'STRONG',
+    'UL',
   ]);
   // Removed outright along with their text content.
-  const SANITIZE_DROP = new Set(['SCRIPT', 'STYLE', 'IFRAME', 'OBJECT', 'EMBED', 'LINK', 'META', 'FORM', 'SVG']);
+  const SANITIZE_DROP = new Set([
+    'SCRIPT',
+    'STYLE',
+    'IFRAME',
+    'OBJECT',
+    'EMBED',
+    'LINK',
+    'META',
+    'FORM',
+    'SVG',
+  ]);
   const SANITIZE_ATTRS = {
     A: ['href', 'target', 'rel', 'title', 'download'],
     IMG: ['src', 'alt', 'width', 'height', 'loading', 'decoding', 'class'],
@@ -410,9 +452,12 @@ export function initChat() {
   }
 
   function sanitizeHtml(html) {
-    if (!html) return "";
+    if (!html) return '';
     if (!/<[a-zA-Z]/.test(html)) return html;
-    const doc = new DOMParser().parseFromString('<div id="bt-san-root">' + html + '</div>', 'text/html');
+    const doc = new DOMParser().parseFromString(
+      '<div id="bt-san-root">' + html + '</div>',
+      'text/html'
+    );
     const root = doc.getElementById('bt-san-root');
     if (!root) return escapeHtml(html);
     const stack = [root];
@@ -420,7 +465,10 @@ export function initChat() {
       const node = stack.pop();
       for (const el of Array.from(node.children)) {
         const tag = el.tagName.toUpperCase();
-        if (SANITIZE_DROP.has(tag)) { el.remove(); continue; }
+        if (SANITIZE_DROP.has(tag)) {
+          el.remove();
+          continue;
+        }
         if (!SANITIZE_TAGS.has(tag)) {
           // unwrap: keep the words, lose the element
           const parent = el.parentNode;
@@ -432,8 +480,11 @@ export function initChat() {
         const allowed = SANITIZE_ATTRS[tag] || [];
         for (const a of Array.from(el.attributes)) {
           const n = a.name.toLowerCase();
-          if (allowed.indexOf(n) === -1) { el.removeAttribute(a.name); continue; }
-          if ((n === "href" || n === "src") && !SANITIZE_URL.test(a.value.trim())) {
+          if (allowed.indexOf(n) === -1) {
+            el.removeAttribute(a.name);
+            continue;
+          }
+          if ((n === 'href' || n === 'src') && !SANITIZE_URL.test(a.value.trim())) {
             el.removeAttribute(a.name);
           }
         }
@@ -481,12 +532,12 @@ export function initChat() {
     let html = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     return sanitizeHtml(
       html
-      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-      .replace(/\*(.*?)\*/g, '<em>$1</em>')
-      .replace(/`([^`]+)`/g, '<code>$1</code>')
-      .replace(/^[-•*]\s+(.*)$/gm, '• $1')
-      .replace(/\n\n/g, '<br><br>')
-      .replace(/\n/g, '<br>')
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+        .replace(/`([^`]+)`/g, '<code>$1</code>')
+        .replace(/^[-•*]\s+(.*)$/gm, '• $1')
+        .replace(/\n\n/g, '<br><br>')
+        .replace(/\n/g, '<br>')
     );
   }
 
@@ -498,7 +549,13 @@ export function initChat() {
     if (meta && meta.sources && meta.sources.length) {
       const topSources = meta.sources
         .slice(0, 2)
-        .map((s) => escapeHtml(String(s.title || '').split('—')[0].trim()))
+        .map((s) =>
+          escapeHtml(
+            String(s.title || '')
+              .split('—')[0]
+              .trim()
+          )
+        )
         .join(', ');
       const sim = meta.sources[0]?.similarity
         ? ` • ${(meta.sources[0].similarity * 100).toFixed(0)}% MATCH`
@@ -632,14 +689,14 @@ export function initChat() {
 
   function offlineAnswer(query) {
     return (
-      "<em>// RAG BACKEND OFFLINE // answering from the local index.</em><br>" +
-      "Shahsawar Orakzai is a Full-Stack AI Engineer and Computer Science undergraduate at UAP " +
-      "with a 4.0 CGPA and dual Harvard CS50x/CS50P credentials. He has delivered 5+ production " +
-      "AI applications, including <strong>REDNOTE</strong> (vector RAG over 10,000+ chunks), " +
-      "an async scraping intelligence pipeline, and <strong>VaultGuard</strong>, a zero-knowledge " +
-      "credential vault. He is also a former MINDGIGS Python intern, a 10-year National Swimmer, " +
-      "and a competitive chess player.<br><br>Once the backend is reachable I can answer in detail. " +
-      "Please try again in a moment."
+      '<em>// RAG BACKEND OFFLINE // answering from the local index.</em><br>' +
+      'Shahsawar Orakzai is a Full-Stack AI Engineer and Computer Science undergraduate at UAP ' +
+      'with a 4.0 CGPA and dual Harvard CS50x/CS50P credentials. He has delivered 5+ production ' +
+      'AI applications, including <strong>REDNOTE</strong> (vector RAG over 10,000+ chunks), ' +
+      'an async scraping intelligence pipeline, and <strong>VaultGuard</strong>, a zero-knowledge ' +
+      'credential vault. He is also a former MINDGIGS Python intern, a 10-year National Swimmer, ' +
+      'and a competitive chess player.<br><br>Once the backend is reachable I can answer in detail. ' +
+      'Please try again in a moment.'
     );
   }
 

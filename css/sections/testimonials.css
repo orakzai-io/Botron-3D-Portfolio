@@ -71,7 +71,11 @@
   padding: 1.6rem;
   border: 1px solid var(--line);
   border-radius: 12px;
-  transition: border-color 0.3s, background 0.3s, transform 0.3s var(--ease), box-shadow 0.3s;
+  transition:
+    border-color 0.3s,
+    background 0.3s,
+    transform 0.3s var(--ease),
+    box-shadow 0.3s;
   display: flex;
   flex-direction: column;
 }
@@ -99,7 +103,9 @@
   border-left: 2px solid var(--line-2);
   margin-bottom: 1.5rem;
   flex: 1;
-  transition: border-color 0.3s, color 0.3s;
+  transition:
+    border-color 0.3s,
+    color 0.3s;
   font-style: italic;
 }
 .bt-quote:hover .bt-quote-body {
@@ -113,7 +119,7 @@
   gap: 0.85rem;
   margin-top: auto;
   padding-top: 1rem;
-  border-top: 1px solid rgba(255,255,255,0.04);
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
 }
 /* ---- Author avatar photo slot ---- */
 /* Always visible. Shows initials by default.
@@ -136,11 +142,14 @@
   align-items: center;
   justify-content: center;
   letter-spacing: 0.05em;
-  transition: border-color 0.3s, box-shadow 0.3s, transform 0.3s var(--ease);
+  transition:
+    border-color 0.3s,
+    box-shadow 0.3s,
+    transform 0.3s var(--ease);
   pointer-events: auto;
 }
 /* when a background-image is set, hide the initials text */
-.bt-avatar-slot[style*="background-image"] {
+.bt-avatar-slot[style*='background-image'] {
   color: transparent;
   font-size: 0;
 }

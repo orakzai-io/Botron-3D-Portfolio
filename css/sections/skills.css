@@ -3,7 +3,9 @@
    in theme.css — see the cascade note there. */
 
 /* ---------- skills: 3D holographic globe & telemetry HUD ---------- */
-.bt-beat--skills { align-items: center; }
+.bt-beat--skills {
+  align-items: center;
+}
 
 /* Telemetry HUD Card */
 .bt-telemetry-hud {

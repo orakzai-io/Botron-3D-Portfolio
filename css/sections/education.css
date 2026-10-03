@@ -15,7 +15,11 @@
   border: 1px solid var(--line);
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.015);
-  transition: border-color 0.3s, background 0.3s, transform 0.3s var(--ease), box-shadow 0.3s;
+  transition:
+    border-color 0.3s,
+    background 0.3s,
+    transform 0.3s var(--ease),
+    box-shadow 0.3s;
   display: flex;
   flex-direction: column;
 }
@@ -27,14 +31,18 @@
 }
 
 /* cyber corner tech brackets appearing on hover */
-.bt-edu::before, .bt-edu::after {
-  content: "";
+.bt-edu::before,
+.bt-edu::after {
+  content: '';
   position: absolute;
   width: 0;
   height: 0;
   border: 2px solid transparent;
   pointer-events: none;
-  transition: border-color 0.3s, width 0.3s, height 0.3s;
+  transition:
+    border-color 0.3s,
+    width 0.3s,
+    height 0.3s;
 }
 .bt-edu::before {
   top: -1px;

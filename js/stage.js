@@ -263,13 +263,11 @@ window.addEventListener('touchend', () => wakeRender(35), { passive: true });
 window.addEventListener('mousemove', () => wakeRender(15), { passive: true });
 window.addEventListener('resize', () => wakeRender(30), { passive: true });
 
-
 function animate(currentTime) {
   requestAnimationFrame(animate);
 
   // Pause rendering completely when the tab is backgrounded to save CPU/GPU
   if (document.hidden) return;
-
 
   // Adaptive frame rate:
   // - Interacting (scroll / touch / cursor): 60 FPS, for judder-free motion.

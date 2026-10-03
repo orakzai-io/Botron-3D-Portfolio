@@ -3,8 +3,9 @@
    in theme.css — see the cascade note there. */
 
 /* --- ambient aurora atmosphere (static gradients behind the 3D stage) --- */
-body::before, body::after {
-  content: "";
+body::before,
+body::after {
+  content: '';
   position: fixed;
   z-index: 0;
   width: 62vw;
@@ -13,15 +14,26 @@ body::before, body::after {
   pointer-events: none;
 }
 body::before {
-  top: -24vw; right: -16vw;
+  top: -24vw;
+  right: -16vw;
   background: radial-gradient(circle, rgba(0, 240, 255, 0.13), transparent 65%);
 }
 body::after {
-  bottom: -28vw; left: -20vw;
+  bottom: -28vw;
+  left: -20vw;
   background: radial-gradient(circle, rgba(0, 240, 255, 0.08), transparent 65%);
 }
 /* --- selection, scrollbar, focus rings --- */
-::selection { background: rgba(0, 240, 255, 0.2); color: #fff; }
+::selection {
+  background: rgba(0, 240, 255, 0.2);
+  color: #fff;
+}
+::-webkit-scrollbar {
+  width: 9px;
+}
+::-webkit-scrollbar-track {
+  background: #05070a;
+}
 ::-webkit-scrollbar-thumb {
   background: linear-gradient(180deg, rgba(0, 240, 255, 0.45), rgba(103, 232, 249, 0.35));
   border-radius: 6px;
@@ -29,23 +41,51 @@ body::after {
 ::-webkit-scrollbar-thumb:hover {
   background: linear-gradient(180deg, rgba(0, 240, 255, 0.7), rgba(103, 232, 249, 0.6));
 }
-a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible {
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
   outline: 2px solid var(--cyan-dim);
   outline-offset: 3px;
 }
 
 /* --- nav: gradient hover underline --- */
-.bt-nav-link::after { background: linear-gradient(90deg, var(--cyan), rgba(103, 232, 249, 0.4), transparent); }
+.bt-nav-link::after {
+  background: linear-gradient(90deg, var(--cyan), rgba(103, 232, 249, 0.4), transparent);
+}
 
-/* --- hero: accent gradient on the name (caret stays OUTSIDE the clip
-   so its opacity blink actually toggles — a background-clip:text parent
-   paints the glyph shape through the mask and defeats child opacity) --- */
-.bt-title-name {
-  background: linear-gradient(100deg, #f2f7fa 8%, var(--cyan-soft) 78%);
+/* --- accent word: the hero's cyan gradient wrapped in a seamless cyan sweep,
+   shared by the hero name (ORAKZAI) and the trailing word of every section
+   heading, so both shimmer. The caret stays OUTSIDE the clip so its opacity
+   blink actually toggles — a background-clip:text parent paints the glyph
+   shape through the mask and defeats child opacity.
+   SEAMLESS SWEEP: 0% and 100% stops are identical so the tile joins invisibly;
+   background-size 200% + a 50% -> 250% shift travels exactly one tile. --- */
+@keyframes headingShimmer {
+  0% {
+    background-position: 50% 0;
+  }
+  100% {
+    background-position: 250% 0;
+  }
+}
+.bt-title-name,
+.bt-beat-accent {
+  background: linear-gradient(
+    100deg,
+    #f2f7fa 0%,
+    #f2f7fa 8%,
+    var(--cyan-soft) 50%,
+    #f2f7fa 92%,
+    #f2f7fa 100%
+  );
+  background-size: 200% 100%;
+  background-position: 50% 0;
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
   -webkit-text-fill-color: transparent;
+  animation: headingShimmer 6s linear infinite;
 }
 .bt-caret {
   color: var(--cyan);
@@ -53,26 +93,42 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
   animation: bCaretBlink 1.1s steps(1) infinite;
 }
 @keyframes bCaretBlink {
-  0%, 49% { opacity: 1; }
-  50%, 100% { opacity: 0; }
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
 }
 
 /* --- buttons: sheen sweep + dual-accent glow --- */
-.bt-btn { position: relative; overflow: hidden; }
+.bt-btn {
+  position: relative;
+  overflow: hidden;
+}
 .bt-btn::after {
-  content: "";
+  content: '';
   position: absolute;
-  top: 0; left: -70%;
-  width: 45%; height: 100%;
+  top: 0;
+  left: -70%;
+  width: 45%;
+  height: 100%;
   background: linear-gradient(105deg, transparent, rgba(255, 255, 255, 0.16), transparent);
   transform: skewX(-22deg);
   transition: left 0.65s var(--ease);
   pointer-events: none;
 }
-.bt-btn:hover::after { left: 135%; }
+.bt-btn:hover::after {
+  left: 135%;
+}
 .bt-btn:hover {
   border-color: rgba(0, 240, 255, 0.45);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5), 0 0 22px rgba(0, 240, 255, 0.16), 0 0 34px rgba(0, 240, 255, 0.08);
+  box-shadow:
+    0 8px 30px rgba(0, 0, 0, 0.5),
+    0 0 22px rgba(0, 240, 255, 0.16),
+    0 0 34px rgba(0, 240, 255, 0.08);
 }
 .bt-actions .bt-btn:not(.bt-btn--ghost),
 .bt-contact-form .bt-btn {
@@ -85,7 +141,9 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
   border-color: rgba(0, 240, 255, 0.6);
 }
 /* --- tags: hover accent --- */
-.bt-tag { transition: all 0.25s var(--ease); }
+.bt-tag {
+  transition: all 0.25s var(--ease);
+}
 .bt-tag:hover {
   color: var(--silver);
   border-color: rgba(0, 240, 255, 0.4);
@@ -95,11 +153,16 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
 }
 
 /* --- cards: quiet education-style treatment (subtle silver hairline, soft shadow) --- */
-.bt-proj, .bt-timeline-card, .bt-quote, .bt-telemetry-hud {
+.bt-proj,
+.bt-timeline-card,
+.bt-quote,
+.bt-telemetry-hud {
   border: 1px solid var(--line);
   box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
 }
-.bt-proj:hover, .bt-timeline-card:hover, .bt-quote:hover {
+.bt-proj:hover,
+.bt-timeline-card:hover,
+.bt-quote:hover {
   border-color: var(--line-2);
   background: linear-gradient(135deg, rgba(17, 22, 33, 0.62), rgba(9, 12, 19, 0.78));
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
@@ -112,11 +175,15 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
    halo): cyan hover, a gradient hairline, a sheen sweep over the screenshot
    and a live status readout. All transform/opacity/shadow — no layout cost.
    The always-on pieces also read on touch, where :hover never fires. */
-.bt-proj { position: relative; }
+.bt-proj {
+  position: relative;
+}
 .bt-proj::before {
-  content: "";
+  content: '';
   position: absolute;
-  top: 0; left: 0; right: 0;
+  top: 0;
+  left: 0;
+  right: 0;
   height: 2px;
   background: linear-gradient(90deg, var(--cyan), var(--cyan-soft));
   opacity: 0.32;
@@ -124,25 +191,37 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
   pointer-events: none;
   transition: opacity 0.3s var(--ease);
 }
-.bt-proj:hover::before { opacity: 1; }
+.bt-proj:hover::before {
+  opacity: 1;
+}
 .bt-proj:hover {
   border-color: rgba(0, 240, 255, 0.45);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45), 0 0 28px rgba(0, 240, 255, 0.14);
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.45),
+    0 0 28px rgba(0, 240, 255, 0.14);
 }
-.bt-proj-thumb img { filter: brightness(0.85) saturate(0.95); }
-.bt-proj:hover .bt-proj-thumb img { filter: brightness(1) saturate(1.05); }
+.bt-proj-thumb img {
+  filter: brightness(0.85) saturate(0.95);
+}
+.bt-proj:hover .bt-proj-thumb img {
+  filter: brightness(1) saturate(1.05);
+}
 .bt-proj-thumb::after {
-  content: "";
+  content: '';
   position: absolute;
-  top: 0; left: -70%;
-  width: 45%; height: 100%;
+  top: 0;
+  left: -70%;
+  width: 45%;
+  height: 100%;
   background: linear-gradient(105deg, transparent, rgba(0, 240, 255, 0.14), transparent);
   transform: skewX(-22deg);
   transition: left 0.65s var(--ease);
   pointer-events: none;
   z-index: 1; /* above the scanlines (::before), below the mission overlay (2) */
 }
-.bt-proj:hover .bt-proj-thumb::after { left: 135%; }
+.bt-proj:hover .bt-proj-thumb::after {
+  left: 135%;
+}
 .bt-proj-idx {
   opacity: 1;
   background: linear-gradient(135deg, var(--cyan), var(--cyan-soft));
@@ -151,18 +230,28 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
   color: transparent;
   -webkit-text-fill-color: transparent;
 }
-.bt-proj-status { display: inline-flex; align-items: center; gap: 0.42em; }
+.bt-proj-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.42em;
+}
 .bt-proj-status::before {
-  content: "";
-  width: 6px; height: 6px;
+  content: '';
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
   background: var(--cyan);
   box-shadow: 0 0 8px rgba(0, 240, 255, 0.85);
   animation: bStatusPulse 1.9s ease-in-out infinite;
 }
 @keyframes bStatusPulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.35; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
 }
 
 /* Same cyan hover treatment as the projects block, exposed only to precise pointers.
@@ -186,7 +275,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
    soft halo, otherwise it reads as a dead pixel instead of a status. */
 .bt-pulse-light--dim {
   background: var(--silver-2);
-  box-shadow: 0 0 8px rgba(205, 215, 228, 0.30);
+  box-shadow: 0 0 8px rgba(205, 215, 228, 0.3);
   animation: none;
   opacity: 1;
 }
@@ -199,9 +288,13 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
        12px border-radius exactly like the border is: it tapers into the corner
        curve with no step, needs no overflow:hidden, and fuses with the cyan border
        above it into one lit top edge instead of two parallel lines. */
-    background: linear-gradient(90deg, rgba(0, 240, 255, 0.45), rgba(103, 232, 249, 0.45)) no-repeat top left / 100% 2px,
+    background:
+      linear-gradient(90deg, rgba(0, 240, 255, 0.45), rgba(103, 232, 249, 0.45)) no-repeat top
+        left / 100% 2px,
       linear-gradient(135deg, rgba(19, 26, 38, 0.66), rgba(10, 14, 22, 0.8));
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45), 0 0 28px rgba(0, 240, 255, 0.14);
+    box-shadow:
+      0 10px 30px rgba(0, 0, 0, 0.45),
+      0 0 28px rgba(0, 240, 255, 0.14);
     transform: translateY(-4px);
   }
   /* the standby lamp acknowledges the row without pretending to be live: the
@@ -214,29 +307,58 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
      louder state (lift + glow), which is why the non-hovered ones are targeted */
   .bt-timeline-card:hover .bt-tag:not(:hover) {
     color: var(--silver);
-    border-color: rgba(0, 240, 255, 0.30);
+    border-color: rgba(0, 240, 255, 0.3);
     background: rgba(0, 240, 255, 0.05);
   }
 }
 
-/* --- section titles: subtle accent gradient text --- */
+/* --- main section headings: the hero's metallic gradient wrapped in the same
+   seamless cinematic sweep the accent word uses (headingShimmer, defined up
+   top). 0% and 100% are both #fff so the tiled edges join invisibly; the
+   deepened trough + bright crest make the moving gleam read clearly.
+   width: fit-content maps the gradient to the TEXT, not the 1fr grid column. */
 .bt-beat-title {
-  background: linear-gradient(95deg, #ffffff 18%, var(--cyan-soft) 92%);
+  width: fit-content;
+  max-width: 100%;
+  background: linear-gradient(
+    115deg,
+    #ffffff 0%,
+    #ffffff 12%,
+    #c6cfda 38%,
+    #6e7887 52%,
+    #ffffff 68%,
+    #ffffff 90%,
+    #ffffff 100%
+  );
+  background-size: 200% 100%;
+  background-position: 50% 0;
   -webkit-background-clip: text;
   background-clip: text;
-  color: transparent;
+  color: var(--silver);
   -webkit-text-fill-color: transparent;
-  text-shadow: 0 0 26px rgba(0, 240, 255, 0.14);
+  filter: drop-shadow(0 0 22px rgba(180, 196, 214, 0.16));
+  animation: headingShimmer 6s linear infinite;
 }
 
 /* --- timeline: gradient spine, accent dots, violet alternation --- */
 .bt-timeline::before {
-  background: linear-gradient(180deg, transparent, rgba(0, 240, 255, 0.35) 8%, rgba(103, 232, 249, 0.42) 50%, rgba(0, 240, 255, 0.35) 92%, transparent);
+  background: linear-gradient(
+    180deg,
+    transparent,
+    rgba(0, 240, 255, 0.35) 8%,
+    rgba(103, 232, 249, 0.42) 50%,
+    rgba(0, 240, 255, 0.35) 92%,
+    transparent
+  );
 }
-.bt-timeline-dot { background: linear-gradient(135deg, var(--cyan), var(--cyan-soft)); }
+.bt-timeline-dot {
+  background: linear-gradient(135deg, var(--cyan), var(--cyan-soft));
+}
 .bt-timeline-item:nth-child(even) .bt-timeline-dot {
   background: linear-gradient(135deg, var(--cyan-soft), var(--cyan));
-  box-shadow: 0 0 0 4px rgba(0, 240, 255, 0.14), 0 0 12px var(--cyan);
+  box-shadow:
+    0 0 0 4px rgba(0, 240, 255, 0.14),
+    0 0 12px var(--cyan);
 }
 .bt-timeline-item:nth-child(even) .bt-timeline-date {
   color: var(--cyan);
@@ -251,41 +373,72 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
    bloom -- its dot scaled but never lit up. */
 @media (hover: hover) and (pointer: fine) {
   .bt-timeline-dot {
-    transition: transform 0.35s var(--ease), box-shadow 0.35s var(--ease);
+    transition:
+      transform 0.35s var(--ease),
+      box-shadow 0.35s var(--ease);
   }
   .bt-timeline-item:hover .bt-timeline-dot {
     transform: translateX(-50%) scale(1.18);
-    box-shadow: 0 0 0 5px rgba(0, 240, 255, 0.16), 0 0 22px rgba(0, 240, 255, 0.9);
+    box-shadow:
+      0 0 0 5px rgba(0, 240, 255, 0.16),
+      0 0 22px rgba(0, 240, 255, 0.9);
   }
 }
 
 /* --- quotes carousel --- */
-.bt-quotes-dot.active { background: linear-gradient(90deg, var(--cyan), var(--cyan-soft)); }
+.bt-quotes-dot.active {
+  background: linear-gradient(90deg, var(--cyan), var(--cyan-soft));
+}
 .bt-quotes-arrow:hover {
   border-color: rgba(0, 240, 255, 0.5);
   color: var(--cyan);
-  box-shadow: 0 0 16px rgba(0, 240, 255, 0.18), 0 0 26px rgba(0, 240, 255, 0.08);
+  box-shadow:
+    0 0 16px rgba(0, 240, 255, 0.18),
+    0 0 26px rgba(0, 240, 255, 0.08);
 }
 
 /* --- contact form focus: dual-accent ring --- */
-.bt-field input:focus, .bt-field textarea:focus {
+.bt-field input:focus,
+.bt-field textarea:focus {
   border-color: rgba(0, 240, 255, 0.45);
-  box-shadow: 0 0 0 3px rgba(0, 240, 255, 0.1), 0 0 22px rgba(0, 240, 255, 0.08);
+  box-shadow:
+    0 0 0 3px rgba(0, 240, 255, 0.1),
+    0 0 22px rgba(0, 240, 255, 0.08);
 }
 
 /* --- footer: social glow (the gradient-hairline trick is gone) --- */
 .bt-social-link:hover {
-  box-shadow: 0 4px 16px rgba(0, 240, 255, 0.2), 0 0 26px rgba(0, 240, 255, 0.08);
+  box-shadow:
+    0 4px 16px rgba(0, 240, 255, 0.2),
+    0 0 26px rgba(0, 240, 255, 0.08);
 }
 
 /* --- reduced motion: disable ambient drift + sheen --- */
 @media (prefers-reduced-motion: reduce) {
-  .bt-btn::after { display: none; }
-  .bt-proj-thumb::after { display: none; }
-  .bt-proj-status::before { animation: none; }
-  .bt-pulse-light { animation: none; }
+  .bt-btn::after {
+    display: none;
+  }
+  /* the heading shimmer is decorative -- a heading that keeps repainting behind
+     a reduced-motion preference is exactly the kind of motion to drop */
+  .bt-beat-title,
+  .bt-beat-accent,
+  .bt-title-name,
+  .bt-title-line:not(.bt-title-line--last) {
+    animation: none;
+  }
+  .bt-proj-thumb::after {
+    display: none;
+  }
+  .bt-proj-status::before {
+    animation: none;
+  }
+  .bt-pulse-light {
+    animation: none;
+  }
   /* keep the timeline dot's hover glow, drop the scale pop */
-  .bt-timeline-item:hover .bt-timeline-dot { transform: translateX(-50%); }
+  .bt-timeline-item:hover .bt-timeline-dot {
+    transform: translateX(-50%);
+  }
 }
 
 /* ==========================================================================
@@ -392,14 +545,29 @@ body::after {
     border-color: var(--line) !important;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6) !important;
   }
-  .bt-proj:hover::before { opacity: 0.32; }
-  .bt-proj:hover .bt-proj-thumb img { filter: brightness(0.85) saturate(0.95); }
+  .bt-proj:hover::before {
+    opacity: 0.32;
+  }
+  .bt-proj:hover .bt-proj-thumb img {
+    filter: brightness(0.85) saturate(0.95);
+  }
   .bt-proj:hover .bt-proj-thumb::after,
-  .bt-btn:hover::after { display: none; }
+  .bt-btn:hover::after {
+    display: none;
+  }
   .bt-edu:hover::before,
-  .bt-edu:hover::after { width: 0; height: 0; border-color: transparent; }
-  .bt-social-link:hover { box-shadow: none !important; }
-  .bt-filter-pill:hover { box-shadow: none !important; }
-  .bt-nav-link:hover::after { transform: scaleX(0); }
-
+  .bt-edu:hover::after {
+    width: 0;
+    height: 0;
+    border-color: transparent;
+  }
+  .bt-social-link:hover {
+    box-shadow: none !important;
+  }
+  .bt-filter-pill:hover {
+    box-shadow: none !important;
+  }
+  .bt-nav-link:hover::after {
+    transform: scaleX(0);
+  }
 }

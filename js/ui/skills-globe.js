@@ -3,7 +3,10 @@
 // Mathematical spherical projection on HTML5 Canvas (zero WebGL context overhead).
 
 // Polyfill CanvasRenderingContext2D.roundRect for iOS Safari < 16 (iPhone 7 on iOS 15)
-if (typeof CanvasRenderingContext2D !== 'undefined' && !CanvasRenderingContext2D.prototype.roundRect) {
+if (
+  typeof CanvasRenderingContext2D !== 'undefined' &&
+  !CanvasRenderingContext2D.prototype.roundRect
+) {
   CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
     if (typeof r === 'undefined') r = 0;
     const rad = Math.min(Math.max(0, r), w / 2, h / 2);

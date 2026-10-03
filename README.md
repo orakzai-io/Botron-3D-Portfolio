@@ -29,14 +29,14 @@ retrieves and generates:
 Three things make that defensible rather than decorative:
 
 **1. It refuses instead of inventing.** Retrieval has a similarity floor. If nothing
-clears it, the LLM is *never called* — it cannot confabulate an answer to "who won the
+clears it, the LLM is _never called_ — it cannot confabulate an answer to "who won the
 2024 election" from unrelated biography text. For a portfolio about a real person, a
 confident false statement is the worst possible failure mode.
 
 **2. The fallback retriever is real TF-IDF.** The dense path uses FastEmbed
 (`BAAI/bge-small-en-v1.5`, 384-dim) into a vectorized NumPy cosine index. When those aren't installed it falls
-back to lexical retrieval — and that fallback originally *omitted the IDF term
-entirely*, so it was a normalised bag-of-words count. Measured result: "best pizza in
+back to lexical retrieval — and that fallback originally _omitted the IDF term
+entirely_, so it was a normalised bag-of-words count. Measured result: "best pizza in
 Lahore" scored **0.2009** while "what are his projects" scored **0.0662** — the score
 distributions fully overlapped and no relevance threshold could exist. Fixing IDF,
 adding sublinear TF, stopword removal and plural folding moved the off-topic median
@@ -45,7 +45,7 @@ answered, 18/20 refused.**
 
 **3. Photos can't be taken away by the model.** Images used to be guaranteed because
 the answer string literally contained the `<img>` tag. With an LLM generating the
-answer, it would have to *choose* to emit one — and when it describes a photo in words
+answer, it would have to _choose_ to emit one — and when it describes a photo in words
 instead, the images silently vanish. Photo intent is therefore detected client-side
 and the tag is injected regardless of what the model said. The prose is generated;
 the image is deterministic.
@@ -64,14 +64,14 @@ the image is deterministic.
 
 ## Stack
 
-| Layer | Technology |
-| :--- | :--- |
-| 3D | Three.js, WebGL, GLTF/GLB + Meshopt, PMREM |
-| Motion | GSAP ScrollTrigger, Lenis smooth scroll |
-| Frontend | Vanilla ES modules, Vite, modern CSS (custom properties) |
-| Retrieval | FastEmbed `bge-small-en-v1.5`, NumPy cosine index, TF-IDF fallback |
-| LLM | Groq — `openai/gpt-oss-120b` → `qwen/qwen3.8-27b` → `openai/gpt-oss-20b` failover |
-| Backend | FastAPI, Pydantic, Uvicorn |
+| Layer     | Technology                                                                        |
+| :-------- | :-------------------------------------------------------------------------------- |
+| 3D        | Three.js, WebGL, GLTF/GLB + Meshopt, PMREM                                        |
+| Motion    | GSAP ScrollTrigger, Lenis smooth scroll                                           |
+| Frontend  | Vanilla ES modules, Vite, modern CSS (custom properties)                          |
+| Retrieval | FastEmbed `bge-small-en-v1.5`, NumPy cosine index, TF-IDF fallback                |
+| LLM       | Groq — `openai/gpt-oss-120b` → `qwen/qwen3.8-27b` → `openai/gpt-oss-20b` failover |
+| Backend   | FastAPI, Pydantic, Uvicorn                                                        |
 
 ## Quick start
 
@@ -125,7 +125,6 @@ VITE_RAG_API_URL=http://localhost:8000/chat
 │   └── knowledge.py      # the indexed knowledge chunks
 ```
 
-
 > **Not in this repository.** `.prettierrc.json` / `.prettierignore` are a personal
 > formatting preference and are excluded locally, as is `docs/` (internal
 > architecture notes). Prettier still runs without them using its defaults, so
@@ -163,9 +162,9 @@ These were measured, not guessed:
   off-screen and the page has settled. A constant 60 wastes battery on a static page.
 - **`content-visibility` disabled on mobile** — `contain-intrinsic-size: 1px 750px`
   substitutes a fixed 750px box when a section scrolls away. On a phone these sections
-  are *taller* than 750px, so scrolling swapped real content for placeholders and
+  are _taller_ than 750px, so scrolling swapped real content for placeholders and
   produced phantom gaps.
-- **`100svh`, not `100vh`** — `100vh` is the *tall* viewport on mobile (it includes the
+- **`100svh`, not `100vh`** — `100vh` is the _tall_ viewport on mobile (it includes the
   area under the collapsing URL bar), so every section overhung the screen. An
   `@supports` fallback covers older iOS.
 - **Assets are Vite imports** — the photos use real `import` statements. A bare
@@ -190,7 +189,7 @@ uses `base: "./"`, so it works on a root domain or a sub-path unchanged.
 
 GitHub Pages is already wired up: pushing to `main` builds and publishes via
 `.github/workflows/deploy-pages.yml`. Set **Settings → Pages → Source** to
-*GitHub Actions* once, and every subsequent push redeploys.
+_GitHub Actions_ once, and every subsequent push redeploys.
 
 **Backend** — FastAPI Cloud or any container host. Root directory `rag`,
 start command `uvicorn main:app --host 0.0.0.0 --port $PORT`, with `GROQ_API_KEY` and

@@ -3,32 +3,81 @@
    in theme.css — see the cascade note there. */
 
 /* toggle the custom cursor only on precise pointers */
-.bt-cursor { display: none; position: fixed; top: 0; left: 0; z-index: 99; pointer-events: none; }
+.bt-cursor {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 99;
+  pointer-events: none;
+}
 .bt-cursor-dot {
-  position: fixed; width: 5px; height: 5px; margin: -2.5px 0 0 -2.5px;
-  border-radius: 50%; background: #e8edf4;
+  position: fixed;
+  width: 5px;
+  height: 5px;
+  margin: -2.5px 0 0 -2.5px;
+  border-radius: 50%;
+  background: #e8edf4;
   box-shadow: 0 0 8px rgba(232, 237, 244, 0.9);
 }
 .bt-cursor-ring {
-  position: fixed; width: 28px; height: 28px; margin: -14px 0 0 -14px;
-  border: 1px solid rgba(232, 237, 244, 0.5); border-radius: 50%;
-  transition: width 0.15s var(--ease), height 0.15s var(--ease),
-              margin 0.15s var(--ease), border-color 0.15s, box-shadow 0.15s;
-  display: grid; place-items: center;
+  position: fixed;
+  width: 28px;
+  height: 28px;
+  margin: -14px 0 0 -14px;
+  border: 1px solid rgba(232, 237, 244, 0.5);
+  border-radius: 50%;
+  transition:
+    width 0.15s var(--ease),
+    height 0.15s var(--ease),
+    margin 0.15s var(--ease),
+    border-color 0.15s,
+    box-shadow 0.15s;
+  display: grid;
+  place-items: center;
 }
-.bt-cursor-ring i { position: absolute; background: rgba(232, 237, 244, 0.55); }
-.bt-cursor-ring i:nth-child(1) { width: 1px; height: 100%; }
-.bt-cursor-ring i:nth-child(2) { width: 1px; height: 100%; transform: rotate(90deg); }
-.bt-cursor-ring i:nth-child(3) { width: 100%; height: 1px; transform: translateY(-50%); }
-.bt-cursor-ring i:nth-child(4) { width: 100%; height: 1px; transform: translateY(50%); }
+.bt-cursor-ring i {
+  position: absolute;
+  background: rgba(232, 237, 244, 0.55);
+}
+.bt-cursor-ring i:nth-child(1) {
+  width: 1px;
+  height: 100%;
+}
+.bt-cursor-ring i:nth-child(2) {
+  width: 1px;
+  height: 100%;
+  transform: rotate(90deg);
+}
+.bt-cursor-ring i:nth-child(3) {
+  width: 100%;
+  height: 1px;
+  transform: translateY(-50%);
+}
+.bt-cursor-ring i:nth-child(4) {
+  width: 100%;
+  height: 1px;
+  transform: translateY(50%);
+}
 .bt-cursor.is-hover .bt-cursor-ring {
-  width: 44px; height: 44px; margin: -22px 0 0 -22px;
-  border-color: var(--cyan-dim); box-shadow: 0 0 16px var(--cyan-dim);
+  width: 44px;
+  height: 44px;
+  margin: -22px 0 0 -22px;
+  border-color: var(--cyan-dim);
+  box-shadow: 0 0 16px var(--cyan-dim);
 }
 /* Press state — shrink via width/height/margin (never `scale`: that property
    composes OUTSIDE `transform`, so it multiplied the JS-written translate3d
    and dragged the ring toward the viewport origin on every mousedown).
    Margins and size interpolate with identical timing, keeping the ring
    pinned to the dot — same technique as the .is-hover rule above. */
-.bt-cursor.is-down .bt-cursor-ring { width: 22.4px; height: 22.4px; margin: -11.2px 0 0 -11.2px; }
-.bt-cursor.is-hover.is-down .bt-cursor-ring { width: 35.2px; height: 35.2px; margin: -17.6px 0 0 -17.6px; }
+.bt-cursor.is-down .bt-cursor-ring {
+  width: 22.4px;
+  height: 22.4px;
+  margin: -11.2px 0 0 -11.2px;
+}
+.bt-cursor.is-hover.is-down .bt-cursor-ring {
+  width: 35.2px;
+  height: 35.2px;
+  margin: -17.6px 0 0 -17.6px;
+}

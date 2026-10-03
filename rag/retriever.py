@@ -18,7 +18,7 @@ import os
 import re
 import threading
 import time
-from typing import Any, Optional
+from typing import Any
 
 import numpy as np
 
@@ -70,7 +70,7 @@ class VectorRetriever:
 
         # Dense storage (NumPy array of normalized vectors: shape [N, 384]).
         # None until initialize() finishes; retrieval checks before use.
-        self._dense_matrix: Optional[np.ndarray] = None
+        self._dense_matrix: np.ndarray | None = None
 
         # Pre-build lightweight TF-IDF index immediately (< 1ms) so the retriever is
         # immediately usable even before FastEmbed finishes loading.
@@ -135,7 +135,6 @@ class VectorRetriever:
         return vocab
 
     def _build_idf(self, texts: list[str]) -> list[float]:
-        import math
         n_docs = len(texts)
         df: dict[str, int] = {}
         for text in texts:
@@ -147,7 +146,6 @@ class VectorRetriever:
         ]
 
     def _tfidf_vector(self, text: str) -> list[float]:
-        import math
         tokens = self._tokenize(text)
         vec = [0.0] * len(self._tfidf_vocab)
         for token in tokens:

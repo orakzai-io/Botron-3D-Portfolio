@@ -10,14 +10,20 @@
   padding: 0.25rem 0 1rem;
 }
 .bt-timeline::before {
-  content: "";
+  content: '';
   position: absolute;
   top: 0;
   bottom: 0;
   left: 50%;
   width: 2px;
   transform: translateX(-50%);
-  background: linear-gradient(180deg, transparent, var(--cyan-dim) 10%, var(--cyan-dim) 90%, transparent);
+  background: linear-gradient(
+    180deg,
+    transparent,
+    var(--cyan-dim) 10%,
+    var(--cyan-dim) 90%,
+    transparent
+  );
   box-shadow: 0 0 12px rgba(0, 240, 255, 0.35);
 }
 .bt-timeline-item {
@@ -34,7 +40,9 @@
   border-radius: 50%;
   background: var(--cyan);
   border: 3px solid var(--bg);
-  box-shadow: 0 0 0 4px rgba(162, 168, 168, 0.18), 0 0 12px var(--cyan);
+  box-shadow:
+    0 0 0 4px rgba(162, 168, 168, 0.18),
+    0 0 12px var(--cyan);
   z-index: 2;
 }
 .bt-timeline-date {
@@ -66,7 +74,10 @@
   border: 1px solid var(--line);
   border-radius: 12px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
-  transition: border-color 0.3s, box-shadow 0.3s, transform 0.3s var(--ease);
+  transition:
+    border-color 0.3s,
+    box-shadow 0.3s,
+    transform 0.3s var(--ease);
 }
 .bt-timeline-item:nth-child(even) .bt-timeline-card {
   margin-right: 0;

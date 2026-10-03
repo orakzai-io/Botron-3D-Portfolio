@@ -247,7 +247,7 @@ def chat(payload: ChatRequest):
 if __name__ == "__main__":
     import uvicorn
 
-    port = int(os.getenv("PORT", 8000))
+    port = int(os.getenv("PORT", "8000"))
     # No reload=True: this is a documented entry point, not a dev convenience.
     # Use `uvicorn main:app --reload` locally instead.
     uvicorn.run("main:app", host="0.0.0.0", port=port)

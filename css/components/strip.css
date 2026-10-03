@@ -2,22 +2,40 @@
    Extracted verbatim from theme.css lines 281-299. Do not reorder imports
    in theme.css — see the cascade note there. */
 
-
 /* live status strip pinned to the bottom of the viewport.
    padding-bottom carries env(safe-area-inset-bottom) so the text clears the
    iOS home indicator / Android gesture bar. */
 .bt-strip {
-  position: fixed; left: 0; right: 0; bottom: 0; z-index: 20;
-  display: flex; justify-content: space-between; gap: 1rem;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 20;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
   padding: 0.55rem clamp(1.25rem, 4vw, 3rem);
   /* max() ensures the strip always clears the iOS home indicator / Android
      gesture pill even if env() returns 0 on a browser that doesn't expose
      safe-area values (requires viewport-fit=cover in the <meta> tag). */
   padding-bottom: max(0.55rem, calc(0.55rem + env(safe-area-inset-bottom)));
-  font-family: var(--font-ui); font-size: 0.62rem; letter-spacing: 0.16em;
-  color: var(--silver-4); border-top: 1px solid var(--line);
-  pointer-events: none; user-select: none;
+  font-family: var(--font-ui);
+  font-size: 0.62rem;
+  letter-spacing: 0.16em;
+  color: var(--silver-4);
+  border-top: 1px solid var(--line);
+  pointer-events: none;
+  user-select: none;
 }
-.bt-strip b { color: var(--silver-2); font-weight: 500; }
-.bt-strip .live { color: var(--cyan); }
-@media (max-width: 720px) { .bt-strip .mid { display: none; } }
+.bt-strip b {
+  color: var(--silver-2);
+  font-weight: 500;
+}
+.bt-strip .live {
+  color: var(--cyan);
+}
+@media (max-width: 720px) {
+  .bt-strip .mid {
+    display: none;
+  }
+}

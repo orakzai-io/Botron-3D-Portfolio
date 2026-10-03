@@ -5,7 +5,6 @@ import * as THREE from 'three';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
 export function setupScene({ container }) {
-
   // --- Renderer ---
   // Must use highp: mobile GPUs (Mali/Adreno) implement mediump as 16-bit half-floats (max 65504).
   // In PBR shaders (MeshStandardMaterial), Cook-Torrance GGX specular highlights exceed 65504,

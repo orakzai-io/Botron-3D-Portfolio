@@ -1,11 +1,10 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>Shahsawar Orakzai | Full-Stack AI Engineer</title>
-        <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/base.css" />
 
     <!-- Quality tiers were removed on purpose: the site ships ONE look on every
          device (flat panels, no CSS glass blur, the low-power 3D path). The old
@@ -16,75 +15,102 @@
          subsetting Google serves, but same-origin — no third-party DNS/TLS
          round-trips, no render-blocking external stylesheet. The faces the hero
          paints with are preloaded; the rest swap in via CSS. -->
-    <link rel="preload" href="assets/fonts/jetbrains-mono-latin.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="preload" href="assets/fonts/space-grotesk-latin.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="stylesheet" href="css/fonts.css">
-    <link rel="stylesheet" href="css/theme.css">
-    <link rel="stylesheet" href="css/chat.css">
+    <link
+      rel="preload"
+      href="assets/fonts/jetbrains-mono-latin.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="assets/fonts/space-grotesk-latin.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link rel="stylesheet" href="css/fonts.css" />
+    <link rel="stylesheet" href="css/theme.css" />
+    <link rel="stylesheet" href="css/chat.css" />
     <!-- Preload the 322 KB 3D bot model at HIGH priority: downloads concurrently
          with the initial bundle so the bot is cached by the time Three.js mounts.
          Starved/data-saver links still drop it via the script below. -->
-    <link id="bt-glb-preload" rel="preload" href="./js/models/botron.glb" as="fetch" type="model/gltf-binary" crossorigin fetchpriority="high">
+    <link
+      id="bt-glb-preload"
+      rel="preload"
+      href="./js/models/botron.glb"
+      as="fetch"
+      type="model/gltf-binary"
+      crossorigin
+      fetchpriority="high"
+    />
     <script>
-        (function () {
-            try {
-                var c = navigator.connection || navigator.mozConnection || navigator.webkitConnection || {};
-                if (c.saveData || /(^|-)2g|3g/.test(c.effectiveType || "")) {
-                    var el = document.getElementById("bt-glb-preload");
-                    if (el && el.parentNode) el.parentNode.removeChild(el);
-                }
-            } catch (e) { /* best effort only */ }
-        })();
+      (function () {
+        try {
+          var c =
+            navigator.connection || navigator.mozConnection || navigator.webkitConnection || {};
+          if (c.saveData || /(^|-)2g|3g/.test(c.effectiveType || '')) {
+            var el = document.getElementById('bt-glb-preload');
+            if (el && el.parentNode) el.parentNode.removeChild(el);
+          }
+        } catch (e) {
+          /* best effort only */
+        }
+      })();
     </script>
-</head>
+  </head>
 
-<body>
+  <body>
     <div class="bt-fx" aria-hidden="true"></div>
     <!-- PINNED: boot overlay. js/boot-gate.js owns the reveal; the safety-net
          script directly below must stay immediately under this element. -->
     <div class="bt-boot" id="bt-boot" aria-hidden="true">
-        <p>&gt; botron_core v2.0 // booting</p>
-        <p>&gt; calibrate_eyes .......... OK</p>
-        <p>&gt; mount_arms ............. OK</p>
-        <p>&gt; handshake_with_human ..... <span class="bt-boot-caret">▊</span></p>
+      <p>&gt; botron_core v2.0 // booting</p>
+      <p>&gt; calibrate_eyes .......... OK</p>
+      <p>&gt; mount_arms ............. OK</p>
+      <p>&gt; handshake_with_human ..... <span class="bt-boot-caret">▊</span></p>
     </div>
     <script>
-        // Boot-gate handoff. js/boot-gate.js owns the reveal once it evaluates,
-        // but on slow connections the bundle (~795 kB of JS) may not have run
-        // when these nets fire — so they only cover the catastrophic paths.
-        var __bBootReveal = function() {
-            if (window.__bBootDone) return;
-            window.__bBootDone = true;
-            document.body.classList.add("intro-complete");
-        };
-        // Net 1: errors. Capture phase catches resource errors too; a runtime
-        // error reports window as target, a resource error reports its element.
-        window.addEventListener("error", function(e) {
-            if (e.target && e.target !== window) {
-                // only a failed SCRIPT lifts the boot screen — a broken image
-                // or stylesheet must not reveal an unfinished site early
-                if (e.target.tagName === "SCRIPT") __bBootReveal();
-                return;
-            }
-            // runtime exception: matters only if the gate never initialized
-            if (!window.__bBootInit) __bBootReveal();
-        }, true);
-        // Net 2: pathological stall (hanging fetch, eval throw with no error
-        // event, gate bug). The gate's own BOOT_MAX_MS (3.5s) covers the normal
-        // path; this only exists for the case where the gate never ran.
-        setTimeout(__bBootReveal, 8000);
+      // Boot-gate handoff. js/boot-gate.js owns the reveal once it evaluates,
+      // but on slow connections the bundle (~795 kB of JS) may not have run
+      // when these nets fire — so they only cover the catastrophic paths.
+      var __bBootReveal = function () {
+        if (window.__bBootDone) return;
+        window.__bBootDone = true;
+        document.body.classList.add('intro-complete');
+      };
+      // Net 1: errors. Capture phase catches resource errors too; a runtime
+      // error reports window as target, a resource error reports its element.
+      window.addEventListener(
+        'error',
+        function (e) {
+          if (e.target && e.target !== window) {
+            // only a failed SCRIPT lifts the boot screen — a broken image
+            // or stylesheet must not reveal an unfinished site early
+            if (e.target.tagName === 'SCRIPT') __bBootReveal();
+            return;
+          }
+          // runtime exception: matters only if the gate never initialized
+          if (!window.__bBootInit) __bBootReveal();
+        },
+        true
+      );
+      // Net 2: pathological stall (hanging fetch, eval throw with no error
+      // event, gate bug). The gate's own BOOT_MAX_MS (3.5s) covers the normal
+      // path; this only exists for the case where the gate never ran.
+      setTimeout(__bBootReveal, 8000);
 
-        // HF Space iframe fix: IntersectionObserver may not fire inside sandboxed iframes.
-        // After 2.5s, force-reveal any sections that are still hidden.
-        setTimeout(function() {
-            document.querySelectorAll('.bt-reveal, .bt-beat').forEach(function(el) {
-                el.classList.add('is-in');
-            });
-        }, 2500);
+      // HF Space iframe fix: IntersectionObserver may not fire inside sandboxed iframes.
+      // After 2.5s, force-reveal any sections that are still hidden.
+      setTimeout(function () {
+        document.querySelectorAll('.bt-reveal, .bt-beat').forEach(function (el) {
+          el.classList.add('is-in');
+        });
+      }, 2500);
     </script>
     <div class="bt-cursor" id="bt-cursor" aria-hidden="true">
-        <span class="bt-cursor-ring"><i></i><i></i><i></i><i></i></span>
-        <span class="bt-cursor-dot"></span>
+      <span class="bt-cursor-ring"><i></i><i></i><i></i><i></i></span>
+      <span class="bt-cursor-dot"></span>
     </div>
 
     <!-- 3D Stage Container (Fixed 3D Canvas Stage) -->
@@ -94,148 +120,236 @@
     <!-- PINNED: every <load> partial below nests inside this element. Sections
          are injected here, never at the top level of <body>. -->
     <div class="ui-overlay">
-        <!-- BOTRON mouth-tracking speech bubble (JS drives its position) -->
-        <div class="bt-bubble bt-bubble--hero" id="botron-bubble" aria-live="polite">
-            <span class="bt-bubble-dot"></span>
-            <p>// I'M BOTRON • ASK ME ANYTHING <span style="color:var(--cyan, #00f0ff)">[CLICK TO CHAT]</span></p>
+      <!-- BOTRON mouth-tracking speech bubble (JS drives its position) -->
+      <div class="bt-bubble bt-bubble--hero" id="botron-bubble" aria-live="polite">
+        <span class="bt-bubble-dot"></span>
+        <p>
+          // I'M BOTRON • ASK ME ANYTHING
+          <span style="color: var(--cyan, #00f0ff)">[CLICK TO CHAT]</span>
+        </p>
+      </div>
+      <!-- Flat-panel navbar -->
+      <nav class="bt-nav" id="bt-nav">
+        <a href="#hero" class="bt-brand">
+          <span class="bt-cube" aria-hidden="true"><i></i><i></i><i></i></span>
+          <span class="bt-brand-name">ORAKZAI</span>
+        </a>
+        <!-- Desktop links -->
+        <ul class="bt-nav-links">
+          <li><a class="bt-nav-link" href="#hero" data-cursor="hover">HOME</a></li>
+          <li><a class="bt-nav-link" href="#about" data-cursor="hover">ABOUT</a></li>
+          <li><a class="bt-nav-link" href="#skills" data-cursor="hover">SKILLS</a></li>
+          <li><a class="bt-nav-link" href="#experience" data-cursor="hover">EXPERIENCE</a></li>
+          <li><a class="bt-nav-link" href="#projects" data-cursor="hover">PROJECTS</a></li>
+          <li><a class="bt-nav-link" href="#education" data-cursor="hover">EDUCATION</a></li>
+          <li><a class="bt-nav-link" href="#testimonials" data-cursor="hover">TESTIMONIALS</a></li>
+          <li><a class="bt-nav-link" href="#contact" data-cursor="hover">CONTACT</a></li>
+        </ul>
+        <!-- Desktop status pill -->
+        <div class="bt-status"><span class="bt-status-dot"></span>SYSTEM ONLINE</div>
+        <!-- Mobile: status pill (compact) + hamburger -->
+        <span class="bt-status-mobile" aria-hidden="true">
+          <span class="bt-status-mobile-dot"></span>SYS ONLINE
+        </span>
+        <button
+          class="bt-burger"
+          id="bt-burger"
+          aria-label="Open navigation"
+          aria-expanded="false"
+          aria-controls="bt-drawer"
+        >
+          <span></span><span></span><span></span>
+        </button>
+        <!-- Mobile drawer (hidden on desktop) -->
+        <div class="bt-nav-drawer" id="bt-drawer" aria-hidden="true">
+          <ul>
+            <li><a href="#hero" class="bt-drawer-link">HOME</a></li>
+            <li><a href="#about" class="bt-drawer-link">ABOUT</a></li>
+            <li><a href="#skills" class="bt-drawer-link">SKILLS</a></li>
+            <li><a href="#experience" class="bt-drawer-link">EXPERIENCE</a></li>
+            <li><a href="#projects" class="bt-drawer-link">PROJECTS</a></li>
+            <li><a href="#education" class="bt-drawer-link">EDUCATION</a></li>
+            <li><a href="#testimonials" class="bt-drawer-link">TESTIMONIALS</a></li>
+            <li><a href="#contact" class="bt-drawer-link">CONTACT</a></li>
+          </ul>
         </div>
-        <!-- Flat-panel navbar -->
-        <nav class="bt-nav" id="bt-nav">
-            <a href="#hero" class="bt-brand">
-                <span class="bt-cube" aria-hidden="true"><i></i><i></i><i></i></span>
-                <span class="bt-brand-name">ORAKZAI</span>
-            </a>
-            <!-- Desktop links -->
-            <ul class="bt-nav-links">
-                <li><a class="bt-nav-link" href="#hero" data-cursor="hover">HOME</a></li>
-                <li><a class="bt-nav-link" href="#about" data-cursor="hover">ABOUT</a></li>
-                <li><a class="bt-nav-link" href="#skills" data-cursor="hover">SKILLS</a></li>
-                <li><a class="bt-nav-link" href="#experience" data-cursor="hover">EXPERIENCE</a></li>
-                <li><a class="bt-nav-link" href="#projects" data-cursor="hover">PROJECTS</a></li>
-                <li><a class="bt-nav-link" href="#education" data-cursor="hover">EDUCATION</a></li>
-                <li><a class="bt-nav-link" href="#testimonials" data-cursor="hover">TESTIMONIALS</a></li>
-                <li><a class="bt-nav-link" href="#contact" data-cursor="hover">CONTACT</a></li>
-            </ul>
-            <!-- Desktop status pill -->
-            <div class="bt-status"><span class="bt-status-dot"></span>SYSTEM ONLINE</div>
-            <!-- Mobile: status pill (compact) + hamburger -->
-            <span class="bt-status-mobile" aria-hidden="true">
-                <span class="bt-status-mobile-dot"></span>SYS ONLINE
-            </span>
-            <button class="bt-burger" id="bt-burger" aria-label="Open navigation" aria-expanded="false" aria-controls="bt-drawer">
-                <span></span><span></span><span></span>
-            </button>
-            <!-- Mobile drawer (hidden on desktop) -->
-            <div class="bt-nav-drawer" id="bt-drawer" aria-hidden="true">
-                <ul>
-                    <li><a href="#hero" class="bt-drawer-link">HOME</a></li>
-                    <li><a href="#about" class="bt-drawer-link">ABOUT</a></li>
-                    <li><a href="#skills" class="bt-drawer-link">SKILLS</a></li>
-                    <li><a href="#experience" class="bt-drawer-link">EXPERIENCE</a></li>
-                    <li><a href="#projects" class="bt-drawer-link">PROJECTS</a></li>
-                    <li><a href="#education" class="bt-drawer-link">EDUCATION</a></li>
-                    <li><a href="#testimonials" class="bt-drawer-link">TESTIMONIALS</a></li>
-                    <li><a href="#contact" class="bt-drawer-link">CONTACT</a></li>
-                </ul>
+        <span class="bt-hair" id="bt-hair" aria-hidden="true"></span>
+      </nav>
+
+      <load src="src/sections/hero.html" />
+
+      <load src="src/sections/about.html" />
+
+      <load src="src/sections/skills.html" />
+
+      <load src="src/sections/experience.html" />
+
+      <load src="src/sections/projects.html" />
+
+      <load src="src/sections/education.html" />
+
+      <load src="src/sections/testimonials.html" />
+
+      <load src="src/sections/contact.html" />
+
+      <load src="src/sections/footer.html" />
+
+      <!-- Floating RAG Chat FAB Trigger -->
+      <button class="bt-chat-fab" id="bt-chat-fab" aria-label="Open BOTRON" data-cursor="hover">
+        <span class="bt-chat-fab-dot"></span>
+        <span class="bt-chat-fab-icon">
+          <svg
+            width="15"
+            height="15"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+          </svg>
+        </span>
+        <span class="bt-chat-fab-label">BOTRON</span>
+      </button>
+
+      <!-- BOTRON RAG Chat Window -->
+      <div
+        class="bt-chat-window"
+        id="bt-chat-window"
+        role="dialog"
+        aria-hidden="true"
+        aria-label="BOTRON Chat"
+      >
+        <div class="bt-chat-header">
+          <div class="bt-chat-header-title">
+            <div class="bt-chat-avatar">BT</div>
+            <div class="bt-chat-meta">
+              <h4>BOTRON v1.0</h4>
+              <span>RAG // ONLINE</span>
             </div>
-            <span class="bt-hair" id="bt-hair" aria-hidden="true"></span>
-        </nav>
+          </div>
+          <button class="bt-chat-close-btn" id="bt-chat-close-btn" aria-label="Close Chat">
+            &times;
+          </button>
+        </div>
 
+        <div class="bt-chat-messages" id="bt-chat-messages">
+          <div class="bt-chat-msg bt-chat-msg--bot">
+            <div class="bt-chat-bubble">
+              Greetings, human. I am <strong>BOTRON</strong>, Shahsawar's autonomous AI assistant.
+              I've indexed his entire portfolio, RAG systems, technical stack, and background into
+              my knowledge base. How can I assist you?
+            </div>
+            <span class="bt-chat-time">SYS // READY</span>
+          </div>
+        </div>
 
-        <load src="src/sections/hero.html" />
-
-        <load src="src/sections/about.html" />
-
-        <load src="src/sections/skills.html" />
-
-        <load src="src/sections/experience.html" />
-
-        <load src="src/sections/projects.html" />
-
-        <load src="src/sections/education.html" />
-
-        <load src="src/sections/testimonials.html" />
-
-        <load src="src/sections/contact.html" />
-
-        <load src="src/sections/footer.html" />
-
-        <!-- Floating RAG Chat FAB Trigger -->
-        <button class="bt-chat-fab" id="bt-chat-fab" aria-label="Open BOTRON" data-cursor="hover">
-            <span class="bt-chat-fab-dot"></span>
-            <span class="bt-chat-fab-icon">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                    stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                </svg>
-            </span>
-            <span class="bt-chat-fab-label">BOTRON</span>
+        <!-- Scroll-to-bottom button (appears when scrolled up) -->
+        <button
+          class="bt-chat-scroll-btn"
+          id="bt-chat-scroll-btn"
+          aria-label="Scroll to latest message"
+        >
+          <svg
+            width="12"
+            height="12"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+          LATEST
         </button>
 
-        <!-- BOTRON RAG Chat Window -->
-        <div class="bt-chat-window" id="bt-chat-window" role="dialog" aria-hidden="true"
-            aria-label="BOTRON Chat">
-            <div class="bt-chat-header">
-                <div class="bt-chat-header-title">
-                    <div class="bt-chat-avatar">BT</div>
-                    <div class="bt-chat-meta">
-                        <h4>BOTRON v1.0</h4>
-                        <span>RAG // ONLINE</span>
-                    </div>
-                </div>
-                <button class="bt-chat-close-btn" id="bt-chat-close-btn" aria-label="Close Chat">&times;</button>
-            </div>
-
-            <div class="bt-chat-messages" id="bt-chat-messages">
-                <div class="bt-chat-msg bt-chat-msg--bot">
-                    <div class="bt-chat-bubble">
-                        Greetings, human. I am <strong>BOTRON</strong>, Shahsawar's autonomous AI assistant. I've indexed his
-                        entire portfolio, RAG systems, technical stack, and background into my knowledge base. How can I
-                        assist you?
-                    </div>
-                    <span class="bt-chat-time">SYS // READY</span>
-                </div>
-            </div>
-
-            <!-- Scroll-to-bottom button (appears when scrolled up) -->
-            <button class="bt-chat-scroll-btn" id="bt-chat-scroll-btn" aria-label="Scroll to latest message">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-                    stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="6 9 12 15 18 9"></polyline>
-                </svg>
-                LATEST
-            </button>
-
-            <!-- Quick Inquiry Suggestions -->
-            <div class="bt-chat-suggestions" id="bt-chat-suggestions">
-                <button type="button" class="bt-chat-chip" data-query="Who is the creator behind BOTRON? Show his photo">👤 Meet the Creator</button>
-                <button type="button" class="bt-chat-chip" data-query="What programming languages, frameworks, and databases does Shahsawar specialize in?">🛠️ Technical Stack</button>
-                <button type="button" class="bt-chat-chip" data-query="What is Shahsawar's academic background and credentials?">🎓 Academics & CS50</button>
-                <button type="button" class="bt-chat-chip" data-query="What is Shahsawar's background as a national swimmer? Show photo">🏊 Sports & Discipline</button>
-                <button type="button" class="bt-chat-chip" data-query="How can I contact Shahsawar for projects?">📬 Get in Touch</button>
-            </div>
-
-            <!-- Input Bar -->
-            <form class="bt-chat-input-bar" id="bt-chat-form" onsubmit="return false;">
-                <input type="text" class="bt-chat-input" id="bt-chat-input"
-                    placeholder="Ask BOTRON anything about Shahsawar..." autocomplete="off">
-                <button type="button" class="bt-chat-send-btn" id="bt-chat-send-btn" aria-label="Send Query">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-                        stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="22" y1="2" x2="11" y2="13"></line>
-                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                    </svg>
-                </button>
-            </form>
+        <!-- Quick Inquiry Suggestions -->
+        <div class="bt-chat-suggestions" id="bt-chat-suggestions">
+          <button
+            type="button"
+            class="bt-chat-chip"
+            data-query="Who is the creator behind BOTRON? Show his photo"
+          >
+            👤 Meet the Creator
+          </button>
+          <button
+            type="button"
+            class="bt-chat-chip"
+            data-query="What programming languages, frameworks, and databases does Shahsawar specialize in?"
+          >
+            🛠️ Technical Stack
+          </button>
+          <button
+            type="button"
+            class="bt-chat-chip"
+            data-query="What is Shahsawar's academic background and credentials?"
+          >
+            🎓 Academics & CS50
+          </button>
+          <button
+            type="button"
+            class="bt-chat-chip"
+            data-query="What is Shahsawar's background as a national swimmer? Show photo"
+          >
+            🏊 Sports & Discipline
+          </button>
+          <button
+            type="button"
+            class="bt-chat-chip"
+            data-query="How can I contact Shahsawar for projects?"
+          >
+            📬 Get in Touch
+          </button>
         </div>
 
-        <div class="bt-strip">
-            <div class="left">BOTRON ACTIVE&nbsp;·&nbsp;<span id="bt-fps" class="live">-- FPS</span>&nbsp;·&nbsp;<span id="bt-net" class="live">NET --</span></div>
-            <div class="mid">STATUS: IDLE // <span class="bt-scroll-arrow">AWAITING SCROLL</span></div>
-            <div class="right">MOUSE <span id="bt-mouse" class="live">0,0</span> · CURSOR TRK</div>
+        <!-- Input Bar -->
+        <form class="bt-chat-input-bar" id="bt-chat-form" onsubmit="return false;">
+          <input
+            type="text"
+            class="bt-chat-input"
+            id="bt-chat-input"
+            placeholder="Ask BOTRON anything about Shahsawar..."
+            autocomplete="off"
+          />
+          <button
+            type="button"
+            class="bt-chat-send-btn"
+            id="bt-chat-send-btn"
+            aria-label="Send Query"
+          >
+            <svg
+              width="15"
+              height="15"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <line x1="22" y1="2" x2="11" y2="13"></line>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+          </button>
+        </form>
+      </div>
+
+      <div class="bt-strip">
+        <div class="left">
+          BOTRON ACTIVE&nbsp;·&nbsp;<span id="bt-fps" class="live">-- FPS</span>&nbsp;·&nbsp;<span
+            id="bt-net"
+            class="live"
+            >NET --</span
+          >
         </div>
+        <div class="mid">STATUS: IDLE // <span class="bt-scroll-arrow">AWAITING SCROLL</span></div>
+        <div class="right">MOUSE <span id="bt-mouse" class="live">0,0</span> · CURSOR TRK</div>
+      </div>
     </div>
-
 
     <!-- PINNED: must remain the last inline script before the module tags below. -->
     <!-- Scroll-reset: must run before any ES module evaluates.
@@ -244,8 +358,10 @@
          the only guaranteed-early slot — it executes synchronously before the
          parser reaches any <script type="module"> tag. -->
     <script>
-        if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
-        try { window.scrollTo(0, 0); } catch (_) {}
+      if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+      try {
+        window.scrollTo(0, 0);
+      } catch (_) {}
     </script>
 
     <!-- Active BOTRON engine (ES modules; entry: js/main.js) -->
@@ -253,7 +369,5 @@
     <script type="module" src="js/ui/ui.js"></script>
     <script type="module" src="js/ui/skills-globe.js"></script>
     <script type="module" src="js/ui/chat.js"></script>
-
-</body>
-
+  </body>
 </html>

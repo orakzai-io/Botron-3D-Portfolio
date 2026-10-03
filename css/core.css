@@ -16,14 +16,14 @@
 :root {
   --bg: #04050a;
   --bg1: #0a0c12;
-  --line: rgba(205, 215, 228, 0.10);
+  --line: rgba(205, 215, 228, 0.1);
   --line-2: rgba(205, 215, 228, 0.22);
   --silver: #e8edf4;
   --silver-2: #b6bfca;
   --silver-3: #8a94a1;
   --silver-4: #555f6d;
   --cyan: #00f0ff;
-  --cyan-dim: rgba(0, 240, 255, 0.30);
+  --cyan-dim: rgba(0, 240, 255, 0.3);
   --font-disp: 'Space Grotesk', 'Inter', sans-serif;
   --font-ui: 'JetBrains Mono', monospace;
   --font-body: 'Inter', -apple-system, sans-serif;
@@ -38,11 +38,18 @@
   --cyan-soft: #67e8f9;
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 /* Mobile: kill the system tap-highlight overlay (a translucent slab painted
    over the whole tapped box — very visible around the globe canvas, pills and
    HUD on the near-black theme). The burger opts out locally; this is global. */
-html { scroll-behavior: smooth; -webkit-tap-highlight-color: transparent; }
+html {
+  scroll-behavior: smooth;
+  -webkit-tap-highlight-color: transparent;
+}
 
 body {
   background: radial-gradient(1200px 800px at 72% -10%, var(--bg1), var(--bg) 60%);
@@ -51,21 +58,29 @@ body {
   overflow-x: hidden;
 }
 
-::selection { background: rgba(0, 240, 255, 0.22); color: #fff; }
-
-::-webkit-scrollbar { width: 9px; }
-::-webkit-scrollbar-track { background: #05070a; }
-::-webkit-scrollbar-thumb { background: #1d2129; border-radius: 6px; }
-::-webkit-scrollbar-thumb:hover { background: #2a303b; }
-
 /* fixed 3D stage */
-.stage-container { position: fixed; inset: 0; z-index: 1; }
-.stage-container canvas { width: 100% !important; height: 100% !important; display: block; }
+.stage-container {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+}
+.stage-container canvas {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+}
 
 /* film overlay -- vignette (the scanline ::before layer is gone) */
-.bt-fx { position: fixed; inset: 0; z-index: 5; pointer-events: none; }
+.bt-fx {
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+}
 .bt-fx::after {
-  content: ""; position: absolute; inset: 0;
+  content: '';
+  position: absolute;
+  inset: 0;
   background:
     radial-gradient(ellipse at 50% 42%, rgba(0, 240, 255, 0.028) 0%, transparent 55%),
     radial-gradient(ellipse at 50% 42%, transparent 55%, rgba(2, 8, 14, 0.78) 100%);
@@ -73,18 +88,51 @@ body {
 
 /* boot sequence overlay */
 .bt-boot {
-  position: fixed; inset: 0; z-index: 12; display: grid;
-  place-content: center; gap: 0.6rem;
+  position: fixed;
+  inset: 0;
+  z-index: 12;
+  display: grid;
+  place-content: center;
+  gap: 0.6rem;
   background: radial-gradient(900px 600px at 60% 30%, #0a0d13, #04050a 70%);
-  font-family: var(--font-ui); font-size: 0.82rem;
-  letter-spacing: 0.05em; color: var(--silver-3);
-  transition: opacity 0.35s var(--ease) 0.25s, visibility 0s 0.8s;
+  font-family: var(--font-ui);
+  font-size: 0.82rem;
+  letter-spacing: 0.05em;
+  color: var(--silver-3);
+  transition:
+    opacity 0.35s var(--ease) 0.25s,
+    visibility 0s 0.8s;
 }
-.bt-boot p { margin: 0; opacity: 0; animation: bootLine 0.4s var(--ease) forwards; }
+.bt-boot p {
+  margin: 0;
+  opacity: 0;
+  animation: bootLine 0.4s var(--ease) forwards;
+}
 /* tightened so all four lines read inside the boot gate's min display */
-.bt-boot p:nth-child(2) { animation-delay: 0.12s; }
-.bt-boot p:nth-child(3) { animation-delay: 0.24s; }
-.bt-boot p:nth-child(4) { animation-delay: 0.36s; }
-body.intro-complete .bt-boot { opacity: 0; visibility: hidden; }
-@keyframes bootLine { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
-.bt-boot-caret { color: var(--cyan); animation: blink 1s steps(1) infinite; }
+.bt-boot p:nth-child(2) {
+  animation-delay: 0.12s;
+}
+.bt-boot p:nth-child(3) {
+  animation-delay: 0.24s;
+}
+.bt-boot p:nth-child(4) {
+  animation-delay: 0.36s;
+}
+body.intro-complete .bt-boot {
+  opacity: 0;
+  visibility: hidden;
+}
+@keyframes bootLine {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.bt-boot-caret {
+  color: var(--cyan);
+  animation: blink 1s steps(1) infinite;
+}

@@ -63,4 +63,3 @@ export function createTelemetry(mouse) {
 
   return { update, setIdle };
 }
-

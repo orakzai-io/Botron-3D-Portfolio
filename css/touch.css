@@ -27,7 +27,9 @@
 .bt-proj,
 .bt-timeline-card,
 .bt-edu,
-.bt-quote { transition-duration: 0.11s !important; }
+.bt-quote {
+  transition-duration: 0.11s !important;
+}
 
 :is(.bt-proj, .bt-timeline-card, .bt-edu, .bt-quote):active,
 :is(.bt-proj, .bt-timeline-card, .bt-edu, .bt-quote).bt-lit {
@@ -36,12 +38,18 @@
 :is(.bt-proj, .bt-timeline-card):active,
 :is(.bt-proj, .bt-timeline-card).bt-lit {
   border-color: rgba(0, 240, 255, 0.45) !important;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45), 0 0 28px rgba(0, 240, 255, 0.14) !important;
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.45),
+    0 0 28px rgba(0, 240, 255, 0.14) !important;
 }
 .bt-proj:active::before,
-.bt-proj.bt-lit::before { opacity: 1 !important; }
+.bt-proj.bt-lit::before {
+  opacity: 1 !important;
+}
 .bt-proj:active .bt-proj-thumb img,
-.bt-proj.bt-lit .bt-proj-thumb img { filter: brightness(1) saturate(1.05) !important; }
+.bt-proj.bt-lit .bt-proj-thumb img {
+  filter: brightness(1) saturate(1.05) !important;
+}
 
 .bt-edu:active,
 .bt-edu.bt-lit {
@@ -52,7 +60,10 @@
 .bt-edu:active::before,
 .bt-edu:active::after,
 .bt-edu.bt-lit::before,
-.bt-edu.bt-lit::after { width: 15px !important; height: 15px !important; }
+.bt-edu.bt-lit::after {
+  width: 15px !important;
+  height: 15px !important;
+}
 .bt-edu:active::before,
 .bt-edu.bt-lit::before {
   border-top-color: var(--cyan) !important;
@@ -80,4 +91,6 @@
    nothing inside .bt-quotes-track), so neither tap state may introduce a lift
    the desktop hover does not have. */
 .bt-quotes-track .bt-quote:active,
-.bt-quotes-track .bt-quote.bt-lit { transform: none !important; }
+.bt-quotes-track .bt-quote.bt-lit {
+  transform: none !important;
+}

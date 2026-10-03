@@ -36,7 +36,9 @@
   font-size: 0.9rem;
   outline: none;
   resize: vertical;
-  transition: border-color 0.3s, box-shadow 0.3s;
+  transition:
+    border-color 0.3s,
+    box-shadow 0.3s;
 }
 .bt-field input::placeholder,
 .bt-field textarea::placeholder {
@@ -45,7 +47,9 @@
 .bt-field input:focus,
 .bt-field textarea:focus {
   border-color: var(--cyan-dim);
-  box-shadow: 0 0 0 3px rgba(0, 240, 255, 0.10), 0 0 18px rgba(0, 240, 255, 0.08);
+  box-shadow:
+    0 0 0 3px rgba(0, 240, 255, 0.1),
+    0 0 18px rgba(0, 240, 255, 0.08);
 }
 .bt-field-error {
   font-family: var(--font-ui);

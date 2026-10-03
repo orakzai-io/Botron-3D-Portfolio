@@ -31,8 +31,3 @@
     grid-template-columns: 1fr;
   }
 }
-
-/* ============================================================
-   ENHANCEMENT LAYER — cyan UI polish (violet reserved for bot scene & skills atom)
-   Appended last so it wins over everything above.
-   ============================================================ */

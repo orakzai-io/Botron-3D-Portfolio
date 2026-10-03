@@ -16,7 +16,10 @@
   border: 1px solid var(--line);
   border-radius: 12px;
   overflow: hidden;
-  transition: border-color 0.3s, box-shadow 0.3s, transform 0.3s var(--ease);
+  transition:
+    border-color 0.3s,
+    box-shadow 0.3s,
+    transform 0.3s var(--ease);
 }
 .bt-proj:hover {
   border-color: var(--cyan-dim);
@@ -58,7 +61,9 @@
   object-position: top;
   display: block;
   filter: brightness(0.75) saturate(0.8);
-  transition: filter 0.4s var(--ease), transform 0.5s var(--ease);
+  transition:
+    filter 0.4s var(--ease),
+    transform 0.5s var(--ease);
 }
 .bt-proj:hover .bt-proj-thumb img {
   filter: brightness(0.9) saturate(1);
@@ -66,7 +71,7 @@
 }
 /* scanline effect on thumbnail */
 .bt-proj-thumb::before {
-  content: "";
+  content: '';
   position: absolute;
   inset: 0;
   background: repeating-linear-gradient(

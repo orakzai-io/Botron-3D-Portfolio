@@ -4,23 +4,36 @@
 
 /* ---------- responsive ---------- */
 @media (max-width: 900px) {
-  .bt-hero-grid, .bt-beat-grid { grid-template-columns: 1fr; }
+  .bt-hero-grid,
+  .bt-beat-grid {
+    grid-template-columns: 1fr;
+  }
   /* .bt-skills-grid is absent above: base.css already sets
      grid-template-columns: 1fr !important for it at <=900px, so declaring it
      here is dead. text-align is not set by base.css and is still needed. */
-  .bt-hero-grid, .bt-beat-grid, .bt-skills-grid { text-align: left; }
+  .bt-hero-grid,
+  .bt-beat-grid,
+  .bt-skills-grid {
+    text-align: left;
+  }
   /* .bt-stage: the empty 3D canvas slot that sits alongside text in the desktop
      2-column grid. On mobile the grid is single-column so the stage becomes a
      spacer row. 44vh was too tall on narrow phones with lots of content — the
      section stretched past a full screen height and stacked up as visible dead
      space. Set to auto so the row only takes what it needs; the robot still
      renders in the fixed WebGL canvas behind the whole page. */
-  .bt-stage { min-height: 0; height: auto; order: 2; }
+  .bt-stage {
+    min-height: 0;
+    height: auto;
+    order: 2;
+  }
   /* 100vh is the TALL viewport on mobile (it ignores the collapsing URL bar),
      so every beat overhung the visible screen and stacked up as empty space
      below the copy. svh is the small/stable viewport and does not jump when
      the bar hides. Padding is trimmed for the same reason. */
-  .bt-hero { min-height: 100svh; }
+  .bt-hero {
+    min-height: 100svh;
+  }
   .bt-beat {
     min-height: auto;
     padding: 5rem 0 3rem;
@@ -51,23 +64,82 @@
    leaving the declaration invalid. */
 @supports not (height: 100svh) {
   @media (max-width: 900px) {
-    .bt-hero { min-height: 100vh; }
+    .bt-hero {
+      min-height: 100vh;
+    }
     /* .bt-beat is now min-height:auto — no svh fallback needed */
+  }
+}
+
+/* ============================================================
+   MOBILE READABILITY OVER THE 3D BOT
+   The bot renders only on the hero / about / contact beats (POSES in
+   js/webgl/config.js) and re-centres to x=0 <= 900px, so on phones it sits
+   directly behind the bare copy. stage.js stamps body[data-bot-visible] as
+   '1'/'0' per beat (only on change, so no DOM churn). While the bot is on
+   screen the copy gains a dark separation halo + a faint cyan bloom, so the
+   shiny silver mech cannot swallow the letterforms.
+   No backdrop-filter: it is banned in this project (README) for perf over the
+   animating canvas. text-shadow is a static paint, not a per-frame re-blur.
+   ============================================================ */
+@media (max-width: 900px) {
+  :is(.bt-copy, .bt-beat-copy)
+    > :is(.bt-eyebrow, .bt-role, .bt-desc, .bt-scrollcue, .bt-kicker, .bt-beat-txt) {
+    transition:
+      color 0.5s var(--ease),
+      text-shadow 0.5s var(--ease);
+  }
+
+  body[data-bot-visible='1'] :is(.bt-copy, .bt-beat-copy) > :is(.bt-desc, .bt-beat-txt, .bt-role) {
+    color: var(--silver-2);
+    text-shadow:
+      0 1px 4px rgba(0, 0, 0, 0.9),
+      0 0 10px rgba(0, 0, 0, 0.75);
+  }
+
+  body[data-bot-visible='1']
+    :is(.bt-copy, .bt-beat-copy)
+    > :is(.bt-eyebrow, .bt-kicker, .bt-scrollcue) {
+    color: var(--silver-3);
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.85);
   }
 }
 
 /* custom cursor — active only on precise pointers; native cursor hidden */
 @media (hover: hover) and (pointer: fine) {
-  html.bt-cursor-on, html.bt-cursor-on * { cursor: none !important; }
+  html.bt-cursor-on,
+  html.bt-cursor-on * {
+    cursor: none !important;
+  }
 }
-html.bt-cursor-on .bt-cursor { display: block; }
+html.bt-cursor-on .bt-cursor {
+  display: block;
+}
 
 /* explicit interaction layer — beats are transparent to clicks,
    the interactive pieces take pointer events back */
-.ui-overlay { pointer-events: none; }
-.bt-nav, .bt-brand, .bt-nav-links, .bt-status, .bt-actions,
-.bt-beat-copy, .bt-chip, .bt-mini, .bt-proj, .bt-timeline, .bt-timeline-card, .bt-quotes-viewport,
-.bt-filter-bar, .bt-filter-pill, .bt-telemetry-hud, .bt-skills-stage, #skills-globe { pointer-events: auto; }
+.ui-overlay {
+  pointer-events: none;
+}
+.bt-nav,
+.bt-brand,
+.bt-nav-links,
+.bt-status,
+.bt-actions,
+.bt-beat-copy,
+.bt-chip,
+.bt-mini,
+.bt-proj,
+.bt-timeline,
+.bt-timeline-card,
+.bt-quotes-viewport,
+.bt-filter-bar,
+.bt-filter-pill,
+.bt-telemetry-hud,
+.bt-skills-stage,
+#skills-globe {
+  pointer-events: auto;
+}
 
 /* BOTRON chat — always interactive regardless of overlay stacking */
 .bt-chat-fab,
@@ -76,25 +148,40 @@ html.bt-cursor-on .bt-cursor { display: block; }
 .bt-chat-input,
 .bt-chat-send-btn,
 .bt-chat-close-btn,
-.bt-chat-chip { pointer-events: auto !important; }
+.bt-chat-chip {
+  pointer-events: auto !important;
+}
 
 /* ============================================================
    Lenis smooth-scroll (wired up in js/webgl/camera-story.js).
    Lenis hijacks the document scroller, so native CSS smooth
    scrolling must be disabled to avoid fighting the JS scroll.
    ============================================================ */
-.lenis.lenis-smooth { scroll-behavior: auto !important; }
-html.lenis { height: auto; }
-html.lenis body { height: auto; }
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+html.lenis {
+  height: auto;
+}
+html.lenis body {
+  height: auto;
+}
 
 /* ============================================================
    BOT-OFF SECTIONS: DASHBOARD GRIDS & TELEMETRY CONSOLE
    ============================================================ */
 
 /* interaction layer addition for moved and interactive sections */
-.bt-proj-grid, .bt-edu-grid, .bt-quotes-viewport, .bt-edu, .bt-quote, .bt-proj,
-.bt-contact-info, .bt-contact-form, .bt-field { 
-  pointer-events: auto; 
+.bt-proj-grid,
+.bt-edu-grid,
+.bt-quotes-viewport,
+.bt-edu,
+.bt-quote,
+.bt-proj,
+.bt-contact-info,
+.bt-contact-form,
+.bt-field {
+  pointer-events: auto;
 }
 
 /* Dashboard full-width section layout */
