@@ -56,7 +56,7 @@ textarea:focus-visible {
 
 
 /* hero last word: static white → electric cyan colour-break + a slow steel-white
-   glow-sheen sweeping left → right every 3 s. */
+   glow-sheen sweeping left → right every 3.6 s. */
 .bt-title-name {
   display: inline-block;
   background-image:
@@ -82,10 +82,10 @@ textarea:focus-visible {
   background-clip: text;
   color: transparent;
   -webkit-text-fill-color: transparent;
-  animation: headingGleam 3s ease-in-out infinite;
+  animation: headingGleam 3.6s ease-in-out infinite;
 }
 /* section accent word: static white → electric cyan colour-break, matched to the
-   hero last word (ORAKZAI), + the slow 3 s glow-sheen. */
+   hero last word (ORAKZAI), + the slow 3.6 s glow-sheen. */
 .bt-beat-accent {
   display: inline-block;
   background-image:
@@ -111,10 +111,10 @@ textarea:focus-visible {
   background-clip: text;
   color: var(--cyan);
   -webkit-text-fill-color: transparent;
-  animation: headingGleam 3s ease-in-out infinite;
+  animation: headingGleam 3.6s ease-in-out infinite;
 }
 /* shared keyframe: a soft steel-white glow-sheen sweeps left → right, then rests.
-   3 s cycle = a slow ~2 s sweep, then ~1 s of calm. */
+   3.6 s cycle = a slow ~2.4 s sweep, then ~1.2 s of calm. */
 @keyframes headingGleam {
   0%,
   16% {
@@ -133,7 +133,7 @@ textarea:focus-visible {
     filter: drop-shadow(0 0 0 rgba(200, 240, 255, 0));
   }
   49% {
-    filter: drop-shadow(0 0 18px rgba(200, 240, 255, 0.6));
+    filter: drop-shadow(0 0 27px rgba(200, 240, 255, 0.9));
   }
   82%,
   100% {
@@ -366,7 +366,7 @@ textarea:focus-visible {
 }
 
 /* --- main section headings: static silver chrome (same gradient as the hero
-   title) with a slow steel-white glow-sheen sweeping left → right every 3 s,
+   title) with a slow steel-white glow-sheen sweeping left → right every 3.6 s,
    plus a synced glow bloom over the whole heading.
    Two background layers: [sheen][static base]; width: fit-content keeps the
    gradient mapped to the text width, not the full grid column. */
@@ -406,8 +406,8 @@ textarea:focus-visible {
   color: var(--silver);
   -webkit-text-fill-color: transparent;
   animation:
-    headingGleam 3s ease-in-out infinite,
-    headingGlow 3s ease-in-out infinite;
+    headingGleam 3.6s ease-in-out infinite,
+    headingGlow 3.6s ease-in-out infinite;
 }
 
 /* --- timeline: gradient spine, accent dots, violet alternation --- */

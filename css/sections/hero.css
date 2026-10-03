@@ -87,13 +87,13 @@ body.intro-complete .bt-copy .bt-in {
   margin-bottom: 1.15rem;
   display: grid;
   gap: 0.2rem;
-  animation: headingGlow 3s ease-in-out infinite;
+  animation: headingGlow 3.6s ease-in-out infinite;
 }
 .bt-title-line {
   display: block;
   width: fit-content;
   font-size: clamp(2.2rem, 5.5vw, 4.4rem);
-  /* static silver chrome with a slow steel-white sheen gliding across every 3 s.
+  /* static silver chrome with a slow steel-white sheen gliding across every 3.6 s.
      Two background layers: [sheen][static base]. */
   background-image:
     linear-gradient(
@@ -128,7 +128,7 @@ body.intro-complete .bt-copy .bt-in {
   color: transparent;
   -webkit-text-fill-color: transparent;
   filter: drop-shadow(0 0 26px rgba(180, 196, 214, 0.18));
-  animation: headingGleam 3s ease-in-out infinite;
+  animation: headingGleam 3.6s ease-in-out infinite;
 }
 .bt-title-line--last {
   background: none;
