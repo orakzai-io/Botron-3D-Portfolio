@@ -74,9 +74,9 @@ textarea:focus-visible {
   background: linear-gradient(
     100deg,
     #f2f7fa 0%,
-    #f2f7fa 8%,
-    var(--cyan-soft) 50%,
-    #f2f7fa 92%,
+    #f2f7fa 35%,
+    var(--cyan) 50%,
+    #f2f7fa 65%,
     #f2f7fa 100%
   );
   background-size: 200% 100%;
@@ -85,7 +85,7 @@ textarea:focus-visible {
   background-clip: text;
   color: transparent;
   -webkit-text-fill-color: transparent;
-  animation: headingShimmer 6s linear infinite;
+  animation: headingShimmer 3.5s linear infinite;
 }
 .bt-caret {
   color: var(--cyan);
@@ -323,11 +323,11 @@ textarea:focus-visible {
   background: linear-gradient(
     115deg,
     #ffffff 0%,
-    #ffffff 12%,
-    #c6cfda 38%,
-    #6e7887 52%,
-    #ffffff 68%,
-    #ffffff 90%,
+    #ffffff 35%,
+    #8a94a1 48%,
+    #2a303b 50%,
+    #8a94a1 52%,
+    #ffffff 65%,
     #ffffff 100%
   );
   background-size: 200% 100%;
@@ -336,8 +336,9 @@ textarea:focus-visible {
   background-clip: text;
   color: var(--silver);
   -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 0 22px rgba(180, 196, 214, 0.16));
-  animation: headingShimmer 6s linear infinite;
+  filter: drop-shadow(0 0 12px rgba(180, 196, 214, 0.45))
+    drop-shadow(0 0 4px rgba(255, 255, 255, 0.8));
+  animation: headingShimmer 3.5s linear infinite;
 }
 
 /* --- timeline: gradient spine, accent dots, violet alternation --- */

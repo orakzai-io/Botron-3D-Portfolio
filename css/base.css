@@ -81,7 +81,7 @@ button {
 }
 
 .bt-filter-pill {
-  font-family: var(--font-ui, 'Inter', sans-serif) !important;
+  font-family: var(--font-ui, 'JetBrains Mono', monospace) !important;
   font-size: 0.72rem !important;
   font-weight: 600 !important;
   letter-spacing: 0.08em !important;
@@ -156,7 +156,7 @@ button {
 }
 
 .bt-telemetry-cat {
-  font-family: var(--font-ui, 'Inter', sans-serif) !important;
+  font-family: var(--font-ui, 'JetBrains Mono', monospace) !important;
   font-size: 0.65rem !important;
   font-weight: 700 !important;
   letter-spacing: 0.14em !important;
@@ -182,14 +182,14 @@ button {
 }
 
 .bt-telemetry-level {
-  font-family: var(--font-ui, 'Inter', sans-serif) !important;
+  font-family: var(--font-ui, 'JetBrains Mono', monospace) !important;
   font-size: 0.9rem !important;
   font-weight: 700 !important;
   color: #f8fafc !important;
 }
 
 .bt-telemetry-title {
-  font-family: var(--font-disp, 'Space Grotesk', sans-serif) !important;
+  font-family: var(--font-disp, 'Orbitron', sans-serif) !important;
   font-size: 1.25rem !important;
   font-weight: 700 !important;
   letter-spacing: 0.04em !important;
@@ -224,7 +224,7 @@ button {
 }
 
 .bt-telemetry-hint {
-  font-family: var(--font-ui, 'Inter', sans-serif) !important;
+  font-family: var(--font-ui, 'JetBrains Mono', monospace) !important;
   font-size: 0.6rem !important;
   letter-spacing: 0.16em !important;
   color: #64748b !important;
@@ -260,7 +260,7 @@ button {
   right: 10px !important;
   display: flex !important;
   justify-content: space-between !important;
-  font-family: var(--font-ui, 'Inter', sans-serif) !important;
+  font-family: var(--font-ui, 'JetBrains Mono', monospace) !important;
   font-size: 0.6rem !important;
   letter-spacing: 0.14em !important;
   color: #64748b !important;
@@ -273,7 +273,7 @@ button {
   bottom: 8px !important;
   left: 50% !important;
   transform: translateX(-50%) !important;
-  font-family: var(--font-ui, 'Inter', sans-serif) !important;
+  font-family: var(--font-ui, 'JetBrains Mono', monospace) !important;
   font-size: 0.62rem !important;
   letter-spacing: 0.16em !important;
   color: #94a3b8 !important;
@@ -335,7 +335,7 @@ button {
 }
 
 .bt-contact-info .bt-mini span {
-  font-family: var(--font-ui, 'Inter', sans-serif) !important;
+  font-family: var(--font-ui, 'JetBrains Mono', monospace) !important;
   font-size: 0.65rem !important;
   font-weight: 700 !important;
   letter-spacing: 0.08em !important;
@@ -348,7 +348,7 @@ button {
 }
 
 .bt-contact-info .bt-mini b {
-  font-family: var(--font-disp, 'Space Grotesk', sans-serif) !important;
+  font-family: var(--font-disp, 'Orbitron', sans-serif) !important;
   font-weight: 600 !important;
   font-size: 0.72rem !important;
   letter-spacing: 0.1em !important;
@@ -356,7 +356,7 @@ button {
 }
 
 .bt-contact-info .bt-mini i {
-  font-family: var(--font-body, 'Inter', sans-serif) !important;
+  font-family: var(--font-body, 'Exo 2', sans-serif) !important;
   font-size: 0.78rem !important;
   font-style: normal !important;
   color: var(--silver-4, #94a3b8) !important;

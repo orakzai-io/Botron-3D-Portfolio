@@ -9,9 +9,9 @@ import { execFileSync } from 'node:child_process';
 
 const BASE = 'https://cdn.jsdelivr.net/npm/@fontsource-variable';
 const FAMILIES = [
-  { id: 'inter', name: 'Inter' },
+  { id: 'exo-2', name: 'Exo 2' },
   { id: 'jetbrains-mono', name: 'JetBrains Mono' },
-  { id: 'space-grotesk', name: 'Space Grotesk' },
+  { id: 'orbitron', name: 'Orbitron' },
 ];
 const SUBSETS = new Set(['latin', 'latin-ext', 'cyrillic', 'cyrillic-ext']);
 

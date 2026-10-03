@@ -15,7 +15,7 @@
   border: 1px solid rgba(0, 240, 255, 0.4);
   border-radius: 999px;
   color: #fff;
-  font-family: 'Space Grotesk', var(--font-body, sans-serif);
+  font-family: var(--font-disp, 'Orbitron', sans-serif);
   font-size: 0.75rem;
   font-weight: 600;
   letter-spacing: 0.08em;
@@ -139,7 +139,7 @@
   align-items: center;
   justify-content: center;
   color: #00f0ff;
-  font-family: 'Space Grotesk', monospace;
+  font-family: var(--font-disp, 'Orbitron', sans-serif);
   font-size: 0.75rem;
   font-weight: 700;
   box-shadow: 0 0 12px rgba(0, 240, 255, 0.2);
@@ -147,7 +147,7 @@
 
 .bt-chat-meta h4 {
   margin: 0;
-  font-family: 'Space Grotesk', var(--font-body, sans-serif);
+  font-family: var(--font-disp, 'Orbitron', sans-serif);
   font-size: 0.85rem;
   font-weight: 700;
   letter-spacing: 0.05em;
@@ -248,7 +248,7 @@
 .bt-chat-bubble {
   padding: 0.75rem 0.95rem;
   border-radius: 12px;
-  font-family: 'Inter', var(--font-body, sans-serif);
+  font-family: var(--font-body, 'Exo 2', sans-serif);
   font-size: 0.8rem;
   line-height: 1.55;
   word-break: break-word;
@@ -361,7 +361,7 @@
   border: 1px solid rgba(0, 240, 255, 0.22);
   border-radius: 999px;
   padding: 0.32rem 0.7rem;
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: var(--font-body, 'Exo 2', sans-serif);
   font-size: 0.68rem;
   color: #cbd5e1;
   cursor: pointer;
@@ -444,7 +444,7 @@
   border-radius: 10px;
   padding: 0.65rem 0.85rem;
   color: #fff;
-  font-family: 'Inter', var(--font-body, sans-serif);
+  font-family: var(--font-body, 'Exo 2', sans-serif);
   font-size: 0.8rem;
   outline: none;
   transition:

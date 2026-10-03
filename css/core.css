@@ -24,9 +24,9 @@
   --silver-4: #555f6d;
   --cyan: #00f0ff;
   --cyan-dim: rgba(0, 240, 255, 0.3);
-  --font-disp: 'Space Grotesk', 'Inter', sans-serif;
+  --font-disp: 'Orbitron', 'Exo 2', sans-serif;
   --font-ui: 'JetBrains Mono', monospace;
-  --font-body: 'Inter', -apple-system, sans-serif;
+  --font-body: 'Exo 2', -apple-system, sans-serif;
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
   /* Error state color: label + input border + message paint from this token.
      Deliberately NOT the cyan accent — an invalid field must read as feedback,
