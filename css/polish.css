@@ -83,31 +83,15 @@ textarea:focus-visible {
   animation: headingGleam 4.5s ease-in-out infinite;
 }
 /* section accent word: static white → electric cyan colour-break, matched to the
-   hero last word (ORAKZAI), + the slow 4.5 s sheen. */
+   hero last word (ORAKZAI). Plain `inline` (not inline-block) so the whole-heading
+   sheen overlay (.bt-beat-title::after) tracks the base text glyph-for-glyph. */
 .bt-beat-accent {
-  display: inline-block;
-  background-image:
-    linear-gradient(
-      100deg,
-      transparent 0%,
-      transparent 43%,
-      rgba(255, 255, 255, 0.2) 46%,
-      rgba(255, 255, 255, 0.85) 48.5%,
-      rgba(255, 255, 255, 1) 50%,
-      rgba(255, 255, 255, 0.85) 51.5%,
-      rgba(255, 255, 255, 0.2) 54%,
-      transparent 57%,
-      transparent 100%
-    ),
-    linear-gradient(100deg, #f2f7fa 8%, var(--cyan) 78%);
-  background-size: 300% 100%, 100% 100%;
-  background-position: 0% 0, 0 0;
-  background-repeat: no-repeat, no-repeat;
+  display: inline;
+  background: linear-gradient(100deg, #f2f7fa 8%, var(--cyan) 78%);
   -webkit-background-clip: text;
   background-clip: text;
   color: var(--cyan);
   -webkit-text-fill-color: transparent;
-  animation: headingGleam 4.5s ease-in-out infinite;
 }
 /* shared keyframe: a soft steel-white glow-sheen sweeps left → right, then rests.
    4.5 s cycle = a slow ~3 s sweep, then ~1.5 s of calm. */
@@ -362,46 +346,57 @@ textarea:focus-visible {
 }
 
 /* --- main section headings: static chrome with a deeper tonal "valley" so the
-   slow steel-white sheen (sweeping left → right every 4.5 s) visibly pops, plus
-   a synced glow bloom over the whole heading.
-   Two background layers: [sheen][static base]; width: fit-content keeps the
-   gradient mapped to the text width, not the full grid column. */
+   highlight pops, plus a synced glow bloom.
+   The moving highlight lives on ::after — a copy of the heading text (data-text)
+   carrying ONE band that crosses the whole line, first word → last word, over
+   the silver body and the cyan accent alike. Keeping it on the parent (instead
+   of per-colour spans) is what makes it a single sweep instead of two that fire
+   together. width: fit-content maps the base gradient to the text, not the column. */
 .bt-beat-title {
+  position: relative;
   width: fit-content;
   max-width: 100%;
-  background-image:
-    linear-gradient(
-      100deg,
-      transparent 0%,
-      transparent 43%,
-      rgba(255, 255, 255, 0.2) 46%,
-      rgba(255, 255, 255, 0.85) 48.5%,
-      rgba(255, 255, 255, 1) 50%,
-      rgba(255, 255, 255, 0.85) 51.5%,
-      rgba(255, 255, 255, 0.2) 54%,
-      transparent 57%,
-      transparent 100%
-    ),
-    linear-gradient(
-      115deg,
-      #eef4fa 0%,
-      #dbe5f0 12%,
-      #a9b8ca 36%,
-      #64727f 52%,
-      #bccadb 68%,
-      #e2eaf3 88%,
-      #f7fafd 100%
-    );
-  background-size: 300% 100%, 100% 100%;
-  background-position: 0% 0, 0 0;
-  background-repeat: no-repeat, no-repeat;
+  background: linear-gradient(
+    115deg,
+    #eef4fa 0%,
+    #dbe5f0 12%,
+    #a9b8ca 36%,
+    #64727f 52%,
+    #bccadb 68%,
+    #e2eaf3 88%,
+    #f7fafd 100%
+  );
   -webkit-background-clip: text;
   background-clip: text;
   color: var(--silver);
   -webkit-text-fill-color: transparent;
-  animation:
-    headingGleam 4.5s ease-in-out infinite,
-    headingGlow 4.5s ease-in-out infinite;
+  animation: headingGlow 4.5s ease-in-out infinite;
+}
+.bt-beat-title::after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: linear-gradient(
+    100deg,
+    transparent 0%,
+    transparent 43%,
+    rgba(255, 255, 255, 0.2) 46%,
+    rgba(255, 255, 255, 0.85) 48.5%,
+    rgba(255, 255, 255, 1) 50%,
+    rgba(255, 255, 255, 0.85) 51.5%,
+    rgba(255, 255, 255, 0.2) 54%,
+    transparent 57%,
+    transparent 100%
+  );
+  background-size: 300% 100%;
+  background-position: 100% 0;
+  background-repeat: no-repeat;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  animation: headingGleam 4.5s ease-in-out infinite;
 }
 
 /* --- timeline: gradient spine, accent dots, violet alternation --- */
@@ -485,7 +480,7 @@ textarea:focus-visible {
   /* the heading shimmer is decorative -- a heading that keeps repainting behind
      a reduced-motion preference is exactly the kind of motion to drop */
   .bt-beat-title,
-  .bt-beat-accent,
+  .bt-beat-title::after,
   .bt-title-line,
   .bt-title-name,
   .bt-title-line--last {
