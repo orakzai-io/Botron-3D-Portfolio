@@ -87,6 +87,7 @@ body.intro-complete .bt-copy .bt-in {
   margin-bottom: 1.15rem;
   display: grid;
   gap: 0.2rem;
+  animation: headingGlow 3s ease-in-out infinite;
 }
 .bt-title-line {
   display: block;
@@ -98,13 +99,15 @@ body.intro-complete .bt-copy .bt-in {
     linear-gradient(
       100deg,
       transparent 0%,
-      transparent 43%,
-      rgba(255, 255, 255, 0.12) 46%,
-      rgba(255, 255, 255, 0.65) 49%,
-      rgba(255, 255, 255, 0.95) 50%,
-      rgba(255, 255, 255, 0.65) 51%,
-      rgba(255, 255, 255, 0.12) 54%,
-      transparent 57%,
+      transparent 41%,
+      rgba(255, 255, 255, 0.08) 44%,
+      rgba(255, 255, 255, 0.3) 47%,
+      rgba(255, 255, 255, 0.85) 49.5%,
+      rgba(255, 255, 255, 1) 50%,
+      rgba(255, 255, 255, 0.85) 50.5%,
+      rgba(255, 255, 255, 0.3) 53%,
+      rgba(255, 255, 255, 0.08) 56%,
+      transparent 59%,
       transparent 100%
     ),
     linear-gradient(

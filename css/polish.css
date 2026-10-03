@@ -56,20 +56,22 @@ textarea:focus-visible {
 
 
 /* hero last word: static white → electric cyan colour-break + a slow steel-white
-   sheen gliding across every 3 s. */
+   glow-sheen sweeping left → right every 3 s. */
 .bt-title-name {
   display: inline-block;
   background-image:
     linear-gradient(
       100deg,
       transparent 0%,
-      transparent 43%,
-      rgba(255, 255, 255, 0.12) 46%,
-      rgba(255, 255, 255, 0.65) 49%,
-      rgba(255, 255, 255, 0.95) 50%,
-      rgba(255, 255, 255, 0.65) 51%,
-      rgba(255, 255, 255, 0.12) 54%,
-      transparent 57%,
+      transparent 41%,
+      rgba(255, 255, 255, 0.08) 44%,
+      rgba(255, 255, 255, 0.3) 47%,
+      rgba(255, 255, 255, 0.85) 49.5%,
+      rgba(255, 255, 255, 1) 50%,
+      rgba(255, 255, 255, 0.85) 50.5%,
+      rgba(255, 255, 255, 0.3) 53%,
+      rgba(255, 255, 255, 0.08) 56%,
+      transparent 59%,
       transparent 100%
     ),
     linear-gradient(100deg, #f2f7fa 8%, var(--cyan) 78%);
@@ -83,20 +85,22 @@ textarea:focus-visible {
   animation: headingGleam 3s ease-in-out infinite;
 }
 /* section accent word: static white → electric cyan colour-break, matched to the
-   hero last word (ORAKZAI), + the slow 3 s sheen. */
+   hero last word (ORAKZAI), + the slow 3 s glow-sheen. */
 .bt-beat-accent {
   display: inline-block;
   background-image:
     linear-gradient(
       100deg,
       transparent 0%,
-      transparent 43%,
-      rgba(255, 255, 255, 0.12) 46%,
-      rgba(255, 255, 255, 0.65) 49%,
-      rgba(255, 255, 255, 0.95) 50%,
-      rgba(255, 255, 255, 0.65) 51%,
-      rgba(255, 255, 255, 0.12) 54%,
-      transparent 57%,
+      transparent 41%,
+      rgba(255, 255, 255, 0.08) 44%,
+      rgba(255, 255, 255, 0.3) 47%,
+      rgba(255, 255, 255, 0.85) 49.5%,
+      rgba(255, 255, 255, 1) 50%,
+      rgba(255, 255, 255, 0.85) 50.5%,
+      rgba(255, 255, 255, 0.3) 53%,
+      rgba(255, 255, 255, 0.08) 56%,
+      transparent 59%,
       transparent 100%
     ),
     linear-gradient(100deg, #f2f7fa 8%, var(--cyan) 78%);
@@ -109,16 +113,31 @@ textarea:focus-visible {
   -webkit-text-fill-color: transparent;
   animation: headingGleam 3s ease-in-out infinite;
 }
-/* shared keyframe: a soft steel-white sheen glides left → right, then rests.
-   3 s cycle = a slow ~2 s glide, then ~1 s of calm. */
+/* shared keyframe: a soft steel-white glow-sheen sweeps left → right, then rests.
+   3 s cycle = a slow ~2 s sweep, then ~1 s of calm. */
 @keyframes headingGleam {
   0%,
   16% {
-    background-position: 0% 0, 0 0;
+    background-position: 100% 0, 0 0;
   }
   82%,
   100% {
-    background-position: 100% 0, 0 0;
+    background-position: 0% 0, 0 0;
+  }
+}
+/* glow bloom over the whole heading, synced with the sweep: it lights up as the
+   sheen crosses the centre, then fades back to nothing. */
+@keyframes headingGlow {
+  0%,
+  16% {
+    filter: drop-shadow(0 0 0 rgba(200, 240, 255, 0));
+  }
+  49% {
+    filter: drop-shadow(0 0 18px rgba(200, 240, 255, 0.6));
+  }
+  82%,
+  100% {
+    filter: drop-shadow(0 0 0 rgba(200, 240, 255, 0));
   }
 }
 .bt-caret {
@@ -347,7 +366,8 @@ textarea:focus-visible {
 }
 
 /* --- main section headings: static silver chrome (same gradient as the hero
-   title) with a slow steel-white sheen gliding across every 3 s.
+   title) with a slow steel-white glow-sheen sweeping left → right every 3 s,
+   plus a synced glow bloom over the whole heading.
    Two background layers: [sheen][static base]; width: fit-content keeps the
    gradient mapped to the text width, not the full grid column. */
 .bt-beat-title {
@@ -357,13 +377,15 @@ textarea:focus-visible {
     linear-gradient(
       100deg,
       transparent 0%,
-      transparent 43%,
-      rgba(255, 255, 255, 0.12) 46%,
-      rgba(255, 255, 255, 0.65) 49%,
-      rgba(255, 255, 255, 0.95) 50%,
-      rgba(255, 255, 255, 0.65) 51%,
-      rgba(255, 255, 255, 0.12) 54%,
-      transparent 57%,
+      transparent 41%,
+      rgba(255, 255, 255, 0.08) 44%,
+      rgba(255, 255, 255, 0.3) 47%,
+      rgba(255, 255, 255, 0.85) 49.5%,
+      rgba(255, 255, 255, 1) 50%,
+      rgba(255, 255, 255, 0.85) 50.5%,
+      rgba(255, 255, 255, 0.3) 53%,
+      rgba(255, 255, 255, 0.08) 56%,
+      transparent 59%,
       transparent 100%
     ),
     linear-gradient(
@@ -383,7 +405,9 @@ textarea:focus-visible {
   background-clip: text;
   color: var(--silver);
   -webkit-text-fill-color: transparent;
-  animation: headingGleam 3s ease-in-out infinite;
+  animation:
+    headingGleam 3s ease-in-out infinite,
+    headingGlow 3s ease-in-out infinite;
 }
 
 /* --- timeline: gradient spine, accent dots, violet alternation --- */
@@ -469,7 +493,8 @@ textarea:focus-visible {
   .bt-beat-title,
   .bt-beat-accent,
   .bt-title-line,
-  .bt-title-name {
+  .bt-title-name,
+  .bt-title {
     animation: none;
   }
   .bt-proj-thumb::after {
