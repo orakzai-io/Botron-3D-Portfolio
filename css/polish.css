@@ -54,76 +54,62 @@ textarea:focus-visible {
   background: linear-gradient(90deg, var(--cyan), rgba(103, 232, 249, 0.4), transparent);
 }
 
-/* --- accent word: the hero's cyan gradient wrapped in a seamless cyan sweep,
-   shared by the hero name (ORAKZAI) and the trailing word of every section
-   heading, so both shimmer. The caret stays OUTSIDE the clip so its opacity
-   blink actually toggles — a background-clip:text parent paints the glyph
-   shape through the mask and defeats child opacity.
-   SEAMLESS SWEEP: 0% and 100% stops are identical so the tile joins invisibly;
-   background-size 200% + a 50% -> 250% shift travels exactly one tile. --- */
-@keyframes headingShimmer {
-  0% {
-    background-position: 50% 0;
-  }
-  100% {
-    background-position: 250% 0;
-  }
-}
-/* hero name keeps the original cyan shimmer sweep — hero-specific character */
+
+/* hero last word: static white → electric cyan colour-break + the shared 3 s gleam */
 .bt-title-name {
   display: inline-block;
-  background: linear-gradient(
-    115deg,
-    var(--cyan) 0%,
-    var(--cyan) 35%,
-    #ffffff 48%,
-    #ffffff 52%,
-    var(--cyan) 65%,
-    var(--cyan) 100%
-  );
-  background-size: 200% 100%;
-  background-position: 50% 0;
+  background-image:
+    linear-gradient(
+      100deg,
+      transparent 0%,
+      transparent 40%,
+      rgba(255, 255, 255, 0.9) 50%,
+      transparent 60%,
+      transparent 100%
+    ),
+    linear-gradient(100deg, #f2f7fa 8%, var(--cyan) 78%);
+  background-size: 300% 100%, 100% 100%;
+  background-position: 0% 0, 0 0;
+  background-repeat: no-repeat, no-repeat;
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
   -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 0 14px rgba(0, 240, 255, 0.45));
-  animation: headingShimmer 3.5s linear infinite;
+  animation: headingGleam 3s linear infinite;
 }
-/* section accent word: solid electric cyan — identical to the // kicker (#00f0ff).
-   Sits static; a brief white gleam sweeps once every ~6 s then goes quiet. */
+/* section accent word: static white → electric cyan colour-break, matched to the
+   hero last word (ORAKZAI), + the shared 3 s gleam. */
 .bt-beat-accent {
   display: inline-block;
-  background: linear-gradient(
-    105deg,
-    var(--cyan) 0%,
-    var(--cyan) 40%,
-    #e8feff 50%,
-    var(--cyan) 60%,
-    var(--cyan) 100%
-  );
-  background-size: 250% 100%;
-  background-position: 200% 0;
+  background-image:
+    linear-gradient(
+      100deg,
+      transparent 0%,
+      transparent 40%,
+      rgba(255, 255, 255, 0.9) 50%,
+      transparent 60%,
+      transparent 100%
+    ),
+    linear-gradient(100deg, #f2f7fa 8%, var(--cyan) 78%);
+  background-size: 300% 100%, 100% 100%;
+  background-position: 0% 0, 0 0;
+  background-repeat: no-repeat, no-repeat;
   -webkit-background-clip: text;
   background-clip: text;
   color: var(--cyan);
   -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 0 10px rgba(0, 240, 255, 0.5));
-  animation: occasionalShimmer 6s linear infinite;
-  animation-delay: -1.5s;
+  animation: headingGleam 3s linear infinite;
 }
-/* shared keyframe: text reads static at start and end; gleam sweeps
-   through in the 15%–40% window (≈ 1.5 s) then stays off for ~3.6 s */
-@keyframes occasionalShimmer {
+/* shared keyframe: a single soft-white gleam drifts left → right, then rests.
+   3 s cycle = it "comes once every 3 seconds" (≈0.7 s sweep + ~2.4 s rest). */
+@keyframes headingGleam {
   0%,
-  15% {
-    background-position: 200% 0;
+  22% {
+    background-position: 0% 0, 0 0;
   }
-  40% {
-    background-position: -100% 0;
-  }
+  46%,
   100% {
-    background-position: -100% 0;
+    background-position: 100% 0, 0 0;
   }
 }
 .bt-caret {
@@ -351,28 +337,40 @@ textarea:focus-visible {
   }
 }
 
-/* --- main section headings: static silver — no continuous motion.
-   A single white gleam sweeps once every ~6 s (offset from the accent word)
-   then the heading goes quiet again. width: fit-content keeps the gradient
-   mapped to the text width, not the full grid column. */
+/* --- main section headings: static silver chrome (same gradient as the hero
+   title) with a single soft-white gleam drifting across every 3 s.
+   Two background layers: [gleam][static base]; width: fit-content keeps the
+   gradient mapped to the text width, not the full grid column. */
 .bt-beat-title {
   width: fit-content;
   max-width: 100%;
-  background: linear-gradient(
-    105deg,
-    var(--silver) 0%,
-    var(--silver) 40%,
-    #ffffff 50%,
-    var(--silver) 60%,
-    var(--silver) 100%
-  );
-  background-size: 250% 100%;
-  background-position: 200% 0;
+  background-image:
+    linear-gradient(
+      100deg,
+      transparent 0%,
+      transparent 40%,
+      rgba(255, 255, 255, 0.85) 50%,
+      transparent 60%,
+      transparent 100%
+    ),
+    linear-gradient(
+      115deg,
+      #ffffff 0%,
+      #ffffff 12%,
+      #c6cfda 38%,
+      #7f8896 52%,
+      #eef2f7 68%,
+      #ffffff 90%,
+      #ffffff 100%
+    );
+  background-size: 300% 100%, 100% 100%;
+  background-position: 0% 0, 0 0;
+  background-repeat: no-repeat, no-repeat;
   -webkit-background-clip: text;
   background-clip: text;
   color: var(--silver);
   -webkit-text-fill-color: transparent;
-  animation: occasionalShimmer 6s linear infinite;
+  animation: headingGleam 3s linear infinite;
 }
 
 /* --- timeline: gradient spine, accent dots, violet alternation --- */
@@ -457,8 +455,8 @@ textarea:focus-visible {
      a reduced-motion preference is exactly the kind of motion to drop */
   .bt-beat-title,
   .bt-beat-accent,
-  .bt-title-name,
-  .bt-title-line:not(.bt-title-line--last) {
+  .bt-title-line,
+  .bt-title-name {
     animation: none;
   }
   .bt-proj-thumb::after {

@@ -92,25 +92,36 @@ body.intro-complete .bt-copy .bt-in {
   display: block;
   width: fit-content;
   font-size: clamp(2.2rem, 5.5vw, 4.4rem);
-  background: linear-gradient(
-    115deg,
-    #ffffff 0%,
-    #ffffff 35%,
-    #8a94a1 48%,
-    #2a303b 50%,
-    #8a94a1 52%,
-    #ffffff 65%,
-    #ffffff 100%
-  );
-  background-size: 200% 100%;
-  background-position: 50% 0;
+  /* static silver chrome (two background layers: [gleam][base]) with a single
+     soft-white gleam drifting across once every 3 s. */
+  background-image:
+    linear-gradient(
+      100deg,
+      transparent 0%,
+      transparent 40%,
+      rgba(255, 255, 255, 0.85) 50%,
+      transparent 60%,
+      transparent 100%
+    ),
+    linear-gradient(
+      115deg,
+      #ffffff 0%,
+      #ffffff 12%,
+      #c6cfda 38%,
+      #7f8896 52%,
+      #eef2f7 68%,
+      #ffffff 90%,
+      #ffffff 100%
+    );
+  background-size: 300% 100%, 100% 100%;
+  background-position: 0% 0, 0 0;
+  background-repeat: no-repeat, no-repeat;
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
   -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 0 12px rgba(180, 196, 214, 0.45))
-    drop-shadow(0 0 4px rgba(255, 255, 255, 0.8));
-  animation: headingShimmer 3.5s linear infinite;
+  filter: drop-shadow(0 0 26px rgba(180, 196, 214, 0.18));
+  animation: headingGleam 3s linear infinite;
 }
 .bt-title-line--last {
   background: none;
