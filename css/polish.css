@@ -56,22 +56,22 @@ textarea:focus-visible {
 
 
 /* hero last word: static white → electric cyan colour-break + a slow steel-white
-   glow-sheen sweeping left → right every 3.6 s. */
+   glow-sheen sweeping left → right every 4.5 s. */
 .bt-title-name {
   display: inline-block;
   background-image:
     linear-gradient(
       100deg,
       transparent 0%,
-      transparent 41%,
-      rgba(255, 255, 255, 0.08) 44%,
-      rgba(255, 255, 255, 0.3) 47%,
-      rgba(255, 255, 255, 0.85) 49.5%,
+      transparent 40%,
+      rgba(255, 255, 255, 0.14) 44%,
+      rgba(255, 255, 255, 0.5) 47%,
+      rgba(255, 255, 255, 0.9) 49%,
       rgba(255, 255, 255, 1) 50%,
-      rgba(255, 255, 255, 0.85) 50.5%,
-      rgba(255, 255, 255, 0.3) 53%,
-      rgba(255, 255, 255, 0.08) 56%,
-      transparent 59%,
+      rgba(255, 255, 255, 0.9) 51%,
+      rgba(255, 255, 255, 0.5) 53%,
+      rgba(255, 255, 255, 0.14) 56%,
+      transparent 60%,
       transparent 100%
     ),
     linear-gradient(100deg, #f2f7fa 8%, var(--cyan) 78%);
@@ -82,25 +82,25 @@ textarea:focus-visible {
   background-clip: text;
   color: transparent;
   -webkit-text-fill-color: transparent;
-  animation: headingGleam 3.6s ease-in-out infinite;
+  animation: headingGleam 4.5s ease-in-out infinite;
 }
 /* section accent word: static white → electric cyan colour-break, matched to the
-   hero last word (ORAKZAI), + the slow 3.6 s glow-sheen. */
+   hero last word (ORAKZAI), + the slow 4.5 s glow-sheen. */
 .bt-beat-accent {
   display: inline-block;
   background-image:
     linear-gradient(
       100deg,
       transparent 0%,
-      transparent 41%,
-      rgba(255, 255, 255, 0.08) 44%,
-      rgba(255, 255, 255, 0.3) 47%,
-      rgba(255, 255, 255, 0.85) 49.5%,
+      transparent 40%,
+      rgba(255, 255, 255, 0.14) 44%,
+      rgba(255, 255, 255, 0.5) 47%,
+      rgba(255, 255, 255, 0.9) 49%,
       rgba(255, 255, 255, 1) 50%,
-      rgba(255, 255, 255, 0.85) 50.5%,
-      rgba(255, 255, 255, 0.3) 53%,
-      rgba(255, 255, 255, 0.08) 56%,
-      transparent 59%,
+      rgba(255, 255, 255, 0.9) 51%,
+      rgba(255, 255, 255, 0.5) 53%,
+      rgba(255, 255, 255, 0.14) 56%,
+      transparent 60%,
       transparent 100%
     ),
     linear-gradient(100deg, #f2f7fa 8%, var(--cyan) 78%);
@@ -111,10 +111,10 @@ textarea:focus-visible {
   background-clip: text;
   color: var(--cyan);
   -webkit-text-fill-color: transparent;
-  animation: headingGleam 3.6s ease-in-out infinite;
+  animation: headingGleam 4.5s ease-in-out infinite;
 }
 /* shared keyframe: a soft steel-white glow-sheen sweeps left → right, then rests.
-   3.6 s cycle = a slow ~2.4 s sweep, then ~1.2 s of calm. */
+   4.5 s cycle = a slow ~3 s sweep, then ~1.5 s of calm. */
 @keyframes headingGleam {
   0%,
   16% {
@@ -366,7 +366,7 @@ textarea:focus-visible {
 }
 
 /* --- main section headings: static silver chrome (same gradient as the hero
-   title) with a slow steel-white glow-sheen sweeping left → right every 3.6 s,
+   title) with a slow steel-white glow-sheen sweeping left → right every 4.5 s,
    plus a synced glow bloom over the whole heading.
    Two background layers: [sheen][static base]; width: fit-content keeps the
    gradient mapped to the text width, not the full grid column. */
@@ -377,15 +377,15 @@ textarea:focus-visible {
     linear-gradient(
       100deg,
       transparent 0%,
-      transparent 41%,
-      rgba(255, 255, 255, 0.08) 44%,
-      rgba(255, 255, 255, 0.3) 47%,
-      rgba(255, 255, 255, 0.85) 49.5%,
+      transparent 40%,
+      rgba(255, 255, 255, 0.14) 44%,
+      rgba(255, 255, 255, 0.5) 47%,
+      rgba(255, 255, 255, 0.9) 49%,
       rgba(255, 255, 255, 1) 50%,
-      rgba(255, 255, 255, 0.85) 50.5%,
-      rgba(255, 255, 255, 0.3) 53%,
-      rgba(255, 255, 255, 0.08) 56%,
-      transparent 59%,
+      rgba(255, 255, 255, 0.9) 51%,
+      rgba(255, 255, 255, 0.5) 53%,
+      rgba(255, 255, 255, 0.14) 56%,
+      transparent 60%,
       transparent 100%
     ),
     linear-gradient(
@@ -406,8 +406,8 @@ textarea:focus-visible {
   color: var(--silver);
   -webkit-text-fill-color: transparent;
   animation:
-    headingGleam 3.6s ease-in-out infinite,
-    headingGlow 3.6s ease-in-out infinite;
+    headingGleam 4.5s ease-in-out infinite,
+    headingGlow 4.5s ease-in-out infinite;
 }
 
 /* --- timeline: gradient spine, accent dots, violet alternation --- */
@@ -494,7 +494,7 @@ textarea:focus-visible {
   .bt-beat-accent,
   .bt-title-line,
   .bt-title-name,
-  .bt-title {
+  .bt-title-line--last {
     animation: none;
   }
   .bt-proj-thumb::after {

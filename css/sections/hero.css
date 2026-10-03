@@ -87,27 +87,26 @@ body.intro-complete .bt-copy .bt-in {
   margin-bottom: 1.15rem;
   display: grid;
   gap: 0.2rem;
-  animation: headingGlow 3.6s ease-in-out infinite;
 }
 .bt-title-line {
   display: block;
   width: fit-content;
   font-size: clamp(2.2rem, 5.5vw, 4.4rem);
-  /* static silver chrome with a slow steel-white sheen gliding across every 3.6 s.
-     Two background layers: [sheen][static base]. */
+  /* static silver chrome with a slow steel-white glow-sheen sweeping across
+     every 4.5 s. Two background layers: [sheen][static base]. */
   background-image:
     linear-gradient(
       100deg,
       transparent 0%,
-      transparent 41%,
-      rgba(255, 255, 255, 0.08) 44%,
-      rgba(255, 255, 255, 0.3) 47%,
-      rgba(255, 255, 255, 0.85) 49.5%,
+      transparent 40%,
+      rgba(255, 255, 255, 0.14) 44%,
+      rgba(255, 255, 255, 0.5) 47%,
+      rgba(255, 255, 255, 0.9) 49%,
       rgba(255, 255, 255, 1) 50%,
-      rgba(255, 255, 255, 0.85) 50.5%,
-      rgba(255, 255, 255, 0.3) 53%,
-      rgba(255, 255, 255, 0.08) 56%,
-      transparent 59%,
+      rgba(255, 255, 255, 0.9) 51%,
+      rgba(255, 255, 255, 0.5) 53%,
+      rgba(255, 255, 255, 0.14) 56%,
+      transparent 60%,
       transparent 100%
     ),
     linear-gradient(
@@ -127,15 +126,15 @@ body.intro-complete .bt-copy .bt-in {
   background-clip: text;
   color: transparent;
   -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 0 26px rgba(180, 196, 214, 0.18));
-  animation: headingGleam 3.6s ease-in-out infinite;
+  animation:
+    headingGleam 4.5s ease-in-out infinite,
+    headingGlow 4.5s ease-in-out infinite;
 }
 .bt-title-line--last {
   background: none;
-  animation: none;
-  filter: none;
   -webkit-text-fill-color: unset;
   color: unset;
+  animation: headingGlow 4.5s ease-in-out infinite;
 }
 .bt-caret {
   color: var(--cyan);
