@@ -13,34 +13,42 @@ body::after {
   border-radius: 50%;
   pointer-events: none;
 }
+
 body::before {
   top: -24vw;
   right: -16vw;
   background: radial-gradient(circle, rgba(0, 240, 255, 0.13), transparent 65%);
 }
+
 body::after {
   bottom: -28vw;
   left: -20vw;
   background: radial-gradient(circle, rgba(0, 240, 255, 0.08), transparent 65%);
 }
+
 /* --- selection, scrollbar, focus rings --- */
 ::selection {
   background: rgba(0, 240, 255, 0.2);
   color: #fff;
 }
+
 ::-webkit-scrollbar {
   width: 9px;
 }
+
 ::-webkit-scrollbar-track {
   background: #05070a;
 }
+
 ::-webkit-scrollbar-thumb {
   background: linear-gradient(180deg, rgba(0, 240, 255, 0.45), rgba(103, 232, 249, 0.35));
   border-radius: 6px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
   background: linear-gradient(180deg, rgba(0, 240, 255, 0.7), rgba(103, 232, 249, 0.6));
 }
+
 a:focus-visible,
 button:focus-visible,
 input:focus-visible,
@@ -60,8 +68,7 @@ textarea:focus-visible {
 .bt-title-name {
   display: inline-block;
   background-image:
-    linear-gradient(
-      100deg,
+    linear-gradient(100deg,
       transparent 0%,
       transparent 43%,
       rgba(255, 255, 255, 0.2) 46%,
@@ -70,8 +77,7 @@ textarea:focus-visible {
       rgba(255, 255, 255, 0.85) 51.5%,
       rgba(255, 255, 255, 0.2) 54%,
       transparent 57%,
-      transparent 100%
-    ),
+      transparent 100%),
     linear-gradient(100deg, #f2f7fa 8%, var(--cyan) 78%);
   background-size: 300% 100%, 100% 100%;
   background-position: 0% 0, 0 0;
@@ -82,6 +88,7 @@ textarea:focus-visible {
   -webkit-text-fill-color: transparent;
   animation: headingGleam 4.5s ease-in-out infinite;
 }
+
 /* section accent word: static white → electric cyan colour-break, matched to the
    hero last word (ORAKZAI). Plain `inline` (not inline-block) so the whole-heading
    sheen overlay (.bt-beat-title::after) tracks the base text glyph-for-glyph. */
@@ -93,43 +100,54 @@ textarea:focus-visible {
   color: var(--cyan);
   -webkit-text-fill-color: transparent;
 }
+
 /* shared keyframe: a soft steel-white glow-sheen sweeps left → right, then rests.
    4.5 s cycle = a slow ~3 s sweep, then ~1.5 s of calm. */
 @keyframes headingGleam {
+
   0%,
   16% {
     background-position: 100% 0, 0 0;
   }
+
   82%,
   100% {
     background-position: 0% 0, 0 0;
   }
 }
+
 /* glow bloom over the whole heading, synced with the sweep: it lights up as the
    sheen crosses the centre, then fades back to nothing. */
 @keyframes headingGlow {
+
   0%,
   16% {
     filter: drop-shadow(0 0 0 rgba(200, 240, 255, 0));
   }
+
   49% {
     filter: drop-shadow(0 0 27px rgba(200, 240, 255, 0.9));
   }
+
   82%,
   100% {
     filter: drop-shadow(0 0 0 rgba(200, 240, 255, 0));
   }
 }
+
 .bt-caret {
   color: var(--cyan);
   -webkit-text-fill-color: var(--cyan);
   animation: bCaretBlink 1.1s steps(1) infinite;
 }
+
 @keyframes bCaretBlink {
+
   0%,
   49% {
     opacity: 1;
   }
+
   50%,
   100% {
     opacity: 0;
@@ -141,6 +159,7 @@ textarea:focus-visible {
   position: relative;
   overflow: hidden;
 }
+
 .bt-btn::after {
   content: '';
   position: absolute;
@@ -153,9 +172,11 @@ textarea:focus-visible {
   transition: left 0.65s var(--ease);
   pointer-events: none;
 }
+
 .bt-btn:hover::after {
   left: 135%;
 }
+
 .bt-btn:hover {
   border-color: rgba(0, 240, 255, 0.45);
   box-shadow:
@@ -163,20 +184,24 @@ textarea:focus-visible {
     0 0 22px rgba(0, 240, 255, 0.16),
     0 0 34px rgba(0, 240, 255, 0.08);
 }
+
 .bt-actions .bt-btn:not(.bt-btn--ghost),
 .bt-contact-form .bt-btn {
   background: linear-gradient(135deg, rgba(0, 240, 255, 0.13), rgba(103, 232, 249, 0.13));
   border-color: rgba(0, 240, 255, 0.35);
 }
+
 .bt-actions .bt-btn:not(.bt-btn--ghost):hover,
 .bt-contact-form .bt-btn:hover {
   background: linear-gradient(135deg, rgba(0, 240, 255, 0.22), rgba(103, 232, 249, 0.22));
   border-color: rgba(0, 240, 255, 0.6);
 }
+
 /* --- tags: hover accent --- */
 .bt-tag {
   transition: all 0.25s var(--ease);
 }
+
 .bt-tag:hover {
   color: var(--silver);
   border-color: rgba(0, 240, 255, 0.4);
@@ -193,6 +218,7 @@ textarea:focus-visible {
   border: 1px solid var(--line);
   box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
 }
+
 .bt-proj:hover,
 .bt-timeline-card:hover,
 .bt-quote:hover {
@@ -211,6 +237,7 @@ textarea:focus-visible {
 .bt-proj {
   position: relative;
 }
+
 .bt-proj::before {
   content: '';
   position: absolute;
@@ -224,21 +251,26 @@ textarea:focus-visible {
   pointer-events: none;
   transition: opacity 0.3s var(--ease);
 }
+
 .bt-proj:hover::before {
   opacity: 1;
 }
+
 .bt-proj:hover {
   border-color: rgba(0, 240, 255, 0.45);
   box-shadow:
     0 10px 30px rgba(0, 0, 0, 0.45),
     0 0 28px rgba(0, 240, 255, 0.14);
 }
+
 .bt-proj-thumb img {
   filter: brightness(0.85) saturate(0.95);
 }
+
 .bt-proj:hover .bt-proj-thumb img {
   filter: brightness(1) saturate(1.05);
 }
+
 .bt-proj-thumb::after {
   content: '';
   position: absolute;
@@ -250,11 +282,14 @@ textarea:focus-visible {
   transform: skewX(-22deg);
   transition: left 0.65s var(--ease);
   pointer-events: none;
-  z-index: 1; /* above the scanlines (::before), below the mission overlay (2) */
+  z-index: 1;
+  /* above the scanlines (::before), below the mission overlay (2) */
 }
+
 .bt-proj:hover .bt-proj-thumb::after {
   left: 135%;
 }
+
 .bt-proj-idx {
   opacity: 1;
   background: linear-gradient(135deg, var(--cyan), var(--cyan-soft));
@@ -263,11 +298,13 @@ textarea:focus-visible {
   color: transparent;
   -webkit-text-fill-color: transparent;
 }
+
 .bt-proj-status {
   display: inline-flex;
   align-items: center;
   gap: 0.42em;
 }
+
 .bt-proj-status::before {
   content: '';
   width: 6px;
@@ -277,11 +314,14 @@ textarea:focus-visible {
   box-shadow: 0 0 8px rgba(0, 240, 255, 0.85);
   animation: bStatusPulse 1.9s ease-in-out infinite;
 }
+
 @keyframes bStatusPulse {
+
   0%,
   100% {
     opacity: 1;
   }
+
   50% {
     opacity: 0.35;
   }
@@ -303,6 +343,7 @@ textarea:focus-visible {
   box-shadow: 0 0 8px rgba(0, 240, 255, 0.85);
   animation: bStatusPulse 1.9s ease-in-out infinite;
 }
+
 /* standby: a lamp that is deliberately NOT live. The pulse is what reads as
    "active", so the dim variant stays static -- but it is still a lit lens with a
    soft halo, otherwise it reads as a dead pixel instead of a status. */
@@ -322,20 +363,21 @@ textarea:focus-visible {
        curve with no step, needs no overflow:hidden, and fuses with the cyan border
        above it into one lit top edge instead of two parallel lines. */
     background:
-      linear-gradient(90deg, rgba(0, 240, 255, 0.45), rgba(103, 232, 249, 0.45)) no-repeat top
-        left / 100% 2px,
+      linear-gradient(90deg, rgba(0, 240, 255, 0.45), rgba(103, 232, 249, 0.45)) no-repeat top left / 100% 2px,
       linear-gradient(135deg, rgba(19, 26, 38, 0.66), rgba(10, 14, 22, 0.8));
     box-shadow:
       0 10px 30px rgba(0, 0, 0, 0.45),
       0 0 28px rgba(0, 240, 255, 0.14);
     transform: translateY(-4px);
   }
+
   /* the standby lamp acknowledges the row without pretending to be live: the
      pulse stays off, only the lens brightens */
   .bt-timeline-card:hover .bt-pulse-light--dim {
     background: var(--silver);
     box-shadow: 0 0 8px rgba(205, 215, 228, 0.5);
   }
+
   /* the row's tags warm up with the card; a single tag's own hover stays the
      louder state (lift + glow), which is why the non-hovered ones are targeted */
   .bt-timeline-card:hover .bt-tag:not(:hover) {
@@ -345,52 +387,49 @@ textarea:focus-visible {
   }
 }
 
-/* --- main section headings: static chrome with a deeper tonal "valley" so the
-   highlight pops, plus a synced glow bloom.
-   The moving highlight lives on ::after — a copy of the heading text (data-text)
-   carrying ONE band that crosses the whole line, first word → last word, over
-   the silver body and the cyan accent alike. Keeping it on the parent (instead
-   of per-colour spans) is what makes it a single sweep instead of two that fire
-   together. width: fit-content maps the base gradient to the text, not the column. */
+/* --- main section headings: dimmed base so the beam contrast reads clearly.
+   The beam lives on ::after — wide, bright, self-evidently glowing wherever it
+   touches text. No whole-heading drop-shadow needed; the beam does the work. */
 .bt-beat-title {
   position: relative;
   width: fit-content;
   max-width: 100%;
-  background: linear-gradient(
-    115deg,
-    #eef4fa 0%,
-    #dbe5f0 12%,
-    #a9b8ca 36%,
-    #64727f 52%,
-    #bccadb 68%,
-    #e2eaf3 88%,
-    #f7fafd 100%
-  );
+  background: linear-gradient(115deg,
+      #7a8896 0%,
+      #6b7a87 25%,
+      #8a98a6 50%,
+      #6b7a87 75%,
+      #7a8896 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: var(--silver);
   -webkit-text-fill-color: transparent;
-  animation: headingGlow 4.5s ease-in-out infinite;
 }
+
 .bt-beat-title::after {
   content: attr(data-text);
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background-image: linear-gradient(
-    100deg,
-    transparent 0%,
-    transparent 43%,
-    rgba(255, 255, 255, 0.2) 46%,
-    rgba(255, 255, 255, 0.85) 48.5%,
-    rgba(255, 255, 255, 1) 50%,
-    rgba(255, 255, 255, 0.85) 51.5%,
-    rgba(255, 255, 255, 0.2) 54%,
-    transparent 57%,
-    transparent 100%
-  );
+  /* Wide crisp beam: 20% bright core, feathered ~5% each side.
+     At 300% background-size the band is physically ~6% of the element
+     width — wide enough to cover an entire word, tight enough to feel
+     like a spotlight rather than a wash. */
+  background-image: linear-gradient(90deg,
+      transparent 0%,
+      transparent 37%,
+      rgba(255, 255, 255, 0.08) 40%,
+      rgba(255, 255, 255, 0.60) 43%,
+      rgba(255, 255, 255, 0.95) 46%,
+      rgba(255, 255, 255, 1.00) 48%,
+      rgba(255, 255, 255, 1.00) 52%,
+      rgba(255, 255, 255, 0.95) 54%,
+      rgba(255, 255, 255, 0.60) 57%,
+      rgba(255, 255, 255, 0.08) 60%,
+      transparent 63%,
+      transparent 100%);
   background-size: 300% 100%;
-  background-position: 100% 0;
+  background-position: 200% 0;
   background-repeat: no-repeat;
   -webkit-background-clip: text;
   background-clip: text;
@@ -401,24 +440,25 @@ textarea:focus-visible {
 
 /* --- timeline: gradient spine, accent dots, violet alternation --- */
 .bt-timeline::before {
-  background: linear-gradient(
-    180deg,
-    transparent,
-    rgba(0, 240, 255, 0.35) 8%,
-    rgba(103, 232, 249, 0.42) 50%,
-    rgba(0, 240, 255, 0.35) 92%,
-    transparent
-  );
+  background: linear-gradient(180deg,
+      transparent,
+      rgba(0, 240, 255, 0.35) 8%,
+      rgba(103, 232, 249, 0.42) 50%,
+      rgba(0, 240, 255, 0.35) 92%,
+      transparent);
 }
+
 .bt-timeline-dot {
   background: linear-gradient(135deg, var(--cyan), var(--cyan-soft));
 }
+
 .bt-timeline-item:nth-child(even) .bt-timeline-dot {
   background: linear-gradient(135deg, var(--cyan-soft), var(--cyan));
   box-shadow:
     0 0 0 4px rgba(0, 240, 255, 0.14),
     0 0 12px var(--cyan);
 }
+
 .bt-timeline-item:nth-child(even) .bt-timeline-date {
   color: var(--cyan);
   border-color: var(--cyan-dim);
@@ -436,6 +476,7 @@ textarea:focus-visible {
       transform 0.35s var(--ease),
       box-shadow 0.35s var(--ease);
   }
+
   .bt-timeline-item:hover .bt-timeline-dot {
     transform: translateX(-50%) scale(1.18);
     box-shadow:
@@ -448,6 +489,7 @@ textarea:focus-visible {
 .bt-quotes-dot.active {
   background: linear-gradient(90deg, var(--cyan), var(--cyan-soft));
 }
+
 .bt-quotes-arrow:hover {
   border-color: rgba(0, 240, 255, 0.5);
   color: var(--cyan);
@@ -477,6 +519,7 @@ textarea:focus-visible {
   .bt-btn::after {
     display: none;
   }
+
   /* the heading shimmer is decorative -- a heading that keeps repainting behind
      a reduced-motion preference is exactly the kind of motion to drop */
   .bt-beat-title,
@@ -486,15 +529,19 @@ textarea:focus-visible {
   .bt-title-line--last {
     animation: none;
   }
+
   .bt-proj-thumb::after {
     display: none;
   }
+
   .bt-proj-status::before {
     animation: none;
   }
+
   .bt-pulse-light {
     animation: none;
   }
+
   /* keep the timeline dot's hover glow, drop the scale pop */
   .bt-timeline-item:hover .bt-timeline-dot {
     transform: translateX(-50%);
@@ -583,6 +630,7 @@ body::after {
    hover effects so a tap cannot leave a lifted card, bright image, sheen, or
    glowing control stuck on screen; focus-visible remains available for keyboards. */
 @media (hover: none) and (pointer: coarse) {
+
   .bt-nav-link:hover,
   .bt-proj:hover,
   .bt-timeline-card:hover,
@@ -605,28 +653,35 @@ body::after {
     border-color: var(--line) !important;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6) !important;
   }
+
   .bt-proj:hover::before {
     opacity: 0.32;
   }
+
   .bt-proj:hover .bt-proj-thumb img {
     filter: brightness(0.85) saturate(0.95);
   }
+
   .bt-proj:hover .bt-proj-thumb::after,
   .bt-btn:hover::after {
     display: none;
   }
+
   .bt-edu:hover::before,
   .bt-edu:hover::after {
     width: 0;
     height: 0;
     border-color: transparent;
   }
+
   .bt-social-link:hover {
     box-shadow: none !important;
   }
+
   .bt-filter-pill:hover {
     box-shadow: none !important;
   }
+
   .bt-nav-link:hover::after {
     transform: scaleX(0);
   }
