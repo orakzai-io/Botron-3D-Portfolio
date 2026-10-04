@@ -125,14 +125,14 @@ body.intro-complete .bt-copy .bt-in {
   color: transparent;
   -webkit-text-fill-color: transparent;
   animation:
-    headingGleam 4.5s ease-in-out infinite,
-    headingGlow 4.5s ease-in-out infinite;
+    headingGleam 7s ease-in-out infinite,
+    headingGlow 7s ease-in-out infinite;
 }
 .bt-title-line--last {
   background: none;
   -webkit-text-fill-color: unset;
   color: unset;
-  animation: headingGlow 4.5s ease-in-out infinite;
+  animation: headingGlow 7s ease-in-out infinite;
 }
 .bt-caret {
   color: var(--cyan);
