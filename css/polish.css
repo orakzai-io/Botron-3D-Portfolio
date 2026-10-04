@@ -86,6 +86,8 @@ textarea:focus-visible {
   background-clip: text;
   color: transparent;
   -webkit-text-fill-color: transparent;
+}
+
 /* section accent word: static white → electric cyan colour-break, matched to the
    hero last word (ORAKZAI). Plain `inline` (not inline-block). */
 .bt-beat-accent {
