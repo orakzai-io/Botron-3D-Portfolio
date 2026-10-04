@@ -101,28 +101,37 @@ textarea:focus-visible {
   -webkit-text-fill-color: transparent;
 }
 
-/* Beam sweep: starts off-right, moves slowly left over 9 s.
-   Static for first 12% (~1 s pause), sweeps through 12%–80%, quiet for last 20%. */
+/* shared keyframe: a soft steel-white glow-sheen sweeps left → right, then rests.
+   4.5 s cycle = a slow ~3 s sweep, then ~1.5 s of calm. */
 @keyframes headingGleam {
-  0%, 12% {
-    background-position: 200% 0;
+
+  0%,
+  16% {
+    background-position: 100% 0, 0 0;
   }
-  80%, 100% {
-    background-position: -100% 0;
+
+  82%,
+  100% {
+    background-position: 0% 0, 0 0;
   }
 }
-/* Glow on the beam itself: filter peaks when beam is mid-heading,
-   zero at rest. Applied to ::after so only the bright text glows,
-   not the whole element. */
-@keyframes beamGlow {
-  0%, 12% {
-    filter: drop-shadow(0 0 0px rgba(255, 255, 255, 0));
+
+/* glow bloom over the whole heading, synced with the sweep: it lights up as the
+   sheen crosses the centre, then fades back to nothing. */
+@keyframes headingGlow {
+
+  0%,
+  16% {
+    filter: drop-shadow(0 0 0 rgba(200, 240, 255, 0));
   }
-  46% {
-    filter: drop-shadow(0 0 16px rgba(255, 255, 255, 0.95)) drop-shadow(0 0 32px rgba(200, 240, 255, 0.65));
+
+  49% {
+    filter: drop-shadow(0 0 27px rgba(200, 240, 255, 0.9));
   }
-  80%, 100% {
-    filter: drop-shadow(0 0 0px rgba(255, 255, 255, 0));
+
+  82%,
+  100% {
+    filter: drop-shadow(0 0 0 rgba(200, 240, 255, 0));
   }
 }
 
@@ -378,9 +387,13 @@ textarea:focus-visible {
   }
 }
 
-/* --- main section headings: dimmed base so the beam contrast reads clearly.
-   The beam lives on ::after — wide, bright, self-evidently glowing wherever it
-   touches text. No whole-heading drop-shadow needed; the beam does the work. */
+/* --- main section headings: static chrome with a deeper tonal "valley" so the
+   highlight pops, plus a synced glow bloom.
+   The moving highlight lives on ::after — a copy of the heading text (data-text)
+   carrying ONE band that crosses the whole line, first word → last word, over
+   the silver body and the cyan accent alike. Keeping it on the parent (instead
+   of per-colour spans) is what makes it a single sweep instead of two that fire
+   together. width: fit-content maps the base gradient to the text, not the column. */
 .bt-beat-title {
   position: relative;
   width: fit-content;
@@ -397,6 +410,7 @@ textarea:focus-visible {
   background-clip: text;
   color: var(--silver);
   -webkit-text-fill-color: transparent;
+  animation: headingGlow 4.5s ease-in-out infinite;
 }
 
 .bt-beat-title::after {
@@ -404,31 +418,24 @@ textarea:focus-visible {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  /* Wide crisp beam: 20% bright core, feathered ~5% each side.
-     At 300% background-size the band is physically ~6% of the element
-     width — wide enough to cover an entire word, tight enough to feel
-     like a spotlight rather than a wash. */
-  background-image: linear-gradient(90deg,
+  background-image: linear-gradient(100deg,
       transparent 0%,
-      transparent 37%,
-      rgba(255, 255, 255, 0.08) 40%,
-      rgba(255, 255, 255, 0.60) 43%,
-      rgba(255, 255, 255, 0.95) 46%,
-      rgba(255, 255, 255, 1.00) 48%,
-      rgba(255, 255, 255, 1.00) 52%,
-      rgba(255, 255, 255, 0.95) 54%,
-      rgba(255, 255, 255, 0.60) 57%,
-      rgba(255, 255, 255, 0.08) 60%,
-      transparent 63%,
+      transparent 43%,
+      rgba(255, 255, 255, 0.2) 46%,
+      rgba(255, 255, 255, 0.85) 48.5%,
+      rgba(255, 255, 255, 1) 50%,
+      rgba(255, 255, 255, 0.85) 51.5%,
+      rgba(255, 255, 255, 0.2) 54%,
+      transparent 57%,
       transparent 100%);
   background-size: 300% 100%;
-  background-position: 200% 0;
+  background-position: 100% 0;
   background-repeat: no-repeat;
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
   -webkit-text-fill-color: transparent;
-  animation: headingGleam 9s ease-in-out infinite, beamGlow 9s ease-in-out infinite;
+  animation: headingGleam 4.5s ease-in-out infinite;
 }
 
 /* --- timeline: gradient spine, accent dots, violet alternation --- */
