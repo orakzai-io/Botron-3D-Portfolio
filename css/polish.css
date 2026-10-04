@@ -62,13 +62,13 @@ textarea:focus-visible {
   background: linear-gradient(90deg, var(--cyan), rgba(103, 232, 249, 0.4), transparent);
 }
 
-
 /* hero last word: static white → electric cyan colour-break + a slow steel-white
    sheen sweeping left → right every 4.5 s. */
 .bt-title-name {
   display: inline-block;
   background-image:
-    linear-gradient(100deg,
+    linear-gradient(
+      100deg,
       transparent 0%,
       transparent 43%,
       rgba(255, 255, 255, 0.2) 46%,
@@ -77,10 +77,15 @@ textarea:focus-visible {
       rgba(255, 255, 255, 0.85) 51.5%,
       rgba(255, 255, 255, 0.2) 54%,
       transparent 57%,
-      transparent 100%),
+      transparent 100%
+    ),
     linear-gradient(100deg, #f2f7fa 8%, var(--cyan) 78%);
-  background-size: 300% 100%, 100% 100%;
-  background-position: 0% 0, 0 0;
+  background-size:
+    300% 100%,
+    100% 100%;
+  background-position:
+    0% 0,
+    0 0;
   background-repeat: no-repeat, no-repeat;
   -webkit-background-clip: text;
   background-clip: text;
@@ -102,22 +107,24 @@ textarea:focus-visible {
 /* shared keyframe: a soft steel-white glow-sheen sweeps left → right, then rests.
    4.5 s cycle = a slow ~3 s sweep, then ~1.5 s of calm. */
 @keyframes headingGleam {
-
   0%,
   16% {
-    background-position: 100% 0, 0 0;
+    background-position:
+      100% 0,
+      0 0;
   }
 
   82%,
   100% {
-    background-position: 0% 0, 0 0;
+    background-position:
+      0% 0,
+      0 0;
   }
 }
 
 /* glow bloom over the whole heading, synced with the sweep: it lights up as the
    sheen crosses the centre, then fades back to nothing. */
 @keyframes headingGlow {
-
   0%,
   16% {
     filter: drop-shadow(0 0 0 rgba(200, 240, 255, 0));
@@ -140,7 +147,6 @@ textarea:focus-visible {
 }
 
 @keyframes bCaretBlink {
-
   0%,
   49% {
     opacity: 1;
@@ -314,7 +320,6 @@ textarea:focus-visible {
 }
 
 @keyframes bStatusPulse {
-
   0%,
   100% {
     opacity: 1;
@@ -361,7 +366,8 @@ textarea:focus-visible {
        curve with no step, needs no overflow:hidden, and fuses with the cyan border
        above it into one lit top edge instead of two parallel lines. */
     background:
-      linear-gradient(90deg, rgba(0, 240, 255, 0.45), rgba(103, 232, 249, 0.45)) no-repeat top left / 100% 2px,
+      linear-gradient(90deg, rgba(0, 240, 255, 0.45), rgba(103, 232, 249, 0.45)) no-repeat top
+        left / 100% 2px,
       linear-gradient(135deg, rgba(19, 26, 38, 0.66), rgba(10, 14, 22, 0.8));
     box-shadow:
       0 10px 30px rgba(0, 0, 0, 0.45),
@@ -396,14 +402,16 @@ textarea:focus-visible {
   position: relative;
   width: fit-content;
   max-width: 100%;
-  background: linear-gradient(115deg,
-      #eef4fa 0%,
-      #dbe5f0 12%,
-      #a9b8ca 36%,
-      #64727f 52%,
-      #bccadb 68%,
-      #e2eaf3 88%,
-      #f7fafd 100%);
+  background: linear-gradient(
+    115deg,
+    #eef4fa 0%,
+    #dbe5f0 12%,
+    #a9b8ca 36%,
+    #64727f 52%,
+    #bccadb 68%,
+    #e2eaf3 88%,
+    #f7fafd 100%
+  );
   -webkit-background-clip: text;
   background-clip: text;
   color: var(--silver);
@@ -412,12 +420,14 @@ textarea:focus-visible {
 
 /* --- timeline: gradient spine, accent dots, violet alternation --- */
 .bt-timeline::before {
-  background: linear-gradient(180deg,
-      transparent,
-      rgba(0, 240, 255, 0.35) 8%,
-      rgba(103, 232, 249, 0.42) 50%,
-      rgba(0, 240, 255, 0.35) 92%,
-      transparent);
+  background: linear-gradient(
+    180deg,
+    transparent,
+    rgba(0, 240, 255, 0.35) 8%,
+    rgba(103, 232, 249, 0.42) 50%,
+    rgba(0, 240, 255, 0.35) 92%,
+    transparent
+  );
 }
 
 .bt-timeline-dot {
@@ -602,7 +612,6 @@ body::after {
    hover effects so a tap cannot leave a lifted card, bright image, sheen, or
    glowing control stuck on screen; focus-visible remains available for keyboards. */
 @media (hover: none) and (pointer: coarse) {
-
   .bt-nav-link:hover,
   .bt-proj:hover,
   .bt-timeline-card:hover,

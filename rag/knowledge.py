@@ -10,15 +10,15 @@ CHUNKS = [
         "title": "Photos of Shahsawar",
         "category": "bio",
         "content": (
-            "If the visitor asks for a photo, picture, portrait, image or snapshot of Shahsawar (including \"swimming photo\", \"chess photo\", or just \"swimming\"/\"chess\" when clearly about an image), reply with an html <img> tag and no other words.\n"
+            'If the visitor asks for a photo, picture, portrait, image or snapshot of Shahsawar (including "swimming photo", "chess photo", or just "swimming"/"chess" when clearly about an image), reply with an html <img> tag and no other words.\n'
             "Choose the file by topic: assets/professionalpic.webp for a general portrait or headshot; assets/swimmingpic.webp for swimming, medals, coaching or athletics; assets/chesspic.webp for chess. Emit all three in that order only if they ask for every photo.\n"
-            "Every tag must carry class=\"bt-chat-photo\" and alt text describing the photo. Do NOT add loading=\"lazy\": the reply is injected into a scroll container that is still display:none, so Chrome defers the fetch and only the first photo paints while the rest stay blank. Example:\n"
+            'Every tag must carry class="bt-chat-photo" and alt text describing the photo. Do NOT add loading="lazy": the reply is injected into a scroll container that is still display:none, so Chrome defers the fetch and only the first photo paints while the rest stay blank. Example:\n'
             '<img class="bt-chat-photo" src="assets/professionalpic.webp" alt="Shahsawar Orakzai in a suit and tie">'
             "Never describe a photograph in words and never invent any other image URL.\n"
-        )
-    },    {
+        ),
+    },
+    {
         "id": "identity_overview",
-
         "title": "Identity, Bio & Quick Facts",
         "category": "bio",
         "content": (
@@ -37,7 +37,7 @@ CHUNKS = [
             "• Hugging Face: https://huggingface.co/orakzai-io\n"
             "• Twitter/X: https://x.com/orakzai_io\n"
             "• Instagram: https://www.instagram.com/orakzai.io/"
-        )
+        ),
     },
     {
         "id": "core_traits_discipline",
@@ -54,7 +54,7 @@ CHUNKS = [
             "including Gold at National Junior Swimming Championships). Operates with elite stamina, laser focus, and composure under deadline pressure.\n"
             "4. Strategic Problem-Solving: Competitive chess player who approaches system design with tactical foresight, "
             "anticipating edge cases, concurrency bottlenecks, and failure modes well before writing code."
-        )
+        ),
     },
     {
         "id": "education_credentials",
@@ -76,7 +76,7 @@ CHUNKS = [
             "   - Issued: October 2025 (Remote)\n"
             "   - Verification URL: https://certificates.cs50.io/9847b334-9e42-4281-a696-a6e5cc35b008.pdf\n"
             "   - Focus: Advanced Python programming, OOP, functional paradigms, error handling, regex, and unit testing."
-        )
+        ),
     },
     {
         "id": "experience_freelance",
@@ -91,7 +91,7 @@ CHUNKS = [
             "• Architected scalable FastAPI backends delivering sub-200ms average response times under zero-downtime production deployments.\n"
             "• Designed multi-tenant RAG retrieval pipelines, JWT auth systems, hybrid search mechanisms, and structured LLM tool-calling workflows.\n"
             "• Client projects include enterprise document search, asynchronous scraping intelligence, and zero-knowledge data platforms."
-        )
+        ),
     },
     {
         "id": "experience_mindgigs",
@@ -106,7 +106,7 @@ CHUNKS = [
             "• Integrated local Intel® Small LLMs (SLMs) for on-premise text extraction and summarization tasks without external API latency.\n"
             "• Built and containerized distributed data scraping pipelines with Docker, successfully processing 20,000+ records daily with "
             "automated error retries and PostgreSQL ingestion."
-        )
+        ),
     },
     {
         "id": "swimming_leadership",
@@ -123,7 +123,7 @@ CHUNKS = [
             "30+ junior swimmers to multiple regional and provincial podium finishes.\n"
             "• Engineering Philosophy: Views software performance through the lens of competitive swimming, obsessing over hundredths "
             "of a second, latency, continuous discipline, and high-pressure execution."
-        )
+        ),
     },
     {
         "id": "project_rednote_detail",
@@ -140,7 +140,7 @@ CHUNKS = [
             "• DevOps: Fully containerized with multi-stage Docker builds. Automated GitHub Actions CI/CD pipeline building and deploying in under 3 minutes.\n"
             "• Code Repository: https://github.com/orakzai-io/Rednote.git\n"
             "• Live Production Demo: https://orakzai-io-rednote.hf.space"
-        )
+        ),
     },
     {
         "id": "project_scraper_detail",
@@ -155,7 +155,7 @@ CHUNKS = [
             "• Real-Time Telemetry: Built a custom TypeScript monitoring dashboard with 3-second interval polling, reducing manual verification overhead by 90%.\n"
             "• Code Repository: https://github.com/orakzai-io/Async-Web-Scraper.git\n"
             "• Live Production Demo: https://orakzai-io-async-web-scraper.hf.space"
-        )
+        ),
     },
     {
         "id": "project_vaultguard_detail",
@@ -171,7 +171,7 @@ CHUNKS = [
             "• Tech Stack: Python, JavaScript, AES-256-GCM, PBKDF2, PostgreSQL, Docker containerization.\n"
             "• Code Repository: https://github.com/orakzai-io/Vault-Guard.git\n"
             "• Video Walkthrough & Demo: https://youtu.be/-OcbtZTuibo?si=o0BBKnni7OCR09bJ"
-        )
+        ),
     },
     {
         "id": "project_portfolio_detail",
@@ -189,7 +189,7 @@ CHUNKS = [
             "• AI Assistant (BOTRON): Autonomous AI wired to a vector RAG pipeline with Groq LLM (120B/27B/20B automatic multi-model failover).\n"
             "• Code Repository: https://github.com/orakzai-io/Personal-Portfolio.git\n"
             "• Live Website: https://orakzai.io"
-        )
+        ),
     },
     {
         "id": "skills_ai_llm_full",
@@ -203,7 +203,7 @@ CHUNKS = [
             "• Autonomous Agents: Multi-agent orchestration, state loops, tool-calling pipelines, structured Pydantic outputs, system guardrails.\n"
             "• Prompt Engineering: Few-shot elicitation, system persona architecture, structured JSON schemas, hallucination suppression.\n"
             "• Local SLMs: Intel Small LLMs (SLMs) and quantized models deployed on CPU edge environments."
-        )
+        ),
     },
     {
         "id": "skills_backend_devops_full",
@@ -215,7 +215,7 @@ CHUNKS = [
             "• Backend Frameworks: FastAPI, Pydantic (data validation, strict serialization), SQLAlchemy (async ORM, connection pooling), RESTful API design.\n"
             "• Databases: PostgreSQL (complex indexing, CTEs, relational modeling, pgvector), SQLite, Redis caching patterns.\n"
             "• DevOps & Cloud: Docker (multi-stage lightweight builds), Docker Compose, GitHub Actions (automated CI/CD deploying under 3 mins), Git, Linux/POSIX Bash, Hugging Face Spaces, Vercel, Cloudflare."
-        )
+        ),
     },
     {
         "id": "skills_frontend_graphics_full",
@@ -226,7 +226,7 @@ CHUNKS = [
             "• Web & 3D Graphics: Three.js (3D scenes, GLTF/GLB loaders, Meshopt, lighting, shadows, cameras), WebGL, HTML5 Canvas math projections, GSAP motion, Lenis smooth scroll.\n"
             "• Frontend Frameworks & Styling: React, TypeScript, Modern CSS3 (Glassmorphism, CSS variables, cyber-mech HUD design, responsive grid/flexbox, accessibility).\n"
             "• Automation & Developer Tooling: n8n platform (webhook triggers, automated event ETL flows), Git/GitHub (feature branch, rebase, PR workflows), VS Code, pgAdmin."
-        )
+        ),
     },
     {
         "id": "testimonials_reviews",
@@ -235,14 +235,14 @@ CHUNKS = [
         "content": (
             "Verified Client & Peer Reviews:\n"
             "1. Vivek Pippala (AI Engineer · Verified via Upwork, 5/5 Stars):\n"
-            "   \"Shahsawar transformed our RAG pipeline from a sluggish proof-of-concept into a lightning-fast production service. His pgvector indexing and async FastAPI architecture cut our search latency by over 60%. Exceptional depth in vector retrieval.\"\n"
+            '   "Shahsawar transformed our RAG pipeline from a sluggish proof-of-concept into a lightning-fast production service. His pgvector indexing and async FastAPI architecture cut our search latency by over 60%. Exceptional depth in vector retrieval."\n'
             "2. Muhammad Imad (Software Engineer at Tech Yard · 5/5 Stars):\n"
-            "   \"Shahsawar writes backend code like a seasoned systems architect. His mastery of async Python, Pydantic data pipelines, and Docker containerization effortlessly scaled our throughput under heavy loads. Clean, rock-solid engineering.\"\n"
+            '   "Shahsawar writes backend code like a seasoned systems architect. His mastery of async Python, Pydantic data pipelines, and Docker containerization effortlessly scaled our throughput under heavy loads. Clean, rock-solid engineering."\n'
             "3. Muhammad Husnain (Web Developer · Direct Collaboration, 5/5 Stars):\n"
-            "   \"Rare to find an engineer who can architect complex LLM agent pipelines on the backend and wire them up to slick, responsive TypeScript interfaces on the frontend. Shahsawar executes fast and delivers code that is a pleasure to work with.\"\n"
+            '   "Rare to find an engineer who can architect complex LLM agent pipelines on the backend and wire them up to slick, responsive TypeScript interfaces on the frontend. Shahsawar executes fast and delivers code that is a pleasure to work with."\n'
             "4. Alex Mercer (Product Lead · Verified via Upwork, 5/5 Stars):\n"
-            "   \"We hired Shahsawar to automate an intensive multi-step data workflow with AI agents. He mapped out the edge cases, built the state loops with ironclad guardrails, and delivered days ahead of schedule. Saved our operations team hours every single day.\""
-        )
+            '   "We hired Shahsawar to automate an intensive multi-step data workflow with AI agents. He mapped out the edge cases, built the state loops with ironclad guardrails, and delivered days ahead of schedule. Saved our operations team hours every single day."'
+        ),
     },
     {
         "id": "contact_hiring_availability",
@@ -259,6 +259,6 @@ CHUNKS = [
             "• GitHub: https://github.com/orakzai-io\n"
             "• Twitter / X: https://x.com/orakzai_io\n"
             "• Hugging Face: https://huggingface.co/orakzai-io"
-        )
-    }
+        ),
+    },
 ]

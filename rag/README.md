@@ -217,7 +217,7 @@ Append to `CHUNKS` in `knowledge.py`:
     "id": "project_something_detail",
     "title": "Project Deep-Dive — Something",
     "category": "projects",
-    "content": "Something (March 2026):\n• Core Problem: ...\n• Architecture: ..."
+    "content": "Something (March 2026):\n• Core Problem: ...\n• Architecture: ...",
 }
 ```
 

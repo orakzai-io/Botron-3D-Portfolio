@@ -30,7 +30,9 @@ async def lifespan(app: FastAPI):
     Allows Uvicorn to bind the port instantly (< 1s) while loading the
     heavier embedding weights in the background without blocking /health or /chat.
     """
-    logger.info("Server port bound. Triggering background FastEmbed model initialization...")
+    logger.info(
+        "Server port bound. Triggering background FastEmbed model initialization..."
+    )
     # Hold a reference to the task. Without one, the event loop may garbage
     # collect it mid-load, and nothing would await it on shutdown. Cancelling
     # on exit stops the load from outliving the process (the thread itself is
@@ -47,7 +49,7 @@ app = FastAPI(
     title="BOTRON RAG API",
     description="Vector RAG Backend for Shahsawar Orakzai's Modern Portfolio",
     version="1.0.0",
-    lifespan=lifespan
+    lifespan=lifespan,
 )
 
 # CORS for the static frontend. Override with ALLOWED_ORIGINS (comma separated).
@@ -78,7 +80,11 @@ GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 # no .env and no env var. Any real deployment sets GROQ_MODELS, which takes
 # precedence, so keep this in sync with .env.example rather than letting it drift
 # to a stale rotation.
-_raw_models = os.getenv("GROQ_MODELS") or os.getenv("GROQ_MODEL") or "openai/gpt-oss-120b,qwen/qwen3.8-27b,openai/gpt-oss-20b"
+_raw_models = (
+    os.getenv("GROQ_MODELS")
+    or os.getenv("GROQ_MODEL")
+    or "openai/gpt-oss-120b,qwen/qwen3.8-27b,openai/gpt-oss-20b"
+)
 GROQ_MODELS = [m.strip() for m in _raw_models.split(",") if m.strip()]
 
 # Initialize Groq client with bounded timeout and retries
@@ -86,24 +92,31 @@ groq_client = None
 if GROQ_API_KEY:
     try:
         from groq import Groq
+
         # Set bounded timeout (20s) and max_retries (1) so dead requests don't hang workers
         groq_client = Groq(api_key=GROQ_API_KEY, timeout=20.0, max_retries=1)
-        logger.info("Groq client initialized with model rotation order: %s", GROQ_MODELS)
+        logger.info(
+            "Groq client initialized with model rotation order: %s", GROQ_MODELS
+        )
     except Exception as e:
         logger.error("Failed to initialize Groq client: %s", e)
 else:
-    logger.warning("GROQ_API_KEY is not set in environment! Add it to .env to enable LLM generation.")
+    logger.warning(
+        "GROQ_API_KEY is not set in environment! Add it to .env to enable LLM generation."
+    )
 
 
 class ChatRequest(BaseModel):
     query: str = Field(..., min_length=1, max_length=2000)
     top_k: int = Field(default=3, ge=1, le=10)
 
+
 class SourceChunk(BaseModel):
     id: str
     title: str
     category: str
     similarity: float
+
 
 class ChatResponse(BaseModel):
     answer: str
@@ -127,6 +140,7 @@ GUIDELINES:
 4. Keep answers concise (2 to 4 punchy sentences or clear bullet points), ideal for a fast-reading chat interface.
 """
 
+
 @app.get("/")
 def root():
     return {
@@ -134,8 +148,9 @@ def root():
         "service": "BOTRON RAG API",
         "groq_configured": bool(groq_client),
         "models_configured": GROQ_MODELS,
-        "indexed_chunks": len(retriever.chunks)
+        "indexed_chunks": len(retriever.chunks),
     }
+
 
 @app.get("/health")
 def health():
@@ -143,8 +158,11 @@ def health():
         "status": "ready" if retriever.is_ready else "waking",
         "groq_ready": bool(groq_client),
         "models": GROQ_MODELS,
-        "embedding_mode": "FastEmbed (NumPy Cosine)" if retriever.use_fastembed else ("TF-IDF" if retriever.is_ready else "loading")
+        "embedding_mode": "FastEmbed (NumPy Cosine)"
+        if retriever.use_fastembed
+        else ("TF-IDF" if retriever.is_ready else "loading"),
     }
+
 
 @app.post("/chat", response_model=ChatResponse)
 def chat(payload: ChatRequest):
@@ -170,17 +188,19 @@ def chat(payload: ChatRequest):
         )
 
     # Format context for prompt
-    context_str = "\n\n".join([
-        f"[Source: {c['title']} | Relevance: {c['similarity']}]\n{c['content']}"
-        for c in top_chunks
-    ])
+    context_str = "\n\n".join(
+        [
+            f"[Source: {c['title']} | Relevance: {c['similarity']}]\n{c['content']}"
+            for c in top_chunks
+        ]
+    )
 
     sources = [
         SourceChunk(
             id=c["id"],
             title=c["title"],
             category=c["category"],
-            similarity=c["similarity"]
+            similarity=c["similarity"],
         )
         for c in top_chunks
     ]
@@ -201,7 +221,7 @@ def chat(payload: ChatRequest):
             sources=sources,
             retrieval_time_ms=retrieval_ms,
             generation_time_ms=round(gen_ms, 2),
-            model="Local-RAG-Demo"
+            model="Local-RAG-Demo",
         )
 
     system_prompt = SYSTEM_PROMPT_TEMPLATE.format(context=context_str)
@@ -213,7 +233,7 @@ def chat(payload: ChatRequest):
             chat_completion = groq_client.chat.completions.create(
                 messages=[
                     {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": query}
+                    {"role": "user", "content": query},
                 ],
                 model=model_name,
                 temperature=0.5,
@@ -229,18 +249,22 @@ def chat(payload: ChatRequest):
                 sources=sources,
                 retrieval_time_ms=retrieval_ms,
                 generation_time_ms=round(gen_ms, 2),
-                model=model_name
+                model=model_name,
             )
 
         except Exception as e:
-            logger.warning("Model '%s' failed or hit rate limit (%s). Failing over...", model_name, e)
+            logger.warning(
+                "Model '%s' failed or hit rate limit (%s). Failing over...",
+                model_name,
+                e,
+            )
             last_error = e
             continue
 
     logger.error("All configured Groq models failed. Last error: %s", last_error)
     raise HTTPException(
         status_code=500,
-        detail=f"All configured Groq models failed. Last error: {last_error!s}"
+        detail=f"All configured Groq models failed. Last error: {last_error!s}",
     )
 
 

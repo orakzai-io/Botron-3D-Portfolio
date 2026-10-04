@@ -28,7 +28,7 @@ logger = logging.getLogger("rag")
 logging.basicConfig(level=logging.INFO)
 
 EMBEDDING_MODEL = "BAAI/bge-small-en-v1.5"
-VECTOR_SIZE     = 384   # bge-small output dimensionality
+VECTOR_SIZE = 384  # bge-small output dimensionality
 
 # Relevance floor: below this score we return nothing so the bot doesn't hallucinate.
 #
@@ -104,7 +104,9 @@ class VectorRetriever:
                 dur_ms = (time.perf_counter() - t0) * 1000
                 logger.info(
                     "FastEmbed dense matrix loaded (%d chunks, %d dims) in %.1fms.",
-                    len(self.chunks), self._dense_matrix.shape[1], dur_ms
+                    len(self.chunks),
+                    self._dense_matrix.shape[1],
+                    dur_ms,
                 )
             except Exception as e:
                 logger.warning(
@@ -117,13 +119,115 @@ class VectorRetriever:
     #  TF-IDF fallback helpers                                           #
     # ------------------------------------------------------------------ #
 
-    _STOPWORDS = frozenset(["what", "which", "who", "whom", "whose", "when", "where", "why", "how", "is", "are", "was", "were", "be", "been", "being", "do", "does", "did", "done", "have", "has", "had", "having", "will", "would", "shall", "should", "can", "could", "may", "might", "must", "a", "an", "the", "and", "or", "but", "if", "then", "than", "that", "this", "these", "those", "it", "its", "he", "she", "they", "them", "his", "her", "their", "you", "your", "i", "we", "our", "us", "me", "my", "of", "in", "on", "at", "to", "for", "from", "by", "with", "about", "as", "into", "over", "under", "again", "further", "more", "most", "other", "some", "such", "no", "nor", "not", "only", "own", "same", "so", "too", "very", "just", "tell", "please", "give", "know"])
+    _STOPWORDS = frozenset(
+        [
+            "what",
+            "which",
+            "who",
+            "whom",
+            "whose",
+            "when",
+            "where",
+            "why",
+            "how",
+            "is",
+            "are",
+            "was",
+            "were",
+            "be",
+            "been",
+            "being",
+            "do",
+            "does",
+            "did",
+            "done",
+            "have",
+            "has",
+            "had",
+            "having",
+            "will",
+            "would",
+            "shall",
+            "should",
+            "can",
+            "could",
+            "may",
+            "might",
+            "must",
+            "a",
+            "an",
+            "the",
+            "and",
+            "or",
+            "but",
+            "if",
+            "then",
+            "than",
+            "that",
+            "this",
+            "these",
+            "those",
+            "it",
+            "its",
+            "he",
+            "she",
+            "they",
+            "them",
+            "his",
+            "her",
+            "their",
+            "you",
+            "your",
+            "i",
+            "we",
+            "our",
+            "us",
+            "me",
+            "my",
+            "of",
+            "in",
+            "on",
+            "at",
+            "to",
+            "for",
+            "from",
+            "by",
+            "with",
+            "about",
+            "as",
+            "into",
+            "over",
+            "under",
+            "again",
+            "further",
+            "more",
+            "most",
+            "other",
+            "some",
+            "such",
+            "no",
+            "nor",
+            "not",
+            "only",
+            "own",
+            "same",
+            "so",
+            "too",
+            "very",
+            "just",
+            "tell",
+            "please",
+            "give",
+            "know",
+        ]
+    )
 
     def _tokenize(self, text: str) -> list[str]:
         toks = re.findall(r"\b[a-zA-Z0-9_-]{2,}\b", text.lower())
         return [
             t[:-1] if len(t) > 4 and t.endswith("s") and not t.endswith("ss") else t
-            for t in toks if t not in self._STOPWORDS
+            for t in toks
+            if t not in self._STOPWORDS
         ]
 
     def _build_vocab(self, texts: list[str]) -> dict[str, int]:
@@ -158,8 +262,8 @@ class VectorRetriever:
 
     def _init_tfidf(self):
         texts = [f"{c['title']}: {c['content']}" for c in self.chunks]
-        self._tfidf_vocab  = self._build_vocab(texts)
-        self._tfidf_idf    = self._build_idf(texts)
+        self._tfidf_vocab = self._build_vocab(texts)
+        self._tfidf_idf = self._build_idf(texts)
         self._tfidf_matrix = np.array(
             [self._tfidf_vector(t) for t in texts], dtype=np.float32
         )
@@ -201,10 +305,10 @@ class VectorRetriever:
 
         results = [
             {
-                "id":         self.chunks[i]["id"],
-                "title":      self.chunks[i]["title"],
-                "category":   self.chunks[i]["category"],
-                "content":    self.chunks[i]["content"],
+                "id": self.chunks[i]["id"],
+                "title": self.chunks[i]["title"],
+                "category": self.chunks[i]["category"],
+                "content": self.chunks[i]["content"],
                 "similarity": round(float(sims[i]), 4),
             }
             for i in top_indices
@@ -218,10 +322,10 @@ class VectorRetriever:
 
         results = [
             {
-                "id":         self.chunks[i]["id"],
-                "title":      self.chunks[i]["title"],
-                "category":   self.chunks[i]["category"],
-                "content":    self.chunks[i]["content"],
+                "id": self.chunks[i]["id"],
+                "title": self.chunks[i]["title"],
+                "category": self.chunks[i]["category"],
+                "content": self.chunks[i]["content"],
                 "similarity": round(float(sims[i]), 4),
             }
             for i in top_indices
