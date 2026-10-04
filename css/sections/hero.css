@@ -94,36 +94,23 @@ body.intro-complete .bt-copy .bt-in {
   font-size: clamp(2.2rem, 5.5vw, 4.4rem);
   /* static chrome with a deeper tonal "valley" so the sweeping highlight has
      contrast to ride across. Two background layers: [sheen][static base]. */
-  background-image:
-    linear-gradient(
-      100deg,
-      transparent 0%,
-      transparent 43%,
-      rgba(255, 255, 255, 0.2) 46%,
-      rgba(255, 255, 255, 0.85) 48.5%,
-      rgba(255, 255, 255, 1) 50%,
-      rgba(255, 255, 255, 0.85) 51.5%,
-      rgba(255, 255, 255, 0.2) 54%,
-      transparent 57%,
-      transparent 100%
-    ),
-    linear-gradient(
-      115deg,
-      #eef4fa 0%,
-      #dbe5f0 12%,
-      #a9b8ca 36%,
-      #64727f 52%,
-      #bccadb 68%,
-      #e2eaf3 88%,
-      #f7fafd 100%
-    );
-  background-size: 300% 100%, 100% 100%;
-  background-position: 0% 0, 0 0;
-  background-repeat: no-repeat, no-repeat;
+  background: linear-gradient(
+    115deg,
+    #f5f8fc 0%,
+    #d0dce8 18%,
+    #ffffff 38%,
+    #b8c8d8 50%,
+    #ffffff 62%,
+    #d0dce8 82%,
+    #f5f8fc 100%
+  );
+  background-size: 200% 100%;
+  background-position: 0% 0;
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
   -webkit-text-fill-color: transparent;
+  animation: chromeDrift 8s ease-in-out infinite alternate;
 }
 .bt-title-line--last {
   background: none;
@@ -134,6 +121,15 @@ body.intro-complete .bt-copy .bt-in {
   color: var(--cyan);
   -webkit-text-fill-color: var(--cyan);
   animation: blink 1.1s steps(1) infinite;
+}
+
+@keyframes chromeDrift {
+  0% {
+    background-position: 0% 0;
+  }
+  100% {
+    background-position: 100% 0;
+  }
 }
 
 /* terminal caret blink — hard on/off, no fade (used by hero caret + boot caret) */

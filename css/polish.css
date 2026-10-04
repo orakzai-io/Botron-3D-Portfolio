@@ -397,17 +397,29 @@ textarea:focus-visible {
   width: fit-content;
   max-width: 100%;
   background: linear-gradient(115deg,
-      #eef4fa 0%,
-      #dbe5f0 12%,
-      #a9b8ca 36%,
-      #64727f 52%,
-      #bccadb 68%,
-      #e2eaf3 88%,
-      #f7fafd 100%);
+      #f5f8fc 0%,
+      #d0dce8 18%,
+      #ffffff 38%,
+      #b8c8d8 50%,
+      #ffffff 62%,
+      #d0dce8 82%,
+      #f5f8fc 100%);
+  background-size: 200% 100%;
+  background-position: 0% 0;
   -webkit-background-clip: text;
   background-clip: text;
   color: var(--silver);
   -webkit-text-fill-color: transparent;
+  animation: chromeDrift 8s ease-in-out infinite alternate;
+}
+
+@keyframes chromeDrift {
+  0% {
+    background-position: 0% 0;
+  }
+  100% {
+    background-position: 100% 0;
+  }
 }
 
 /* --- timeline: gradient spine, accent dots, violet alternation --- */
