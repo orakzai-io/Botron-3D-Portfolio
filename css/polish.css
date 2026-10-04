@@ -86,12 +86,8 @@ textarea:focus-visible {
   background-clip: text;
   color: transparent;
   -webkit-text-fill-color: transparent;
-  animation: headingGleam 7s ease-in-out infinite;
-}
-
 /* section accent word: static white → electric cyan colour-break, matched to the
-   hero last word (ORAKZAI). Plain `inline` (not inline-block) so the whole-heading
-   sheen overlay (.bt-beat-title::after) tracks the base text glyph-for-glyph. */
+   hero last word (ORAKZAI). Plain `inline` (not inline-block). */
 .bt-beat-accent {
   display: inline;
   background: linear-gradient(100deg, #f2f7fa 8%, var(--cyan) 78%);
@@ -410,32 +406,6 @@ textarea:focus-visible {
   background-clip: text;
   color: var(--silver);
   -webkit-text-fill-color: transparent;
-  animation: headingGlow 7s ease-in-out infinite;
-}
-
-.bt-beat-title::after {
-  content: attr(data-text);
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background-image: linear-gradient(100deg,
-      transparent 0%,
-      transparent 43%,
-      rgba(255, 255, 255, 0.6) 46%,
-      rgba(255, 255, 255, 1) 48.5%,
-      rgba(255, 255, 255, 1) 50%,
-      rgba(255, 255, 255, 1) 51.5%,
-      rgba(255, 255, 255, 0.6) 54%,
-      transparent 57%,
-      transparent 100%);
-  background-size: 300% 100%;
-  background-position: 100% 0;
-  background-repeat: no-repeat;
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  -webkit-text-fill-color: transparent;
-  animation: headingGleam 7s ease-in-out infinite;
 }
 
 /* --- timeline: gradient spine, accent dots, violet alternation --- */

@@ -124,15 +124,11 @@ body.intro-complete .bt-copy .bt-in {
   background-clip: text;
   color: transparent;
   -webkit-text-fill-color: transparent;
-  animation:
-    headingGleam 7s ease-in-out infinite,
-    headingGlow 7s ease-in-out infinite;
 }
 .bt-title-line--last {
   background: none;
   -webkit-text-fill-color: unset;
   color: unset;
-  animation: headingGlow 7s ease-in-out infinite;
 }
 .bt-caret {
   color: var(--cyan);
