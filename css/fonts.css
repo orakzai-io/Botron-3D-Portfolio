@@ -1,8 +1,7 @@
 /* Self-hosted variable fonts (Fontsource via jsDelivr, OFL licensed).
  * Replaces the fonts.googleapis.com stylesheet: identical unicode-range
  * on-demand subsetting, but same-origin - no third-party DNS/TLS round-trips,
- * no render-blocking external CSS, fully preloaded + cacheable.
- * Regenerate with: node scripts/fetch-fonts.mjs */
+ * no render-blocking external CSS, fully preloaded + cacheable. */
 
 /* Exo 2 - cyrillic-ext */
 @font-face {

@@ -187,18 +187,27 @@
       quoteViewport.addEventListener('mouseenter', stop);
       quoteViewport.addEventListener('mouseleave', restart);
 
+      // threshold 0.15, not 0.35: the deck is max-width 720px but its height is
+      // the tallest quote, so on a short window 0.35 was never reached and the
+      // observer kept reporting isIntersecting=false while the section was
+      // plainly on screen.
       const qIO = new IntersectionObserver(
         (entries) => {
           entries.forEach((en) => {
             en.isIntersecting ? start() : stop();
           });
         },
-        { threshold: 0.35 }
+        { threshold: 0.15 }
       );
-      qIO.observe(quoteViewport);
 
+      // ORDER MATTERS: qIO.observe() must come AFTER go(0)/stop(). This element
+      // is also a .bt-reveal, so the reveal observer above targets the same
+      // node — registering here first let the initial IO callback start the
+      // timer and the reveal path stop it a tick later, freezing the reviews
+      // until an unrelated mouseenter/mouseleave happened to restart them.
       go(0);
       stop(); // wait until scrolled into view before auto-playing
+      qIO.observe(quoteViewport);
     }
   }
 
