@@ -1,6 +1,6 @@
 /* Testimonials — quote carousel deck
-   Extracted verbatim from theme.css lines 983-1163. Do not reorder imports
-   in theme.css — see the cascade note there. */
+   Split out of the original monolithic theme.css; theme.css is now the @import
+   manifest. Do not reorder imports in theme.css: order is load-bearing. */
 
 /* ---------- 4. Testimonials: Carousel Deck ---------- */
 .bt-quotes-viewport {

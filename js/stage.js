@@ -208,7 +208,21 @@ function updateBotronBubble() {
 // per-event canvas reallocs + ScrollTrigger.refresh() jank the compositor
 // exactly while the user is scrolling.
 let _lastAppliedW = window.innerWidth;
+let _lastAppliedH = window.innerHeight;
 let _resizePending = false;
+let _heightSettleTimer = null;
+
+// Single owner of the camera/renderer size sync. Both the width path and the
+// debounced height path call this so they can never drift apart.
+function applyRendererSize() {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.0));
+  _lastAppliedW = window.innerWidth;
+  _lastAppliedH = window.innerHeight;
+}
+
 window.addEventListener(
   'resize',
   () => {
@@ -217,19 +231,40 @@ window.addEventListener(
     requestAnimationFrame(() => {
       _resizePending = false;
       const widthChanged = window.innerWidth !== _lastAppliedW;
+      const heightChanged = window.innerHeight !== _lastAppliedH;
       _bubbleW = 0;
       _bubbleH = 0;
-      // ONLY reallocate WebGL canvas buffer on width changes (orientation flip).
-      // Height-only changes are the collapsing mobile URL bar; canvas is fixed inset:0.
+
       if (widthChanged) {
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.0));
+        // Orientation flip: immediate. This is also the ONLY path that triggers
+        // ScrollTrigger.refresh() (story.onResize in camera-story.js), which
+        // camera-story.js itself gates on widthChanged.
+        clearTimeout(_heightSettleTimer);
+        _heightSettleTimer = null;
+        applyRendererSize();
         story.onResize?.({ widthChanged: true });
-        _lastAppliedW = window.innerWidth;
-      } else {
-        story.onResize?.({ widthChanged: false });
+        return;
+      }
+
+      // Height-only. onResize stays immediate and cheap (relayout +
+      // applyCameraFromScroll, no refresh) so the scroll scrub tracks the new
+      // viewport without waiting on the buffer below.
+      story.onResize?.({ widthChanged: false });
+
+      if (heightChanged) {
+        // The CSS box DOES follow viewport height (.stage-container is
+        // height:100vh and base.css forces the canvas to height:100%!important),
+        // so leaving the drawing buffer at the old size stretches the render
+        // vertically. BUT a raw setSize() per event is exactly the jank the
+        // comment above warns about, and mobile URL-bar collapse fires these
+        // continuously mid-scroll. So debounce on the trailing edge: each new
+        // event resets the timer, so only a SETTLED height reallocates.
+        clearTimeout(_heightSettleTimer);
+        _heightSettleTimer = setTimeout(() => {
+          _heightSettleTimer = null;
+          if (window.innerHeight === _lastAppliedH) return; // reverted
+          applyRendererSize();
+        }, 150);
       }
     });
   },

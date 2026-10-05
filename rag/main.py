@@ -1,7 +1,8 @@
 # rag/main.py
 """
 FastAPI RAG Microservice for BOTRON.
-Integrates Vector Retrieval (FastEmbed + NumPy) with Groq Cloud (Llama 3.3).
+Integrates Vector Retrieval (FastEmbed + NumPy) with Groq Cloud (GPT-OSS / Qwen
+rotation — see GROQ_MODELS).
 """
 
 import asyncio

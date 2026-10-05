@@ -1,6 +1,6 @@
 /* Hero — cinematic split
-   Extracted verbatim from theme.css lines 301-473. Do not reorder imports
-   in theme.css — see the cascade note there. */
+   Split out of the original monolithic theme.css; theme.css is now the @import
+   manifest. Do not reorder imports in theme.css: order is load-bearing. */
 
 /* ---------- hero — cinematic split ---------- */
 @keyframes bAppear {

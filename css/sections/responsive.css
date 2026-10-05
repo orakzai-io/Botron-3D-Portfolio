@@ -1,6 +1,6 @@
 /* Responsive — hero/stage/beats/skills at <=900px
-   Extracted verbatim from theme.css lines 536-638. Do not reorder imports
-   in theme.css — see the cascade note there. */
+   Split out of the original monolithic theme.css; theme.css is now the @import
+   manifest. Do not reorder imports in theme.css: order is load-bearing. */
 
 /* ---------- responsive ---------- */
 @media (max-width: 900px) {

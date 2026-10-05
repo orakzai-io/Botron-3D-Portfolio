@@ -1,6 +1,6 @@
 /* Custom cyber cursor (pointer-fine only)
-   Extracted verbatim from theme.css lines 88-121. Do not reorder imports
-   in theme.css — see the cascade note there. */
+   Split out of the original monolithic theme.css; theme.css is now the @import
+   manifest. Do not reorder imports in theme.css: order is load-bearing. */
 
 /* toggle the custom cursor only on precise pointers */
 .bt-cursor {

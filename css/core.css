@@ -1,6 +1,6 @@
 /* Design tokens, reset, page shell, boot overlay
-   Extracted verbatim from theme.css lines 1-87. Do not reorder imports
-   in theme.css — see the cascade note there. */
+   Split out of the original monolithic theme.css; theme.css is now the @import
+   manifest. Do not reorder imports in theme.css: order is load-bearing. */
 
 /* ============================================================
    BOTRON — POLISHED MECH · black & silver, scarce cyan

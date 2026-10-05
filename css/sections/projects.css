@@ -1,6 +1,6 @@
 /* Projects — 2x2 grid dashboard
-   Extracted verbatim from theme.css lines 743-877. Do not reorder imports
-   in theme.css — see the cascade note there. */
+   Split out of the original monolithic theme.css; theme.css is now the @import
+   manifest. Do not reorder imports in theme.css: order is load-bearing. */
 
 /* ---------- 2. Projects: 2x2 Grid Dashboard ---------- */
 .bt-proj-grid {

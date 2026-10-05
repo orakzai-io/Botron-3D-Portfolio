@@ -46,6 +46,12 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Check formatting
+        # .prettierrc.json is committed, so this is the same config a fresh
+        # clone gets. Runs before the build so a formatting drift is reported
+        # on its own rather than as a deploy failure.
+        run: npm run format:check
+
       - name: Build
         # Vite inlines import.meta.env.VITE_* at BUILD time, so a repository
         # variable does not reach the bundle unless it is explicitly mapped into

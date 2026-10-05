@@ -1,6 +1,6 @@
 /* Contact — unified console + robot stage
-   Extracted verbatim from theme.css lines 1164-1232. Do not reorder imports
-   in theme.css — see the cascade note there. */
+   Split out of the original monolithic theme.css; theme.css is now the @import
+   manifest. Do not reorder imports in theme.css: order is load-bearing. */
 
 /* ---------- 5. Contact: Unified Console & Robot Stage (Option 1) ---------- */
 

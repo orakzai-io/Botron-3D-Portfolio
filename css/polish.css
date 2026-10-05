@@ -1,6 +1,6 @@
 /* Accent + override layer (carries the !important rules that beat base.css)
-   Extracted verbatim from theme.css lines 1357-1762. Do not reorder imports
-   in theme.css — see the cascade note there. */
+   Split out of the original monolithic theme.css; theme.css is now the @import
+   manifest. Do not reorder imports in theme.css: order is load-bearing. */
 
 /* --- ambient aurora atmosphere (static gradients behind the 3D stage) --- */
 body::before,

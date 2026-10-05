@@ -1,6 +1,6 @@
 /* Skills — 3D globe + telemetry HUD
-   Extracted verbatim from theme.css lines 509-535. Do not reorder imports
-   in theme.css — see the cascade note there. */
+   Split out of the original monolithic theme.css; theme.css is now the @import
+   manifest. Do not reorder imports in theme.css: order is load-bearing. */
 
 /* ---------- skills: 3D holographic globe & telemetry HUD ---------- */
 .bt-beat--skills {

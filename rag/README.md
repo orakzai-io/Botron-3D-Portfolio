@@ -97,7 +97,9 @@ Copy `.env.example` to `.env`:
 | :--- | :--- | :--- |
 | `GROQ_API_KEY` | — | **Required.** From [console.groq.com](https://console.groq.com) |
 | `GROQ_MODELS` | `openai/gpt-oss-120b,qwen/qwen3.8-27b,openai/gpt-oss-20b` | Tried in order; a 429 fails over to the next |
-| `MIN_SIMILARITY` | `0.06` | Use `0.35` in production (dense backend) |
+| `MIN_SIMILARITY` | unset | Overrides BOTH floors below. Leave it unset unless you run a single backend — setting it applies to dense and lexical alike |
+| `DENSE_MIN_SIMILARITY` | `0.35` | Dense backend floor. Tuned on 20 on-topic + 20 off-topic queries |
+| `LEXICAL_MIN_SIMILARITY` | `0.06` | Lexical backend floor (IDF path) |
 | `PORT` | `8000` | Cloud hosts usually inject this |
 
 `top_k` and query length are validated by Pydantic (`ge=1, le=10`, `max_length=2000`)
@@ -106,11 +108,12 @@ prompt.
 
 ### ⚠️ `load_dotenv()` ordering
 
-`main.py` calls `load_dotenv()` **before** `from rag import retriever`. This is
-load-bearing: importing `rag` executes its module body, which reads `MIN_SIMILARITY`
-from the environment. With the import first, the `.env` value was silently discarded
-and the hardcoded default was always used. There is a `# noqa: E402` on that import so
-a formatter or linter does not helpfully reorder it back.
+`main.py` calls `load_dotenv()` **before** `from retriever import retriever`. This is
+load-bearing: importing `retriever` executes its module body, which reads the
+similarity floors from the environment. With the import first, the `.env` values
+were silently discarded and the hardcoded defaults were always used. Keep the
+import below `load_dotenv()` — there is no lint suppression on it, so be careful
+that an import-sorting tool does not helpfully reorder it back.
 
 ## Running locally
 

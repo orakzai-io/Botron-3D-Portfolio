@@ -3,7 +3,6 @@
 (function () {
   const fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
   const root = document.documentElement;
-  const coarseMQ = window.matchMedia('(hover: none) and (pointer: coarse)');
   const LIT_CARDS = '.bt-proj, .bt-timeline-card, .bt-edu, .bt-quote';
   if (fine) root.classList.add('bt-cursor-on');
 
@@ -126,7 +125,7 @@
   document.querySelectorAll('.bt-beat, .bt-reveal').forEach((el) => io.observe(el));
 
   // ============================================================
-  // Testimonials carousel — prev/next + dots, 6s auto-advance
+  // Testimonials carousel — prev/next + dots, 2s auto-advance
   // paused on hover and whenever the viewport is off-screen.
   // ============================================================
   const quoteViewport = document.querySelector('.bt-quotes-viewport');

@@ -125,12 +125,11 @@ VITE_RAG_API_URL=http://localhost:8000/chat
 │   └── knowledge.py      # the indexed knowledge chunks
 ```
 
-> **Not in this repository.** `.prettierrc.json` / `.prettierignore` are a personal
-> formatting preference and are excluded locally, as is `docs/` (internal
-> architecture notes). Prettier still runs without them using its defaults, so
-> `npm run format` works for anyone who clones — but note that the shipped code was
-> formatted with the local config, so `npm run format:check` will report diffs on a
-> fresh clone. That is expected, not a bug.
+> **Not in this repository.** `docs/` holds internal architecture notes and is
+> excluded via `.git/info/exclude`. Everything a contributor needs to match the
+> shipped formatting — `.prettierrc.json` and `.prettierignore` — **is** committed,
+> so `npm run format:check` passes on a fresh clone and CI enforces it on every
+> push.
 
 > **Two `assets` directories, on purpose.** `assets/` holds files the bundler
 > processes — they are imported in JS, content-hashed, and emitted to `dist/assets/`.

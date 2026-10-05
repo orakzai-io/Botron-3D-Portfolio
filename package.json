@@ -4,6 +4,16 @@
   "version": "1.0.0",
   "type": "module",
   "description": "Static portfolio (BOTRON) — built with Vite, output is pure static files",
+  "author": "Shahsawar Orakzai",
+  "license": "MIT",
+  "homepage": "https://orakzai.io/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/orakzai-io/Botron-3D-Portfolio.git"
+  },
+  "bugs": {
+    "url": "https://github.com/orakzai-io/Botron-3D-Portfolio/issues"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",

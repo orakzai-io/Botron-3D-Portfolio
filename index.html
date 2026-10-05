@@ -4,6 +4,37 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>Shahsawar Orakzai | Full-Stack AI Engineer</title>
+    <meta
+      name="description"
+      content="Scroll-driven 3D portfolio: a WebGL mech that follows you down the page, tracks your cursor with inverse kinematics, and answers questions with real vector retrieval instead of canned replies."
+    />
+    <link rel="canonical" href="https://orakzai.io/" />
+
+    <!-- Social preview. No og:image on purpose: the only image available is a UI
+         screenshot, and OG wants a 1200x630 PNG/JPG (LinkedIn ignores WebP).
+         Add og:image + twitter:image once a real card asset exists — an
+         unresolvable image URL renders a worse preview than none at all. -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Shahsawar Orakzai" />
+    <meta property="og:url" content="https://orakzai.io/" />
+    <meta property="og:title" content="Shahsawar Orakzai | Full-Stack AI Engineer" />
+    <meta
+      property="og:description"
+      content="Scroll-driven 3D portfolio: a WebGL mech that follows you down the page, tracks your cursor with inverse kinematics, and answers questions with real vector retrieval instead of canned replies."
+    />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Shahsawar Orakzai | Full-Stack AI Engineer" />
+    <meta
+      name="twitter:description"
+      content="Scroll-driven 3D portfolio: a WebGL mech that follows you down the page, tracks your cursor with inverse kinematics, and answers questions with real vector retrieval instead of canned replies."
+    />
+    <meta name="theme-color" content="#04050a" />
+    <!-- Inline SVG favicon: matches --bg/--cyan from css/core.css and needs no
+         extra request, so it cannot 404 on a fresh clone. -->
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%2304050a'/%3E%3Ccircle cx='32' cy='32' r='15' fill='none' stroke='%2300f0ff' stroke-width='5'/%3E%3Ccircle cx='32' cy='32' r='5' fill='%2300f0ff'/%3E%3C/svg%3E"
+    />
     <link rel="stylesheet" href="css/base.css" />
 
     <!-- Quality tiers were removed on purpose: the site ships ONE look on every
@@ -18,13 +49,6 @@
     <link
       rel="preload"
       href="assets/fonts/jetbrains-mono-latin.woff2"
-      as="font"
-      type="font/woff2"
-      crossorigin
-    />
-    <link
-      rel="preload"
-      href="assets/fonts/space-grotesk-latin.woff2"
       as="font"
       type="font/woff2"
       crossorigin
@@ -99,14 +123,6 @@
       // event, gate bug). The gate's own BOOT_MAX_MS (3.5s) covers the normal
       // path; this only exists for the case where the gate never ran.
       setTimeout(__bBootReveal, 8000);
-
-      // HF Space iframe fix: IntersectionObserver may not fire inside sandboxed iframes.
-      // After 2.5s, force-reveal any sections that are still hidden.
-      setTimeout(function () {
-        document.querySelectorAll('.bt-reveal, .bt-beat').forEach(function (el) {
-          el.classList.add('is-in');
-        });
-      }, 2500);
     </script>
     <div class="bt-cursor" id="bt-cursor" aria-hidden="true">
       <span class="bt-cursor-ring"><i></i><i></i><i></i><i></i></span>

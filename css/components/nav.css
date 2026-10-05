@@ -1,6 +1,6 @@
 /* Flat navbar, brand cube, status pill, burger + mobile drawer, scroll hairline
-   Extracted verbatim from theme.css lines 122-280. Do not reorder imports
-   in theme.css — see the cascade note there. */
+   Split out of the original monolithic theme.css; theme.css is now the @import
+   manifest. Do not reorder imports in theme.css: order is load-bearing. */
 
 /* navigation — flat black panel, silver hairline progress */
 .bt-nav {
