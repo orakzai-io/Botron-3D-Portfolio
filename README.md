@@ -2,7 +2,7 @@
 
 A scroll-driven 3D portfolio featuring an integrated retrieval-augmented chatbot. A WebGL robot follows scroll progress down the page, tracks the cursor using inverse kinematics, and answers questions about projects using vector search over a structured knowledge base.
 
-**Live:** [orakzai.io](https://orakzai.io) | **Contact:** shahsawar.dev@gmail.com
+**Live:** [orakzai-io.github.io](https://orakzai-io.github.io) | **Contact:** shahsawar.dev@gmail.com
 
 <video src="https://github.com/user-attachments/assets/afdd3e64-6152-4805-8645-fafef5768bb6"
        autoplay loop muted playsinline width="100%"></video>

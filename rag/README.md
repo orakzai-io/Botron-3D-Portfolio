@@ -1,6 +1,6 @@
 # BOTRON RAG Backend
 
-FastAPI microservice powering the chatbot on [orakzai.io](https://orakzai.io). It receives user questions, retrieves relevant chunks from a structured knowledge base, and queries Groq LLMs grounded strictly in the retrieved context.
+FastAPI microservice powering the chatbot on [orakzai-io.github.io](https://orakzai-io.github.io). It receives user questions, retrieves relevant chunks from a structured knowledge base, and queries Groq LLMs grounded strictly in the retrieved context.
 
 ## Request Lifecycle
 

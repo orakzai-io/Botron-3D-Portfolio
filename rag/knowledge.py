@@ -31,7 +31,7 @@ CHUNKS = [
             "• Location: Peshawar, Pakistan\n"
             "• Email: shahsawar.dev@gmail.com\n"
             "• Phone: +92 343 8925150\n"
-            "• Portfolio: https://orakzai.io\n"
+            "• Portfolio: https://orakzai-io.github.io\n"
             "• GitHub: https://github.com/orakzai-io\n"
             "• LinkedIn: https://linkedin.com/in/orakzai-io\n"
             "• Hugging Face: https://huggingface.co/orakzai-io\n"
@@ -178,7 +178,7 @@ CHUNKS = [
         "title": "Project Deep-Dive — 3D Cyber-Mech Portfolio & BOTRON AI Assistant",
         "category": "projects",
         "content": (
-            "Personal 3D Interactive Portfolio (orakzai.io):\n"
+            "Personal 3D Interactive Portfolio (orakzai-io.github.io):\n"
             "• Concept & Vision: A living cyberpunk 3D WebGL experience moving away from generic static templates. "
             "Starred by BOTRON, an interactive 3D robot model with real-time inverse-kinematics cursor gaze tracking and procedural dot-matrix LED eyes.\n"
             "• 3D & Graphics Engine: Custom Three.js stage, PMREM environment lighting, procedural room reflection, mathematical 3D spherical skills globe "
@@ -188,7 +188,7 @@ CHUNKS = [
             "• Deliberate Low-Power Render Path: The Three.js renderer requests a low-power GPU, disables antialiasing and shadow maps, drops the ground plane, and runs 70 atmosphere particles.\n"
             "• AI Assistant (BOTRON): Autonomous AI wired to a vector RAG pipeline with Groq LLM (120B/27B/20B automatic multi-model failover).\n"
             "• Code Repository: https://github.com/orakzai-io/Personal-Portfolio.git\n"
-            "• Live Website: https://orakzai.io"
+            "• Live Website: https://orakzai-io.github.io"
         ),
     },
     {
@@ -254,7 +254,7 @@ CHUNKS = [
             "• Email: shahsawar.dev@gmail.com | shaso@orakzai.io\n"
             "• Phone: +92 343 8925150\n"
             "• Direct Message Form: Available on portfolio via Formspree (https://formspree.io/f/meevnwzk)\n"
-            "• Portfolio: https://orakzai.io\n"
+            "• Portfolio: https://orakzai-io.github.io\n"
             "• LinkedIn: https://linkedin.com/in/orakzai-io\n"
             "• GitHub: https://github.com/orakzai-io\n"
             "• Twitter / X: https://x.com/orakzai_io\n"
