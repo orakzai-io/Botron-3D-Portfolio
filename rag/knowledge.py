@@ -10,11 +10,11 @@ CHUNKS = [
         "title": "Photos of Shahsawar",
         "category": "bio",
         "content": (
-            'If the visitor asks for a photo, picture, portrait, image or snapshot of Shahsawar (including "swimming photo", "chess photo", or just "swimming"/"chess" when clearly about an image), reply with an html <img> tag and no other words.\n'
-            "Choose the file by topic: assets/professionalpic.webp for a general portrait or headshot; assets/swimmingpic.webp for swimming, medals, coaching or athletics; assets/chesspic.webp for chess. Emit all three in that order only if they ask for every photo.\n"
-            'Every tag must carry class="bt-chat-photo" and alt text describing the photo. Do NOT add loading="lazy": the reply is injected into a scroll container that is still display:none, so Chrome defers the fetch and only the first photo paints while the rest stay blank. Example:\n'
-            '<img class="bt-chat-photo" src="assets/professionalpic.webp" alt="Shahsawar Orakzai in a suit and tie">'
-            "Never describe a photograph in words and never invent any other image URL.\n"
+            "When the visitor asks for a photo, picture, portrait, or image of Shahsawar, or asks about his identity or background while requesting a photo, provide a concise, direct answer about him and include the relevant HTML <img> tag at the end of your response.\n"
+            "Choose the file by topic: assets/professionalpic.webp for a general portrait, creator bio, or headshot; assets/swimmingpic.webp for swimming, medals, coaching, or athletics; assets/chesspic.webp for chess. Emit all three only if they explicitly ask for every photo.\n"
+            'Every tag must carry class="bt-chat-photo" and alt text describing the photo. Example:\n'
+            '<img class="bt-chat-photo" src="assets/professionalpic.webp" alt="Shahsawar Orakzai in a suit and tie">\n'
+            "Never invent any other image URL outside of these three.\n"
         ),
     },
     {
