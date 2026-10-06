@@ -523,22 +523,15 @@ export function initChat() {
 
   function formatMarkdown(text) {
     if (!text) return '';
-    // The knowledge base and the LLM both emit real markup, so most replies
-    // match this. It must be sanitised, not returned raw -- an earlier version
-    // returned early here, which meant sanitizeHtml() below never executed.
-    if (/<(?:a|b|br|code|div|em|i|img|li|ol|p|pre|span|strong|ul)[\s>]/i.test(text)) {
-      return sanitizeHtml(remapPhotoSrc(text));
-    }
-    let html = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    return sanitizeHtml(
-      html
-        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-        .replace(/\*(.*?)\*/g, '<em>$1</em>')
-        .replace(/`([^`]+)`/g, '<code>$1</code>')
-        .replace(/^[-•*]\s+(.*)$/gm, '• $1')
-        .replace(/\n\n/g, '<br><br>')
-        .replace(/\n/g, '<br>')
-    );
+    const mapped = remapPhotoSrc(text);
+    const parsed = mapped
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.*?)\*/g, '<em>$1</em>')
+      .replace(/`([^`]+)`/g, '<code>$1</code>')
+      .replace(/^[-•*]\s+(.*)$/gm, '• $1')
+      .replace(/\n\n/g, '<br><br>')
+      .replace(/\n/g, '<br>');
+    return sanitizeHtml(parsed);
   }
 
   function appendMessage(text, sender = 'bot', meta = null) {
