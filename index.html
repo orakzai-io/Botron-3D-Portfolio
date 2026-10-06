@@ -10,10 +10,7 @@
     />
     <link rel="canonical" href="https://orakzai-io.github.io/" />
 
-    <!-- Social preview. No og:image on purpose: the only image available is a UI
-         screenshot, and OG wants a 1200x630 PNG/JPG (LinkedIn ignores WebP).
-         Add og:image + twitter:image once a real card asset exists — an
-         unresolvable image URL renders a worse preview than none at all. -->
+    <!-- Social Preview (Open Graph & Twitter Cards) -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Shahsawar Orakzai" />
     <meta property="og:url" content="https://orakzai-io.github.io/" />
@@ -22,12 +19,20 @@
       property="og:description"
       content="Scroll-driven 3D portfolio: a WebGL mech that follows you down the page, tracks your cursor with inverse kinematics, and answers questions with real vector retrieval instead of canned replies."
     />
-    <meta name="twitter:card" content="summary" />
+    <meta property="og:image" content="https://orakzai-io.github.io/og-image.png" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Shahsawar Orakzai - 3D Cyber-Mech Portfolio with BOTRON RAG Chatbot" />
+
+    <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Shahsawar Orakzai | Full-Stack AI Engineer" />
     <meta
       name="twitter:description"
       content="Scroll-driven 3D portfolio: a WebGL mech that follows you down the page, tracks your cursor with inverse kinematics, and answers questions with real vector retrieval instead of canned replies."
     />
+    <meta name="twitter:image" content="https://orakzai-io.github.io/og-image.png" />
+    <meta name="twitter:image:alt" content="Shahsawar Orakzai - 3D Cyber-Mech Portfolio with BOTRON RAG Chatbot" />
     <meta name="theme-color" content="#04050a" />
     <!-- Inline SVG favicon: matches --bg/--cyan from css/core.css and needs no
          extra request, so it cannot 404 on a fresh clone. -->
