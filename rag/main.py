@@ -62,7 +62,7 @@ _allowed_origins = [
     origin.strip()
     for origin in os.getenv(
         "ALLOWED_ORIGINS",
-        "https://orakzai.io,https://www.orakzai.io,https://orakzai-io.github.io",
+        "https://orakzai.io,https://www.orakzai.io,https://orakzai-io.github.io,http://localhost:5173,http://localhost:3000",
     ).split(",")
     if origin.strip()
 ]
