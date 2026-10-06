@@ -12,13 +12,14 @@ import time
 from contextlib import asynccontextmanager
 
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
 load_dotenv()
 
 from retriever import retriever
+from analytics import log_query
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("botron-api")
@@ -166,15 +167,24 @@ def health():
 
 
 @app.post("/chat", response_model=ChatResponse)
-def chat(payload: ChatRequest):
+def chat(payload: ChatRequest, request: Request):
     query = payload.query.strip()
     if not query:
         raise HTTPException(status_code=400, detail="Query cannot be empty.")
+
+    # Extract client IP, honouring X-Forwarded-For set by reverse proxies
+    # (Railway, Render, Cloudflare). The leftmost address in the header is the
+    # originating client; subsequent entries are intermediate proxies.
+    # This value is passed to the telemetry sink for geo resolution only and
+    # is never written to any persistent store.
+    _forwarded = request.headers.get("X-Forwarded-For", "")
+    client_ip = (_forwarded.split(",")[0].strip() if _forwarded else request.client.host)
 
     # 1. RAG Vector Retrieval Step
     top_chunks, retrieval_ms = retriever.retrieve(query, top_k=payload.top_k)
 
     if not top_chunks:
+        log_query(query, answered=False, top_score=None, model_used=None, client_ip=client_ip)
         return ChatResponse(
             answer=(
                 "I don't have anything indexed on that. My knowledge base covers Shahsawar's "
@@ -244,6 +254,7 @@ def chat(payload: ChatRequest):
             answer = chat_completion.choices[0].message.content
             gen_ms = (time.perf_counter() - t_gen_start) * 1000
             logger.info("Success with '%s' in %.1fms.", model_name, gen_ms)
+            log_query(query, answered=True, top_score=top_chunks[0]["similarity"], model_used=model_name, client_ip=client_ip)
 
             return ChatResponse(
                 answer=answer,
