@@ -2,9 +2,9 @@
 """
 BOTRON Query Telemetry Sink.
 
-Captures per-request telemetry vectors — query text, cosine similarity score,
+Captures per-request telemetry vectors - query text, cosine similarity score,
 LLM model identifier, retrieval outcome (answered/refused), and derived
-geolocation attributes — and persists them to a Supabase Postgres table for
+geolocation attributes - and persists them to a Supabase Postgres table for
 offline RAG quality analysis and knowledge gap identification.
 
 DATA PIPELINE
@@ -12,7 +12,7 @@ DATA PIPELINE
 All inserts are dispatched as fire-and-forget daemon threads; the /chat
 request-response cycle completes before any I/O to Supabase or ip-api.com
 occurs. The client IP is resolved to (country, city) within the thread and
-is not forwarded to the Supabase payload — only the derived geo attributes
+is not forwarded to the Supabase payload - only the derived geo attributes
 are persisted. RFC 1918 and loopback addresses are filtered before any
 external geo lookup is attempted.
 
@@ -61,7 +61,7 @@ if _url and _key:
         logger.warning("Query telemetry init failed (non-fatal): %s", exc)
 else:
     logger.info(
-        "SUPABASE_URL / SUPABASE_KEY not set — query telemetry disabled."
+        "SUPABASE_URL / SUPABASE_KEY not set - query telemetry disabled."
     )
 
 # Private IPs and loopback ranges that must never be forwarded to a geo API.
@@ -80,7 +80,7 @@ def _resolve_geo(ip: str) -> tuple[str | None, str | None]:
     can store NULL without raising.
 
     The raw IP is used only within this function scope and is discarded
-    immediately after the HTTP response is parsed — it is never written
+    immediately after the HTTP response is parsed - it is never written
     to any persistent store.
     """
     if not ip or any(ip.startswith(p) for p in _PRIVATE_PREFIXES):
@@ -118,7 +118,7 @@ def log_query(
     (country, city) via ip-api.com, (2) constructs the row payload, and
     (3) executes a single Supabase insert. The thread is detached so /chat
     latency is unaffected. Any exception in either step is caught and logged
-    at WARNING level — a failed telemetry write must never propagate as an
+    at WARNING level - a failed telemetry write must never propagate as an
     API error.
 
     client_ip is consumed by _resolve_geo() within the thread scope and is
